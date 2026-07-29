@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="no-referrer" />
 <title>清新工作台</title>
 <style>
   :root {
@@ -250,12 +251,88 @@
   }
   .app-card:hover { border-color: var(--mint); transform: translateY(-2px); box-shadow: var(--shadow); }
   .app-card:active { transform: scale(.97); }
+  /* 热点聚合 */
+  .hot-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .hot-tip { font-size: 12px; color: var(--ink-soft); }
+  .hot-card { background: #fbfdfc; border: 1.5px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; }
+  .hot-card-title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+  .hot-card-title .ic { font-size: 18px; }
+  .hot-card-title .cached { font-size: 11px; font-weight: 400; color: var(--ink-soft); background: #eef4f1; border-radius: 8px; padding: 1px 8px; }
+  .hot-list { display: flex; flex-direction: column; gap: 2px; }
+  .hot-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; text-decoration: none; color: var(--ink); transition: background .15s; }
+  .hot-item:hover { background: #eef6f3; }
+  .hot-rank { width: 22px; height: 22px; flex: 0 0 22px; border-radius: 6px; background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .hot-name { flex: 1; font-size: 14px; line-height: 1.4; word-break: break-word; }
+  .hot-hot { font-size: 12px; color: var(--mint-deep); font-weight: 700; white-space: nowrap; }
+
+  /* 精神食粮 - 视频卡片 */
+  .feed-tabs { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .feed-tab { border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px; }
+  .feed-tab.active, .feed-tab:hover { border-color: var(--mint); color: var(--mint-deep); background: #eef6f3; }
+  .feed-grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .vcard { display: block; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden; text-decoration: none; color: var(--ink); transition: transform .15s, box-shadow .15s; }
+  .vcard:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(40,170,140,.15); }
+  .vcard-thumb { position: relative; aspect-ratio: 16 / 10; background: #eef2f1 center/cover no-repeat; }
+  .vcard-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vcard-thumb.noimg { background: linear-gradient(135deg, #e8f4ef, #dcefe9); }
+  .vcard-thumb.noimg::before { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 28px; color: var(--mint-deep); opacity: .5; }
+  .vcard-dur { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.62); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 6px; }
+  .vcard-meta { padding: 10px 12px 12px; }
+  .vcard-title { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--ink); max-height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .vcard-sub { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; font-size: 12px; color: var(--ink-soft); }
+  .feed-cat-head { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .feed-cat-head .ic { font-size: 18px; }
+  .feed-cat-head .cached { font-size: 11px; font-weight: 400; color: var(--ink-soft); background: #eef4f1; border-radius: 8px; padding: 1px 8px; }
+  .hot-fallback { font-size: 13px; color: var(--ink-soft); padding: 6px 2px; }
+  .hot-fallback a { color: var(--mint-deep); font-weight: 700; text-decoration: none; }
   .app-ic { font-size:26px; line-height:1; }
   .app-name { font-size:14px; font-weight:600; color: var(--ink); }
   .app-hint { color: var(--ink-soft); font-size:13px; margin-bottom:14px; }
   .jump .ic { font-size:18px; }
 
   .empty { color: var(--ink-soft); font-size: 14px; text-align:center; padding: 24px; }
+
+  /* 习惯打卡 */
+  .habit-row { background: #fbfdfc; border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+  .habit-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .habit-name { font-size: 16px; font-weight: 700; color: var(--ink); flex: 1; min-width: 120px; word-break: break-word; }
+  .habit-count { font-size: 13px; color: var(--ink-soft); }
+  .habit-count b { color: var(--mint-deep); font-size: 16px; }
+  .habit-acts { display: flex; align-items: center; gap: 8px; }
+  .habit-acts .btn { padding: 7px 14px; font-size: 13px; }
+  .habit-cal { margin-top: 14px; border-top: 1.5px dashed var(--line); padding-top: 14px; }
+  .cal-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .cal-nav { border: 1.5px solid var(--line); background: #fff; color: var(--mint-deep); width: 30px; height: 30px; border-radius: 9px; cursor: pointer; font-size: 16px; font-weight: 700; }
+  .cal-nav:hover { background: var(--line); }
+  .cal-label { font-weight: 700; color: var(--ink); min-width: 96px; text-align: center; }
+  .cal-mode { margin-left: auto; border: 1.5px solid var(--mint); background: #fff; color: var(--mint-deep); font-size: 12px; padding: 5px 12px; border-radius: 9px; cursor: pointer; font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 360px; }
+  .cal-grid.mini { gap: 3px; max-width: none; }
+  .cal-wk { text-align: center; font-size: 12px; color: var(--ink-soft); font-weight: 700; padding: 2px 0; }
+  .cal-cell { text-align: center; font-size: 13px; padding: 7px 0; border-radius: 9px; background: #f3f8f6; color: var(--ink-soft); }
+  .cal-grid.mini .cal-cell { font-size: 10px; padding: 4px 0; }
+  .cal-cell.empty { background: transparent; }
+  .cal-cell.on { background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; font-weight: 700; }
+  .cal-year { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .cal-month { background: #fbfdfc; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; }
+  .cal-month .mt { font-size: 12px; font-weight: 700; color: var(--mint-deep); text-align: center; margin-bottom: 6px; }
+  .cal-year-total { margin-top: 14px; text-align: center; font-weight: 700; color: var(--mint-deep); }
+  .habit-sel { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 10px; font-size: 14px; color: var(--ink); background: #fbfdfc; outline: none; }
+  .rec-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .rec-bar .btn.active { background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; border-color: var(--mint); }
+  .rec-tip { font-size: 12px; color: var(--ink-soft); }
+  .rec-panel { background: linear-gradient(135deg, #f1fbf8, #f3f9fe); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+  .cal-cell { position: relative; }
+  .cal-grid:not(.mini) .cal-cell.on { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 0; }
+  .cnt-badge { font-size: 10px; line-height: 1; opacity: .95; }
+  .cal-month-total { font-size: 11px; color: var(--ink-soft); text-align: center; margin-bottom: 6px; }
+  .habit-acts .btn:disabled { opacity: .55; cursor: default; box-shadow: none; transform: none; }
+  .rec-perhabit { margin-top: 14px; background: #fff; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .rec-perhabit-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .rec-perhabit-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-top: 1px dashed var(--line); }
+  .rec-perhabit-item:first-of-type { border-top: none; }
+  .rec-perhabit-item .nm { font-size: 14px; color: var(--ink); word-break: break-word; }
+  .rec-perhabit-item .vl { font-size: 14px; font-weight: 700; color: var(--mint-deep); white-space: nowrap; margin-left: 12px; }
 
   /* 同步栏 */
   .syncbar {
@@ -313,6 +390,9 @@
     <button class="tab" data-view="todo">待做事项</button>
     <button class="tab" data-view="idea">灵感</button>
     <button class="tab" data-view="app">APP分享</button>
+    <button class="tab" data-view="habit">习惯打卡</button>
+    <button class="tab" data-view="hot">热点</button>
+    <button class="tab" data-view="feed">精神食粮</button>
   </nav>
   <div class="syncbar">
     <span class="sync-status" id="sync-status">连接中…</span>
@@ -322,14 +402,6 @@
     <button class="sbtn" id="sync-now">立即同步</button>
     <button class="sbtn" id="sync-export">导出</button>
     <button class="sbtn" id="sync-import">导入</button>
-    <span class="autobk">自动备份
-      <select id="autobackup">
-        <option value="off">关闭</option>
-        <option value="daily">每天一次</option>
-        <option value="open">每次打开</option>
-      </select>
-      <span id="autobk-status"></span>
-    </span>
     <input type="file" id="sync-file" accept="application/json,.json" style="display:none" />
   </div>
 </header>
@@ -436,6 +508,52 @@
       <div class="app-grid" id="app-list"></div>
     </div>
   </section>
+
+  <!-- 习惯打卡 -->
+  <section class="view" id="view-habit">
+    <div class="panel">
+      <h2>✅ 习惯打卡</h2>
+      <div class="sub">添加习惯，可选「每天1次」或「每天多次」；自动累计次数，可查看所有习惯合并的月 / 年打卡记录</div>
+      <div class="add-row">
+        <input type="text" id="habit-input" class="grow" placeholder="例如：每天喝水 / 读书30分钟 / 运动…" />
+        <select id="habit-perday" class="habit-sel">
+          <option value="once">每天1次</option>
+          <option value="multi">每天多次</option>
+        </select>
+        <button class="btn" id="habit-add">添加</button>
+      </div>
+      <div class="rec-bar">
+        <button class="btn ghost" id="habit-record">📊 累计记录</button>
+        <span class="rec-tip">查看所有习惯合并在一起的打卡日历</span>
+      </div>
+      <div id="habit-record-panel"></div>
+      <div id="habit-list"></div>
+    </div>
+  </section>
+
+  <!-- 热点 -->
+  <section class="view" id="view-hot">
+    <h2>🔥 热点聚合</h2>
+    <div class="sub">自动提取各平台实时热搜，点击标题看原帖；每 5 分钟自动刷新一次，也可点「全部刷新」手动更新。</div>
+    <div class="hot-bar">
+      <button class="btn" id="hot-refresh">🔄 全部刷新</button>
+      <span class="hot-tip" id="hot-tip"></span>
+    </div>
+    <div id="hot-list"></div>
+  </section>
+
+  <!-- 精神食粮 -->
+  <section class="view" id="view-feed">
+    <h2>🍱 精神食粮</h2>
+    <div class="sub">全网热门的运动教学 / 化妆 / 健身身材视频，实时更新；点卡片直接跳 B站观看。每 5 分钟自动刷新，也可点「刷新 / 换一批」。</div>
+    <div class="feed-tabs" id="feed-tabs"></div>
+    <div class="hot-bar">
+      <button class="btn" id="feed-refresh">🔄 刷新</button>
+      <button class="btn ghost" id="feed-next">🔁 换一批</button>
+      <span class="hot-tip" id="feed-tip"></span>
+    </div>
+    <div id="feed-grid"></div>
+  </section>
 </main>
 
 <script>
@@ -522,6 +640,8 @@
       document.querySelectorAll(".view").forEach((x) => x.classList.remove("active"));
       t.classList.add("active");
       $("#view-" + t.dataset.view).classList.add("active");
+      if (t.dataset.view === "hot") loadAllHot(false);
+      if (t.dataset.view === "feed") loadFeed();
     });
   });
 
@@ -699,6 +819,7 @@
     if (typeof renderCalendar === "function") renderCalendar();
     if (typeof renderTodos === "function") renderTodos();
     if (typeof renderIdeas === "function") renderIdeas();
+    if (typeof renderHabits === "function") renderHabits();
   }
   showBoard();
   $("#sync-copy").onclick = function () {
@@ -757,35 +878,7 @@
     e.target.value = "";
   });
 
-  /* 自动备份（定时把数据导出成 JSON 存到你电脑，脱离任何账号也能恢复） */
-  const autobkSel = $("#autobackup");
-  const autobkStatus = $("#autobk-status");
-  function fmtTime(ts) {
-    if (!ts) return "从未";
-    const d = new Date(Number(ts)), p = (n) => String(n).padStart(2, "0");
-    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
-  }
-  function updateAutobkStatus() {
-    const last = Number(localStorage.getItem("wb_lastbackup") || 0);
-    autobkStatus.innerHTML = "上次 <b>" + fmtTime(last) + "</b>";
-  }
-  function runAutoBackup() {
-    const mode = autobkSel.value;
-    if (mode === "off") { updateAutobkStatus(); return; }
-    const last = Number(localStorage.getItem("wb_lastbackup") || 0);
-    const now = Date.now();
-    if (mode === "daily" && last && now - last < 24 * 3600 * 1000) { updateAutobkStatus(); return; }
-    exportData();
-    localStorage.setItem("wb_lastbackup", String(now));
-    updateAutobkStatus();
-  }
-  autobkSel.value = localStorage.getItem("wb_autobackup") || "daily";
-  autobkSel.addEventListener("change", function () {
-    localStorage.setItem("wb_autobackup", autobkSel.value);
-    if (autobkSel.value !== "off") runAutoBackup(); else updateAutobkStatus();
-  });
-  updateAutobkStatus();
-  setTimeout(runAutoBackup, 1500);
+  /* 自动备份已取消（用户要求） */
 
   /* ---------- APP分享（URL Scheme 唤起手机APP） ---------- */
   const APPS = [
@@ -797,9 +890,13 @@
     { name: "京东", ic: "🛒", scheme: "openapp.jdmobile://", web: "https://m.jd.com", cat: "购物" },
     { name: "淘宝", ic: "🛍️", scheme: "taobao://", web: "https://www.taobao.com", cat: "购物" },
     { name: "拼多多", ic: "📦", scheme: "pinduoduo://", web: "https://mobile.yangkeduo.com", cat: "购物" },
+    { name: "美团", ic: "🍜", scheme: "imeituan://", web: "https://www.meituan.com", cat: "购物" },
+    { name: "闲鱼", ic: "🐟", scheme: "fleamarket://", web: "https://www.goofish.com", cat: "购物" },
+    { name: "山姆会员商店", ic: "🏬", scheme: "samsclub://", web: "https://www.samsclub.cn", cat: "购物" },
     { name: "支付宝", ic: "💙", scheme: "alipay://", web: "https://www.alipay.com", cat: "金融" },
     { name: "京东金融", ic: "🏦", scheme: "jrjd://", web: "https://jr.jd.com", cat: "金融" },
-    { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具" }
+    { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具" },
+    { name: "百度网盘", ic: "☁️", scheme: "baidunetdisk://", web: "https://pan.baidu.com", cat: "工具" }
   ];
   const APP_CATS = ["内容娱乐", "购物", "金融", "工具"];
   function openApp(app) {
@@ -836,9 +933,486 @@
     });
   })();
 
+  /* ---------- 习惯打卡 ---------- */
+  let habits = store.get("wb_habits", []);
+  const habitCal = { id: null, mode: "month", y: new Date().getFullYear(), m: new Date().getMonth() };
+  function saveHabits() { store.set("wb_habits", habits); }
+  let habitRecordOpen = false;
+  function cntOf(checks, ds) { const v = checks[ds]; return typeof v === "number" ? v : (v ? 1 : 0); }
+  function monthGrid(y, m, counts, opts) {
+    opts = opts || {};
+    const grid = document.createElement("div");
+    grid.className = "cal-grid" + (opts.mini ? " mini" : "");
+    ["日", "一", "二", "三", "四", "五", "六"].forEach((w) => { const c = document.createElement("div"); c.className = "cal-wk"; c.textContent = w; grid.appendChild(c); });
+    const first = new Date(y, m, 1).getDay();
+    const days = new Date(y, m + 1, 0).getDate();
+    for (let i = 0; i < first; i++) { const e = document.createElement("div"); e.className = "cal-cell empty"; grid.appendChild(e); }
+    for (let d = 1; d <= days; d++) {
+      const ds = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+      const count = counts[ds] || 0;
+      const cell = document.createElement("div");
+      cell.className = "cal-cell" + (count > 0 ? " on" : "");
+      cell.textContent = d;
+      if (opts.showNum && count > 0) { const b = document.createElement("span"); b.className = "cnt-badge"; b.textContent = count; cell.appendChild(b); }
+      grid.appendChild(cell);
+    }
+    return grid;
+  }
+  function allCounts() {
+    const map = {};
+    habits.forEach((h) => { const checks = h.checks || {}; for (const ds in checks) { map[ds] = (map[ds] || 0) + cntOf(checks, ds); } });
+    return map;
+  }
+  function monthTotal(counts, y, m) { const p = y + "-" + String(m + 1).padStart(2, "0"); let s = 0; for (const ds in counts) if (ds.slice(0, 7) === p) s += counts[ds]; return s; }
+  function habitRangeTotal(checks, y, m) { const prefix = m === null ? (y + "-") : (y + "-" + String(m + 1).padStart(2, "0")); let s = 0; for (const ds in checks) if (ds.slice(0, prefix.length) === prefix) s += cntOf(checks, ds); return s; }
+  function appendPerHabit(wrap, title, y, m) {
+    if (!habits.length) return;
+    const ph = document.createElement("div"); ph.className = "rec-perhabit";
+    const pht = document.createElement("div"); pht.className = "rec-perhabit-title"; pht.textContent = title; ph.appendChild(pht);
+    habits.forEach((h) => {
+      const t = habitRangeTotal(h.checks || {}, y, m);
+      const it = document.createElement("div"); it.className = "rec-perhabit-item";
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = h.name;
+      const vl = document.createElement("span"); vl.className = "vl"; vl.textContent = t + " 次";
+      it.append(nm, vl); ph.appendChild(it);
+    });
+    wrap.appendChild(ph);
+  }
+  function renderRecordPanel() {
+    const panel = $("#habit-record-panel"); panel.innerHTML = "";
+    if (!habitRecordOpen) return;
+    const counts = allCounts();
+    const wrap = document.createElement("div"); wrap.className = "rec-panel";
+    const bar = document.createElement("div"); bar.className = "cal-bar";
+    const prev = document.createElement("button"); prev.className = "cal-nav"; prev.textContent = "‹";
+    const next = document.createElement("button"); next.className = "cal-nav"; next.textContent = "›";
+    const label = document.createElement("div"); label.className = "cal-label";
+    const modeBtn = document.createElement("button"); modeBtn.className = "cal-mode"; modeBtn.textContent = habitCal.mode === "month" ? "看年 ▾" : "看月 ▾";
+    modeBtn.onclick = () => { habitCal.mode = habitCal.mode === "month" ? "year" : "month"; renderHabits(); };
+    if (habitCal.mode === "month") {
+      label.textContent = habitCal.y + "年" + (habitCal.m + 1) + "月";
+      prev.onclick = () => { let m = habitCal.m - 1, y = habitCal.y; if (m < 0) { m = 11; y--; } habitCal.m = m; habitCal.y = y; renderHabits(); };
+      next.onclick = () => { let m = habitCal.m + 1, y = habitCal.y; if (m > 11) { m = 0; y++; } habitCal.m = m; habitCal.y = y; renderHabits(); };
+      bar.append(prev, label, next, modeBtn);
+      wrap.appendChild(bar);
+      const tip = document.createElement("div"); tip.className = "rec-tip"; tip.textContent = "格子里的数字 = 当天所有习惯打卡总次数"; wrap.appendChild(tip);
+      wrap.appendChild(monthGrid(habitCal.y, habitCal.m, counts, { showNum: true }));
+      const mt = monthTotal(counts, habitCal.y, habitCal.m);
+      const tline = document.createElement("div"); tline.className = "cal-year-total"; tline.textContent = (habitCal.m + 1) + "月累计 " + mt + " 次（全部习惯）"; wrap.appendChild(tline);
+      appendPerHabit(wrap, (habitCal.m + 1) + "月 · 各习惯分别累计", habitCal.y, habitCal.m);
+    } else {
+      label.textContent = habitCal.y + "年";
+      prev.onclick = () => { habitCal.y--; renderHabits(); };
+      next.onclick = () => { habitCal.y++; renderHabits(); };
+      bar.append(prev, label, next, modeBtn); wrap.appendChild(bar);
+      const yearBox = document.createElement("div"); yearBox.className = "cal-year";
+      let yearTotal = 0;
+      for (let mo = 0; mo < 12; mo++) {
+        const moStr = String(mo + 1).padStart(2, "0");
+        const mcounts = {}; for (const ds in counts) if (ds.slice(0, 7) === habitCal.y + "-" + moStr) mcounts[ds] = counts[ds];
+        let moTotal = 0; for (const ds in mcounts) moTotal += mcounts[ds]; yearTotal += moTotal;
+        const box = document.createElement("div"); box.className = "cal-month";
+        const t = document.createElement("div"); t.className = "mt"; t.textContent = (mo + 1) + "月"; box.appendChild(t);
+        const tt = document.createElement("div"); tt.className = "cal-month-total"; tt.textContent = "共 " + moTotal + " 次"; box.appendChild(tt);
+        box.appendChild(monthGrid(habitCal.y, mo, mcounts, {}));
+        yearBox.appendChild(box);
+      }
+      wrap.appendChild(yearBox);
+      const yt = document.createElement("div"); yt.className = "cal-year-total"; yt.textContent = habitCal.y + "年累计 " + yearTotal + " 次（全部习惯）"; wrap.appendChild(yt);
+      appendPerHabit(wrap, habitCal.y + "年 · 各习惯分别累计", habitCal.y, null);
+    }
+    panel.appendChild(wrap);
+  }
+  function renderHabits() {
+    habits = store.get("wb_habits", []);
+    const list = $("#habit-list"); list.innerHTML = "";
+    const today = todayStr();
+    const recBtn = $("#habit-record");
+    if (recBtn) { recBtn.textContent = habitRecordOpen ? "📊 收起记录" : "📊 累计记录"; recBtn.classList.toggle("active", habitRecordOpen); }
+    if (!habits.length) { list.innerHTML = '<div class="empty">还没有习惯，添加第一个开始打卡吧～</div>'; }
+    habits.forEach((h) => {
+      const checks = h.checks || {};
+      const perDay = h.perDay || "once";
+      let total = 0; for (const ds in checks) total += cntOf(checks, ds);
+      const todayCnt = cntOf(checks, today);
+      const row = document.createElement("div"); row.className = "habit-row";
+      const head = document.createElement("div"); head.className = "habit-head";
+      const name = document.createElement("div"); name.className = "habit-name"; name.textContent = h.name + (perDay === "multi" ? "（每天多次）" : "");
+      const cnt = document.createElement("div"); cnt.className = "habit-count"; cnt.innerHTML = "累计 <b>" + total + "</b> 次";
+      const acts = document.createElement("div"); acts.className = "habit-acts";
+      const btn = document.createElement("button"); btn.className = "btn";
+      if (perDay === "once") {
+        const done = todayCnt > 0;
+        btn.textContent = done ? "今日已打卡 ✓" : "打卡";
+        btn.classList.toggle("ghost", done);
+        btn.disabled = done;
+        btn.onclick = () => { if (cntOf(h.checks, today) > 0) return; h.checks[today] = 1; saveHabits(); renderHabits(); };
+      } else {
+        btn.textContent = "打卡 +1" + (todayCnt > 0 ? "（今日 " + todayCnt + "）" : "");
+        btn.onclick = () => { h.checks[today] = cntOf(h.checks, today) + 1; saveHabits(); renderHabits(); };
+      }
+      const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+      del.onclick = () => { if (confirm("删除习惯「" + h.name + "」？打卡记录会一起删除")) { habits = habits.filter((x) => x.id !== h.id); saveHabits(); renderHabits(); } };
+      acts.append(btn, del);
+      head.append(name, cnt, acts);
+      row.appendChild(head);
+      list.appendChild(row);
+    });
+    renderRecordPanel();
+  }
+  $("#habit-record").onclick = () => { habitRecordOpen = !habitRecordOpen; habitCal.mode = "month"; habitCal.y = new Date().getFullYear(); habitCal.m = new Date().getMonth(); renderHabits(); };
+  $("#habit-add").onclick = () => {
+    const v = $("#habit-input").value.trim(); if (!v) return;
+    const perDay = $("#habit-perday").value || "once";
+    habits.push({ id: uid(), name: v, created: todayStr(), perDay, checks: {} });
+    $("#habit-input").value = ""; saveHabits(); renderHabits();
+  };
+  $("#habit-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#habit-add").click(); });
+  renderHabits();
+
   Sync.onRemote = applyRemote;
   });
 })();
+  /* ---------- 热点聚合（自动提取各平台热搜） ---------- */
+  const HOT = [
+    { key: "weibo", name: "新浪微博", ic: "📰", api: "https://60s.viki.moe/v2/weibo", web: "https://s.weibo.com/top/summary" },
+    { key: "douyin", name: "抖音", ic: "🎵", api: "https://60s.viki.moe/v2/douyin", web: "https://www.douyin.com/hot" },
+    { key: "xiaohongshu", name: "小红书", ic: "📕", api: "https://60s.viki.moe/v2/rednote", web: "https://www.xiaohongshu.com/explore" },
+    { key: "bili", name: "哔哩哔哩", ic: "📺", api: "https://60s.viki.moe/v2/bili", web: "https://www.bilibili.com/v/popular/rank/all", retry: 4 },
+    { key: "toutiao", name: "头条", ic: "🗞️", api: "https://60s.viki.moe/v2/toutiao", web: "https://www.toutiao.com" },
+    { key: "hot", name: "热点", ic: "🔥", api: "https://60s.viki.moe/v2/baidu/hot", web: "https://top.baidu.com/board?tab=realtime" }
+  ];
+  const hotCache = {};
+  function hotStoreKey(k) { return "wb_hot_" + k; }
+  function saveHot(k, list) { try { localStorage.setItem(hotStoreKey(k), JSON.stringify({ ts: Date.now(), list })); } catch (e) {} }
+  function loadHotCache(k) { try { const r = JSON.parse(localStorage.getItem(hotStoreKey(k)) || "null"); return r && r.list ? r.list : null; } catch (e) { return null; } }
+  function extractList(j) {
+    let a = j && j.data;
+    if (Array.isArray(a)) return a;
+    if (a && Array.isArray(a.data)) return a.data;
+    if (Array.isArray(j && j.list)) return j.list;
+    if (Array.isArray(j && j.result)) return j.result;
+    return [];
+  }
+  function buildHotItem(it) {
+    const title = it.title || it.word || it.name || it.query || "";
+    const hv = (it.hot_value != null) ? it.hot_value
+      : (it.hot != null) ? it.hot
+      : (it.score_desc != null) ? it.score_desc
+      : (it.score != null) ? it.score
+      : (it.hotScore != null) ? it.hotScore : "";
+    const url = it.link || it.url || it.href || "";
+    return { title: String(title), hot: (hv === "" ? "" : String(hv)), url: String(url) };
+  }
+  function renderHotCard(p, list, isCache) {
+    const box = document.getElementById("hot-list"); if (!box) return;
+    let card = document.getElementById("hot-" + p.key);
+    if (!card) { card = document.createElement("div"); card.className = "hot-card"; card.id = "hot-" + p.key; box.appendChild(card); }
+    card.innerHTML = "";
+    const head = document.createElement("div"); head.className = "hot-card-title";
+    head.innerHTML = '<span class="ic">' + p.ic + "</span>" + p.name + (isCache ? ' <span class="cached">缓存</span>' : "");
+    card.appendChild(head);
+    if (list && list.length) {
+      const ul = document.createElement("div"); ul.className = "hot-list";
+      list.slice(0, 15).forEach(function (it, i) {
+        const item = document.createElement("a"); item.className = "hot-item";
+        item.href = it.url || p.web; item.target = "_blank"; item.rel = "noopener";
+        const rank = document.createElement("span"); rank.className = "hot-rank"; rank.textContent = i + 1;
+        const nm = document.createElement("span"); nm.className = "hot-name"; nm.textContent = it.title;
+        item.append(rank, nm);
+        if (it.hot) { const h = document.createElement("span"); h.className = "hot-hot"; h.textContent = it.hot; item.appendChild(h); }
+        ul.appendChild(item);
+      });
+      card.appendChild(ul);
+    } else {
+      const fb = document.createElement("div"); fb.className = "hot-fallback";
+      fb.innerHTML = '自动提取暂不可用 · <a href="' + p.web + '" target="_blank" rel="noopener">前往' + p.name + "看热点 ›</a>";
+      card.appendChild(fb);
+    }
+  }
+  /* 综合聚合卡片已移除：「热点」卡片现直接拉取百度实时热搜（/v2/baidu/hot） */
+  async function fetchHot(p) {
+    if (!p.api) return null;
+    let lastErr = null;
+    const tries = (p.retry || 2) + 1; for (let attempt = 0; attempt < tries; attempt++) {
+      try {
+        const r = await fetch(p.api, { cache: "no-store" });
+        if (!r.ok) throw new Error("http " + r.status);
+        const j = await r.json();
+        const raw = extractList(j);
+        const list = raw.map(buildHotItem).filter(function (x) { return x.title; });
+        if (!list.length) throw new Error("empty");
+        return list;
+      } catch (e) { lastErr = e; await new Promise(function (res) { setTimeout(res, 800); }); }
+    }
+    throw lastErr;
+  }
+  async function loadOneHot(p, force) {
+    const cached = loadHotCache(p.key);
+    if (cached && cached.length) { hotCache[p.key] = cached; renderHotCard(p, cached, true); }
+    try {
+      const list = await fetchHot(p);
+      hotCache[p.key] = list; saveHot(p.key, list); renderHotCard(p, list, false);
+    } catch (e) {
+      if (!cached) renderHotCard(p, null, false);
+    }
+  }
+  function loadAllHot(force) {
+    const tip = document.getElementById("hot-tip");
+    if (tip) tip.textContent = "正在提取…";
+    let done = 0; const total = HOT.length;
+    HOT.forEach(function (p) {
+      loadOneHot(p, force).finally(function () { done++; if (done >= total && tip) tip.textContent = "更新于 " + new Date().toLocaleTimeString(); });
+    });
+  }
+  const hotRefresh = document.getElementById("hot-refresh");
+  if (hotRefresh) hotRefresh.onclick = function () { loadAllHot(true); };
+  // 实时更新：每 5 分钟自动刷新一次热点（仅当「热点」页处于激活状态时，避免无谓请求）
+  setInterval(function () {
+    const hotTab = document.querySelector('.tab[data-view="hot"]');
+    if (hotTab && hotTab.classList.contains("active")) loadAllHot(true);
+  }, 5 * 60 * 1000);
+
+  /* ---------- 精神食粮（全网热门视频，实时更新） ---------- */
+  function feedMd5(input) {
+    var bytes = [];
+    for (var i = 0; i < input.length; i++) {
+      var c = input.charCodeAt(i);
+      if (c < 0x80) bytes.push(c);
+      else if (c < 0x800) { bytes.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f)); }
+      else if (c >= 0xd800 && c < 0xe000) { var c2 = 0x10000 + (((c & 0x3ff) << 10) | (input.charCodeAt(++i) & 0x3ff)); bytes.push(0xf0 | (c2 >> 18), 0x80 | ((c2 >> 12) & 0x3f), 0x80 | ((c2 >> 6) & 0x3f), 0x80 | (c2 & 0x3f)); }
+      else { bytes.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f)); }
+    }
+    var origLen = bytes.length;
+    bytes.push(0x80);
+    while (bytes.length % 64 !== 56) bytes.push(0);
+    var bitLen = origLen * 8;
+    bytes.push(bitLen & 0xff, (bitLen >>> 8) & 0xff, (bitLen >>> 16) & 0xff, (bitLen >>> 24) & 0xff, 0, 0, 0, 0);
+    var s = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+    var K = [];
+    for (var i2 = 0; i2 < 64; i2++) K[i2] = Math.floor(Math.abs(Math.sin(i2 + 1)) * 4294967296) >>> 0;
+    function rol(x, c) { return (x << c) | (x >>> (32 - c)); }
+    var a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+    for (var off = 0; off < bytes.length; off += 64) {
+      var M = [];
+      for (var k = 0; k < 16; k++) M[k] = (bytes[off + k * 4] | (bytes[off + k * 4 + 1] << 8) | (bytes[off + k * 4 + 2] << 16) | (bytes[off + k * 4 + 3] << 24)) >>> 0;
+      var A = a0, B = b0, C = c0, D = d0;
+      for (var i3 = 0; i3 < 64; i3++) {
+        var F, g;
+        if (i3 < 16) { F = (B & C) | (~B & D); g = i3; }
+        else if (i3 < 32) { F = (D & B) | (~D & C); g = (5 * i3 + 1) % 16; }
+        else if (i3 < 48) { F = B ^ C ^ D; g = (3 * i3 + 5) % 16; }
+        else { F = C ^ (B | ~D); g = (7 * i3) % 16; }
+        F = (F + A + K[i3] + M[g]) >>> 0;
+        var t = D; D = C; C = B; B = (B + rol(F, s[(i3 >> 4) * 4 + (i3 & 3)])) >>> 0; A = t;
+      }
+      a0 = (a0 + A) >>> 0; b0 = (b0 + B) >>> 0; c0 = (c0 + C) >>> 0; d0 = (d0 + D) >>> 0;
+    }
+    function hex(x) { var o = ""; for (var n = 0; n < 4; n++) o += ("0" + ((x >>> (n * 8)) & 0xff).toString(16)).slice(-2); return o; }
+    return hex(a0) + hex(b0) + hex(c0) + hex(d0);
+  }
+  const MIXIN_KEY_ENC_TBL = [46,47,18,2,53,8,23,32,15,50,10,31,58,3,45,35,27,43,5,49,33,9,42,19,29,28,14,39,12,38,41,13,37,48,7,16,24,55,40,61,26,17,0,1,57,56,30,52,59,47,22,60,36,44,21,34,11,20,25,54,6,4,51,62];
+  let feedMixin = null;
+  const FEED_PROXIES = [
+    (u) => "https://api.allorigins.win/get?url=" + encodeURIComponent(u),
+    (u) => "https://api.codetabs.com/v1/proxy/?quest=" + u,
+    (u) => "https://cors.eu.org/" + u
+  ];
+  function fetchTimeout(url, ms) {
+    return new Promise(function (resolve, reject) {
+      const ctl = ("AbortController" in window) ? new AbortController() : null;
+      const t = setTimeout(function () { if (ctl) ctl.abort(); reject(new Error("timeout")); }, ms);
+      fetch(url, ctl ? { cache: "no-store", signal: ctl.signal } : { cache: "no-store" })
+        .then(function (r) { clearTimeout(t); resolve(r); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
+  function proxyJSON(target) {
+    const attempts = FEED_PROXIES.map(function (mk) {
+      return fetchTimeout(mk(target), 12000).then(async function (r) {
+        if (!r.ok) throw new Error("http " + r.status);
+        const d = JSON.parse(await r.text());
+        return (d && typeof d.contents === "string") ? JSON.parse(d.contents) : d;
+      });
+    });
+    if (typeof Promise.any === "function") return Promise.any(attempts);
+    return new Promise(function (resolve, reject) {
+      let fails = 0;
+      attempts.forEach(function (p) { p.then(resolve, function (e) { if (++fails === attempts.length) reject(e); }); });
+    });
+  }
+  async function getMixinKey() {
+    if (feedMixin) return feedMixin;
+    const nav = await proxyJSON("https://api.bilibili.com/x/web-interface/nav");
+    const wbi = (nav && nav.data && nav.data.wbi_img) || {};
+    const img = ((wbi.img_url || "").split("/").pop() || "").split(".")[0];
+    const sub = ((wbi.sub_url || "").split("/").pop() || "").split(".")[0];
+    feedMixin = MIXIN_KEY_ENC_TBL.map((i) => (img + sub)[i]).join("");
+    return feedMixin;
+  }
+  function wbiSign(params, mixinKey) {
+    const p = Object.assign({}, params, { wts: String(Math.floor(Date.now() / 1000)) });
+    const keys = Object.keys(p).sort();
+    const q = keys.map((k) => k + "=" + encodeURIComponent(p[k])).join("&");
+    p.w_rid = feedMd5(q + mixinKey);
+    return p;
+  }
+  const FEED_CATS = [
+    { key: "sport", name: "运动教学", ic: "🏃", kws: ["健身教学", "瑜伽教学", "普拉提", "跑步训练", "拉伸放松"] },
+    { key: "makeup", name: "化妆视频", ic: "💄", kws: ["化妆教程", "新手化妆", "日常妆容", "通勤妆", "约会妆"] },
+    { key: "body", name: "健身身材", ic: "💪", kws: ["健身打卡", "马甲线", "好身材", "增肌", "减脂"] }
+  ];
+  const FEED_SEED = {"sport":{"kw":"健身教学","list":[{"title":"健体刘孟易 各肌群训练讲解【合集】","author":"健身教学","play":"9.7万","duration":"65:54","pic":"https://i0.hdslb.com/bfs/archive/34d700f214988a6801a4201c5b9edf4872941512.png","link":"https://www.bilibili.com/video/BV14V411B7F3"},{"title":"💪🏻B站版《健身新手的训练完全手册》™","author":"好人松松","play":"511.1万","duration":"56:34","pic":"https://i1.hdslb.com/bfs/archive/e426ffdb1144c95f5eef72792df45e0efc8e0d3a.jpg","link":"https://www.bilibili.com/video/BV1Hk4y187jF"},{"title":"咏春自习室 咏春拳系统教学 向前老师主讲","author":"咏春拳自习室","play":"16.2万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/18723b3cb2836d6235f9a50c16395e0b5fda0988.jpg","link":"https://www.bilibili.com/cheese/play/ss9649?query_from=0&search_id=6232589517962578835&search_query=%E5%81%A5%E8%BA%AB%E6%95%99%E5%AD%A6"},{"title":"匠造君/【零基础健身合集】解析动作发力，保证看完就会，言简意赅！","author":"匠造君","play":"54.1万","duration":"20:8","pic":"https://i2.hdslb.com/bfs/archive/38aa892329fb63d4a1512c947f4df0f244f9d958.jpg","link":"https://www.bilibili.com/video/BV1ut411L7NE"},{"title":"国内健身教程系列-健身训练技巧（全40集），针对性健身训练，健身房器材用法，健身知识、健身百科，基础健身，局部训练，锻炼腹肌，快速燃脂，在家健身，快速瘦身等","author":"深夜白鹿","play":"26.5万","duration":"202:17","pic":"https://i1.hdslb.com/bfs/archive/ebcff20c18a976c90b2211264019a67a796aa99b.jpg","link":"https://www.bilibili.com/video/BV1Db411y7SN"},{"title":"论高手赛场必备的技巧，四大技巧一定要练起来！","author":"猛男训练班","play":"12.4万","duration":"3:15","pic":"https://i2.hdslb.com/bfs/archive/3beb2e20a251bb61e515510c47799066add7856a.jpg","link":"https://www.bilibili.com/video/BV1aoVvzME6i"},{"title":"难怪这家健身房办卡的人多，原来辅助健身是这样的！","author":"SexyCoke","play":"8.9万","duration":"0:53","pic":"https://i1.hdslb.com/bfs/archive/edc3386b19530268b7137d6da29771d76c4e414d.jpg","link":"https://www.bilibili.com/video/BV1qmcsznEGy"},{"title":"【哑铃教程合集】25个动作详细讲解，看完就会！（健身必看）","author":"FitMen六六","play":"161.6万","duration":"18:7","pic":"https://i2.hdslb.com/bfs/archive/f548c5f20391e80182df651d1bf0793755154d57.jpg","link":"https://www.bilibili.com/video/BV127411i78s"},{"title":"0基础学搏击十七节自由搏击教学课","author":"咏春拳李师傅","play":"3.5万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/75b0ebe2f48f2f6479f7503a5560a6fd4441967c.jpg","link":"https://www.bilibili.com/cheese/play/ss61318?query_from=0&search_id=6232589517962578835&search_query=%E5%81%A5%E8%BA%AB%E6%95%99%E5%AD%A6"},{"title":"健身私教课，这钱不白花","author":"百变视君","play":"19.4万","duration":"0:51","pic":"https://i0.hdslb.com/bfs/archive/e0ca1c1170d4c46f5eadc1ce126b9d9e28cd71c4.png","link":"https://www.bilibili.com/video/BV1eCTvzxEX8"},{"title":"新手实操训练指南，快收藏起来！","author":"郭哥延时技巧","play":"6.4万","duration":"2:4","pic":"https://i1.hdslb.com/bfs/archive/00339fed5ca7962a43b0e4ef6ddc0fc8b74f8a49.jpg","link":"https://www.bilibili.com/video/BV1PcqBY7EvT"},{"title":"【无器械健身合集】在家健身这一个视频就够了（家庭居家必备）","author":"FitMen六六","play":"449.9万","duration":"17:52","pic":"https://i0.hdslb.com/bfs/archive/8ddfbb4ba58b32e1c3eed0fd8d771c90f804272e.jpg","link":"https://www.bilibili.com/video/BV1Gy4y1n7Pv"}]},"makeup":{"kw":"化妆教程","list":[{"title":"【化妆入门课】0基础化妆变美逆袭课！易上手|化妆技巧|化妆教程|系统课|手把手教化妆|毕业变美指南","author":"JSMN-Me","play":"307.9万","duration":"706:28","pic":"https://i1.hdslb.com/bfs/archive/13f3dbf71ada18ba13be81fe20814b6d117f2d7a.png","link":"https://www.bilibili.com/video/BV1iU4y1L7G2"},{"title":"超详细全流程步骤拆解！日常全妆教程（新老手皆宜版）","author":"姜乘澜","play":"243.5万","duration":"13:59","pic":"https://i1.hdslb.com/bfs/archive/844d18e571fa51fcaf5cbec859530c5d831b9363.jpg","link":"https://www.bilibili.com/video/BV1hk5k6yE1z"},{"title":"不用动脑的化妆教程，懒人也能秒变精致","author":"棉棉爱吃棒棒糖","play":"0","duration":"1:37","pic":"https://i2.hdslb.com/bfs/archive/95fc9b2573873baa53de583c057a8ee574d18fe4.jpg","link":"https://www.bilibili.com/video/BV1hH3C6TEqE"},{"title":"巨巨巨巨详细新手化妆教程来啦❗码住跟练~","author":"煤球球coal","play":"41.7万","duration":"13:43","pic":"https://i2.hdslb.com/bfs/archive/48c426b4583a402ed743db9725eeefbb54fcffc0.jpg","link":"https://www.bilibili.com/video/BV1dpGAz7E6f"},{"title":"新手跟练版！巨巨巨详细化妆教程，我看谁还学不会。","author":"王艺慈wyc","play":"116.5万","duration":"15:7","pic":"https://i0.hdslb.com/bfs/archive/d4f4d6bda970636024b6c071fc017d756b21aca1.jpg","link":"https://www.bilibili.com/video/BV1Kz421Z7Xc"},{"title":"《看完你就学会化妆》","author":"dao刀刀_","play":"389.4万","duration":"14:33","pic":"https://i1.hdslb.com/bfs/archive/2200201d2187398e69c3aea8db97697f5070a815.jpg","link":"https://www.bilibili.com/video/BV1qa411o7MT"},{"title":"30min全妆跟练｜真保姆级新手化妆教程｜夏日黄皮橘棕日常感亚裔妆｜均价不过百的平价彩妆推荐","author":"一颗山根痣","play":"104.6万","duration":"36:19","pic":"https://i0.hdslb.com/bfs/archive/b1f5510895e25271b3a9912820e89d07cec2d41e.jpg","link":"https://www.bilibili.com/video/BV1QZ421N7Ra"},{"title":"不剪辑！让新手看清细节的20min全妆跟练！！","author":"正义的宝妹","play":"8.2万","duration":"19:6","pic":"https://i2.hdslb.com/bfs/archive/04f6b023ad227208bf62b81a4c3fd2eeb647d9f4.jpg","link":"https://www.bilibili.com/video/BV1XKzEBBEeA"},{"title":"新手超详细5min新中式气质淡妆保姆级教程来啦，一个视频教会你！","author":"安琪教化妆","play":"3990","duration":"10:39","pic":"https://i1.hdslb.com/bfs/archive/6746ca0f4e6adebaeb3514ae5e6c655a8f3d2444.jpg","link":"https://www.bilibili.com/video/BV1RugZ6mEHC"},{"title":"热 门 化 妆 技 巧 实 测","author":"一块小排骨_","play":"86.1万","duration":"5:28","pic":"https://i2.hdslb.com/bfs/archive/223b65a2cceb4f97a7d05e6b2d293db9a08465a5.jpg","link":"https://www.bilibili.com/video/BV1yf4y1F7os"},{"title":"5min淡颜柔粉韩妆｜越素越美的氛围感神妆","author":"向南造型时尚教育","play":"900","duration":"5:26","pic":"https://i0.hdslb.com/bfs/archive/a76c3a5f481b719ec3d95c89ac2605f0f45749a0.jpg","link":"https://www.bilibili.com/video/BV1jy3T61EM7"},{"title":"新手6min跟练✨淡颜网感上镜妆~手残党也能轻松拿捏❗❗","author":"梦梦爱化妆","play":"1260","duration":"6:16","pic":"https://i0.hdslb.com/bfs/archive/a6ecd9a523a7a9f675d4bb93f9a5d099e2714474.jpg","link":"https://www.bilibili.com/video/BV1YuiRBaEkW"}]},"body":{"kw":"马甲线","list":[{"title":"躺床8分钟高效瘦腰虐腹！快速练出马甲线/沙漏腰（跟练版）","author":"叫我tina小姐姐","play":"2523.8万","duration":"10:19","pic":"https://i1.hdslb.com/bfs/archive/a82ac0fa13f1d52fb67369c9287bb0d0520d6a81.jpg","link":"https://www.bilibili.com/video/BV14p4y1X7iP"},{"title":"12分钟马甲线运动，高效瘦腰瘦肚子，亲测有效！无跳动，新手友好，无需器械【韩小四April】","author":"韩小四AprilHan","play":"1206.8万","duration":"13:39","pic":"https://i1.hdslb.com/bfs/archive/8284baa58046411dc62d3110045ced01be35d6bf.jpg","link":"https://www.bilibili.com/video/BV1D4411D7qn"},{"title":"每天5分钟，甩掉小肚子，get马甲线！亲测一周见效，躺床就能做【韩小四April】","author":"韩小四AprilHan","play":"2603.8万","duration":"15:17","pic":"https://i1.hdslb.com/bfs/archive/ce9a406b93a1f3e1af8163bd6a563ff24a70679c.jpg","link":"https://www.bilibili.com/video/BV11t4y1274C"},{"title":"暑假速成马甲线！3天2厘米！大肚腩拜拜肉没了！","author":"十斤阿","play":"7281","duration":"3:57","pic":"https://i2.hdslb.com/bfs/archive/bfc44ea4dd52518d2f1a60ee6849e146a42aef5c.jpg","link":"https://www.bilibili.com/video/BV1k5g16dEPz"},{"title":"马甲线","author":"奶瑶同学丶","play":"2.5万","duration":"0:49","pic":"https://i2.hdslb.com/bfs/archive/024a4fc594260fb70bcdfbed4b747b2d88442fc5.jpg","link":"https://www.bilibili.com/video/BV1E3zSBiEGP"},{"title":"【Pamela Reif 帕梅拉】10分钟腹部训练 | 新手友好 | 练就钢铁马甲线 | 帕老师带你运动燃脂","author":"绝味鱼腿","play":"1561.2万","duration":"10:30","pic":"https://i0.hdslb.com/bfs/archive/45b79f3b14dbb80a4d9e190aaf20af3c0ca9b2bc.jpg","link":"https://www.bilibili.com/video/BV1kA411q7cH"},{"title":"五分钟在家瘦腰运动！快速瘦肚子小蛮腰，马甲线一周现形！适合初学者【周六野Zoey】","author":"周六野Zoey","play":"4801.0万","duration":"7:51","pic":"https://i2.hdslb.com/bfs/archive/e161008a0355e91901a8cf518becfa47261c607b.jpg","link":"https://www.bilibili.com/video/BV1ax411y7zQ"},{"title":"【東黄&amp;黄庚依】对马甲线爱不释手了","author":"奶糖_补觉中","play":"2.3万","duration":"1:14","pic":"https://i1.hdslb.com/bfs/archive/9beb36901ce788eee90716bbbe18c1a4db767685.jpg","link":"https://www.bilibili.com/video/BV1dbgi6sExU"},{"title":"帕梅拉 - 10min 马甲线训练|高效虐腹训练腹肌核心|紧实腹部|无器械(Pamela Reif Official)","author":"帕梅拉PamelaReif","play":"695.5万","duration":"10:33","pic":"https://i0.hdslb.com/bfs/archive/2dcad7b7bc28573e26df66b461ab3ffda35aa6b9.jpg","link":"https://www.bilibili.com/video/BV18b4y1Q7ey"},{"title":"马甲线！","author":"我超爱吃这个","play":"4717","duration":"2:17","pic":"https://i1.hdslb.com/bfs/archive/6987aad21b979b0911d457975fa2c243aef30b8b.jpg","link":"https://www.bilibili.com/video/BV1HEcZzJEP7"},{"title":"自用｜帕梅拉20分钟腹部训练｜15天练出马甲线｜不练侧腹拒绝H型腰｜沙漏腰yyds","author":"波可比的波","play":"136.9万","duration":"20:46","pic":"https://i0.hdslb.com/bfs/archive/1302658682d586e5e5983477ad784e5600b4b767.jpg","link":"https://www.bilibili.com/video/BV1C14y157Kx"},{"title":"快速瘦腰腹‖沙漏⌛️腰+平坦小腹+马甲线（睡眠无声）","author":"诔扇","play":"17.4万","duration":"2:2","pic":"https://i1.hdslb.com/bfs/archive/38a9579fe5b48bf9db14db3634f0ded8dfbbd159.jpg","link":"https://www.bilibili.com/video/BV1FU421o7Xk"}]}};
+  let feedCat = 0, feedKwIdx = 0;
+  const feedCache = {};
+  // 从 localStorage 恢复上次的视频缓存（跨会话秒开）
+  try {
+    const savedFeed = JSON.parse(localStorage.getItem("wb_feed_cache") || "{}");
+    Object.keys(savedFeed).forEach(function (k) { if (savedFeed[k] && savedFeed[k].list && savedFeed[k].list.length) feedCache[k] = savedFeed[k]; });
+  } catch (e) {}
+  function saveFeedCache() { try { localStorage.setItem("wb_feed_cache", JSON.stringify(feedCache)); } catch (e) {} }
+  // 取「立即可显示」的数据：本地缓存 → 内置种子
+  function feedInstant(catKey) {
+    if (feedCache[catKey] && feedCache[catKey].list && feedCache[catKey].list.length) return feedCache[catKey];
+    if (typeof FEED_SEED === "object" && FEED_SEED[catKey] && FEED_SEED[catKey].list.length) return FEED_SEED[catKey];
+    return null;
+  }
+  function feedFmtCount(n) { n = Number(n) || 0; if (n >= 1e8) return (n / 1e8).toFixed(1) + "亿"; if (n >= 1e4) return (n / 1e4).toFixed(1) + "万"; return String(n); }
+  function feedEscapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function buildVideo(it) {
+    const title = String(it.title || "").replace(/<[^>]+>/g, "");
+    const bvid = it.bvid || "";
+    const link = bvid ? ("https://www.bilibili.com/video/" + bvid) : (it.arcurl || "https://www.bilibili.com");
+    let pic = it.pic || "";
+    if (pic.indexOf("//") === 0) pic = "https:" + pic;
+    return { title: title, author: it.author || it.uname || "", play: feedFmtCount(it.play), duration: it.duration || "", pic: pic, link: link };
+  }
+  async function searchBiliVideos(kw) {
+    const mixin = await getMixinKey();
+    const p = wbiSign({ search_type: "video", keyword: kw, page: 1, page_size: 12 }, mixin);
+    const url = "https://api.bilibili.com/x/web-interface/wbi/search/type?" + Object.keys(p).sort().map((k) => k + "=" + encodeURIComponent(p[k])).join("&");
+    const j = await proxyJSON(url);
+    const res = (j && j.data && j.data.result) || [];
+    if (!res.length) throw new Error("empty");
+    return res.slice(0, 12).map(buildVideo);
+  }
+  function renderFeedFallback(cat, grid) {
+    grid.innerHTML = "";
+    const head = document.createElement("div"); head.className = "feed-cat-head";
+    head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name + ' <span class="cached">实时获取失败</span>';
+    grid.appendChild(head);
+    const wrap = document.createElement("div"); wrap.className = "feed-grid-cards";
+    cat.kws.forEach(function (kw) {
+      const a = document.createElement("a"); a.className = "vcard fallback";
+      a.href = "https://search.bilibili.com/all?keyword=" + encodeURIComponent(kw);
+      a.target = "_blank"; a.rel = "noopener";
+      a.innerHTML = '<div class="vcard-meta"><div class="vcard-title">🔍 ' + feedEscapeHtml(kw) + '</div><div class="vcard-sub"><span>前往 B站看相关视频 ›</span></div></div>';
+      wrap.appendChild(a);
+    });
+    grid.appendChild(wrap);
+  }
+  function renderFeed(cat, list, kw, isCache) {
+    const grid = document.getElementById("feed-grid"); if (!grid) return;
+    grid.innerHTML = "";
+    const head = document.createElement("div"); head.className = "feed-cat-head";
+    head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name + " · " + feedEscapeHtml(kw) + (isCache ? ' <span class="cached">缓存</span>' : "");
+    grid.appendChild(head);
+    if (list && list.length) {
+      const wrap = document.createElement("div"); wrap.className = "feed-grid-cards";
+      list.forEach(function (v) {
+        const a = document.createElement("a"); a.className = "vcard"; a.href = v.link; a.target = "_blank"; a.rel = "noopener";
+        const thumb = document.createElement("div"); thumb.className = "vcard-thumb";
+        const img = document.createElement("img"); img.loading = "lazy"; img.src = v.pic; img.alt = v.title; img.referrerPolicy = "no-referrer";
+        img.onerror = function () { thumb.classList.add("noimg"); img.style.display = "none"; };
+        const dur = document.createElement("span"); dur.className = "vcard-dur"; dur.textContent = v.duration;
+        thumb.append(img, dur);
+        const meta = document.createElement("div"); meta.className = "vcard-meta";
+        const t = document.createElement("div"); t.className = "vcard-title"; t.textContent = v.title;
+        const sub = document.createElement("div"); sub.className = "vcard-sub";
+        sub.innerHTML = "<span>" + feedEscapeHtml(v.author) + "</span><span>▶ " + v.play + "</span>";
+        meta.append(t, sub);
+        a.append(thumb, meta);
+        wrap.appendChild(a);
+      });
+      grid.appendChild(wrap);
+    } else {
+      renderFeedFallback(cat, grid);
+    }
+  }
+  let feedLoadSeq = 0;
+  async function loadFeed(forceNet) {
+    const cat = FEED_CATS[feedCat];
+    const kw = cat.kws[feedKwIdx % cat.kws.length];
+    const tip = document.getElementById("feed-tip");
+    const seq = ++feedLoadSeq;
+    // 第一步：立刻渲染已有内容（本地缓存或内置视频），保证打开就有视频可看
+    const inst = feedInstant(cat.key);
+    if (inst) {
+      renderFeed(cat, inst.list, inst.kw, false);
+      if (tip) tip.textContent = "「" + inst.kw + "」· 正在获取最新…";
+    } else if (tip) {
+      tip.textContent = "正在搜索「" + kw + "」…";
+    }
+    // 第二步：后台拉取最新，拉到后静默替换
+    try {
+      const fresh = feedCache[cat.key];
+      // 5 分钟内的新鲜缓存且非强制刷新/换一批：不再请求网络
+      if (!forceNet && fresh && fresh.kw === kw && Date.now() - (fresh.ts || 0) < 5 * 60 * 1000) {
+        if (tip) tip.textContent = "「" + fresh.kw + "」· 更新于 " + new Date(fresh.ts).toLocaleTimeString();
+        return;
+      }
+      const list = await searchBiliVideos(kw);
+      if (seq !== feedLoadSeq) return; // 期间用户已切换，丢弃过期结果
+      feedCache[cat.key] = { kw: kw, list: list, ts: Date.now() };
+      saveFeedCache();
+      renderFeed(cat, list, kw, false);
+      if (tip) tip.textContent = "「" + kw + "」· 更新于 " + new Date().toLocaleTimeString();
+    } catch (e) {
+      if (seq !== feedLoadSeq) return;
+      if (inst) { if (tip) tip.textContent = "「" + inst.kw + "」· 实时刷新失败，稍后自动重试"; }
+      else { renderFeedFallback(cat, document.getElementById("feed-grid")); if (tip) tip.textContent = "实时获取失败，已提供直达链接"; }
+    }
+  }
+  // 页面加载后就静默预热：预取签名密钥 + 后台刷新三个分类的视频缓存
+  setTimeout(function () {
+    getMixinKey().then(function () {
+      FEED_CATS.forEach(function (cat, i) {
+        setTimeout(function () {
+          searchBiliVideos(cat.kws[0]).then(function (list) {
+            feedCache[cat.key] = { kw: cat.kws[0], list: list, ts: Date.now() };
+            saveFeedCache();
+            // 若用户正停在该分类，静默更新画面
+            const view = document.getElementById("view-feed");
+            if (view && view.classList.contains("active") && FEED_CATS[feedCat].key === cat.key && feedKwIdx === 0) {
+              renderFeed(cat, list, cat.kws[0], false);
+              const tip = document.getElementById("feed-tip");
+              if (tip) tip.textContent = "「" + cat.kws[0] + "」· 更新于 " + new Date().toLocaleTimeString();
+            }
+          }).catch(function () {});
+        }, i * 1500);
+      });
+    }).catch(function () {});
+  }, 800);
+  function renderFeedTabs() {
+    const box = document.getElementById("feed-tabs"); if (!box) return;
+    box.innerHTML = "";
+    FEED_CATS.forEach(function (cat, i) {
+      const b = document.createElement("button");
+      b.className = "feed-tab" + (i === feedCat ? " active" : "");
+      b.innerHTML = "<span>" + cat.ic + "</span> " + cat.name;
+      b.onclick = function () { feedCat = i; feedKwIdx = 0; renderFeedTabs(); loadFeed(); };
+      box.appendChild(b);
+    });
+  }
+  renderFeedTabs();
+  const feedRefresh = document.getElementById("feed-refresh");
+  if (feedRefresh) feedRefresh.onclick = function () { loadFeed(true); };
+  const feedNext = document.getElementById("feed-next");
+  if (feedNext) feedNext.onclick = function () { feedKwIdx++; loadFeed(true); };
+  setInterval(function () {
+    const tab = document.querySelector('.tab[data-view="feed"]');
+    if (tab && tab.classList.contains("active")) loadFeed(true);
+  }, 5 * 60 * 1000);
+
 </script>
 </body>
 </html>
