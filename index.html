@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>清新工作台</title>
+<style>
+  :root {
+    --mint: #5ec6b8;
+    --mint-deep: #3aa997;
+    --sky: #7fc8e8;
+    --leaf: #8fd9a8;
+    --bg-1: #e8f7f4;
+    --bg-2: #eef6fb;
+    --card: #ffffff;
+    --ink: #2f4f4a;
+    --ink-soft: #6b8a84;
+    --line: #e1f0ec;
+    --warn: #ff9a76;
+    --done: #b7c9c4;
+    --shadow: 0 8px 24px rgba(93, 178, 184, 0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* 顶部导航 */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 16px rgba(93, 178, 184, 0.1);
+  }
+  .nav {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--mint-deep);
+    margin-right: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    box-shadow: 0 0 10px rgba(94,198,184,.6);
+  }
+  .tab {
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 9px 18px;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .tab:hover { background: var(--line); color: var(--mint-deep); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(94,198,184,.35);
+  }
+
+  main { max-width: 1080px; margin: 26px auto 0; padding: 0 22px; }
+  .view { display: none; animation: fade .4s ease; }
+  .view.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px);} to {opacity:1; transform:none;} }
+
+  .panel {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+  }
+  .panel h2 {
+    font-size: 18px;
+    color: var(--mint-deep);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel .sub { color: var(--ink-soft); font-size: 13px; margin-bottom: 18px; }
+
+  .clock-card {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, #f1fbf8, #f3f9fe);
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+  .clock-date { font-size: 26px; font-weight: 800; color: var(--ink); }
+  .clock-time { font-size: 34px; font-weight: 800; color: var(--mint-deep); font-variant-numeric: tabular-nums; }
+  .clock-week { color: var(--ink-soft); font-size: 14px; }
+  .clock-tag {
+    margin-left: auto;
+    background: var(--mint);
+    color: #fff;
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-weight: 600;
+  }
+
+  /* 输入区 */
+  .add-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  input[type="text"], textarea, input[type="date"] {
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fbfdfc;
+    outline: none;
+    transition: border .2s;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, textarea:focus, input[type="date"]:focus {
+    border-color: var(--mint);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 56px; width: 100%; }
+  .grow { flex: 1; min-width: 180px; }
+
+  .btn {
+    border: none;
+    background: linear-gradient(135deg, var(--mint), var(--sky));
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 11px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 5px 14px rgba(94,198,184,.3);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(94,198,184,.4); }
+  .btn.ghost {
+    background: #fff;
+    color: var(--mint-deep);
+    border: 1.5px solid var(--mint);
+    box-shadow: none;
+  }
+  .btn.ghost:hover { background: var(--line); }
+
+  /* 列表项 */
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fbfdfc;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    transition: all .2s;
+  }
+  .item:hover { border-color: var(--mint); }
+  .item.done .text { text-decoration: line-through; color: var(--done); }
+  .item .text { flex: 1; font-size: 15px; word-break: break-word; }
+  .check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--mint);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px;
+    transition: all .2s;
+  }
+  .item.done .check { background: var(--mint); }
+  .del {
+    border: none; background: transparent; cursor: pointer;
+    color: var(--ink-soft); font-size: 18px; padding: 4px 6px; border-radius: 8px;
+  }
+  .del:hover { background: #ffe9e3; color: var(--warn); }
+
+  .sec-title { font-size: 15px; font-weight: 700; color: var(--ink); margin: 8px 0 12px; display:flex; align-items:center; gap:8px;}
+  .sec-title .bar { width: 5px; height: 16px; border-radius: 3px; background: var(--mint); display:inline-block;}
+
+  /* 待做事项表 */
+  .todo-grid { display: grid; grid-template-columns: 130px 130px 1fr auto auto; gap: 10px; align-items: center; }
+  .todo-head { font-size: 13px; color: var(--ink-soft); font-weight: 700; padding: 0 4px; }
+  .todo-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 130px 130px 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    background: #fbfdfc;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .todo-row.overdue { border-color: var(--warn); background: #fff6f1; }
+  .todo-row.done .todo-text { text-decoration: line-through; color: var(--done); }
+  .date-pill { font-size: 13px; color: var(--ink-soft); background: var(--line); padding: 4px 10px; border-radius: 10px; text-align:center;}
+  .todo-text { font-size: 15px; }
+  .badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 700; }
+  .badge.prog { background: #e6f6f2; color: var(--mint-deep); }
+  .badge.ok { background: #e9f7ee; color: #3c9a5f; }
+  .badge.late { background: #ffe9e3; color: var(--warn); }
+
+  /* 灵感 */
+  .idea-row { display:flex; align-items:flex-start; gap:12px; background:#fbfdfc; border:1.5px solid var(--line); border-radius:14px; padding:13px 16px; margin-bottom:10px;}
+  .idea-date { font-size:12px; color:#fff; background:var(--sky); padding:4px 11px; border-radius:12px; white-space:nowrap; font-weight:600; flex-shrink:0;}
+  .idea-text { flex:1; font-size:15px; white-space:pre-wrap; word-break:break-word;}
+
+  .jump-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+  .jump {
+    display:flex; align-items:center; gap:8px;
+    text-decoration:none;
+    background: linear-gradient(135deg, #fff, #f3fbf9);
+    border:1.5px solid var(--line);
+    color: var(--ink);
+    font-weight:600; font-size:14px;
+    padding:11px 18px; border-radius:14px;
+    transition: all .2s;
+  }
+  .jump:hover { border-color: var(--mint); transform: translateY(-2px); box-shadow: var(--shadow); }
+
+  .app-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(118px,1fr)); gap:12px; margin-top:6px; }
+  .app-card {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    background: linear-gradient(135deg, #fff, #f3fbf9);
+    border:1.5px solid var(--line); border-radius:16px; padding:16px 10px;
+    cursor:pointer; transition: all .2s; text-align:center; user-select:none;
+  }
+  .app-card:hover { border-color: var(--mint); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .app-card:active { transform: scale(.97); }
+  .app-ic { font-size:26px; line-height:1; }
+  .app-name { font-size:14px; font-weight:600; color: var(--ink); }
+  .app-hint { color: var(--ink-soft); font-size:13px; margin-bottom:14px; }
+  .jump .ic { font-size:18px; }
+
+  .empty { color: var(--ink-soft); font-size: 14px; text-align:center; padding: 24px; }
+
+  /* 同步栏 */
+  .syncbar {
+    max-width: 1080px; margin: 0 auto; padding: 6px 22px 12px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .sync-status { color: var(--mint-deep); font-weight: 600; }
+  .sync-code b { color: var(--ink); font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .5px; }
+  .sbtn {
+    border: 1.5px solid var(--mint); background: #fff; color: var(--mint-deep);
+    font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: 10px; cursor: pointer;
+    transition: all .2s;
+  }
+  .sbtn:hover { background: var(--line); }
+  .syncbar select {
+    border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft);
+    font-size: 13px; padding: 6px 10px; border-radius: 10px; cursor: pointer; outline: none;
+  }
+  .syncbar select:focus { border-color: var(--mint); }
+  .autobk { color: var(--ink-soft); font-size: 12px; }
+  .autobk b { color: var(--mint-deep); }
+
+  /* 日历 */
+  .viewbar { display:flex; align-items:center; gap:12px; margin-bottom:16px; font-size:14px; color:var(--ink-soft); }
+  .viewbar b { color: var(--mint-deep); font-size:15px; }
+  .viewbar .btn.ghost { margin-left:auto; padding:7px 14px; font-size:13px; }
+  .cal-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .cal-title { font-weight:700; font-size:16px; color: var(--ink); min-width:120px; text-align:center; }
+  .cal-head .btn.ghost { padding:7px 14px; font-size:14px; }
+  .cal-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:6px; }
+  .cal-dow { text-align:center; font-size:12px; color: var(--ink-soft); padding:6px 0; font-weight:700; }
+  .cal-day { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; border-radius:12px; border:1.5px solid var(--line); background:#fbfdfc; cursor:pointer; font-size:14px; color:var(--ink); transition:all .15s; position:relative; }
+  .cal-day:hover { border-color: var(--mint); }
+  .cal-day.muted { color:#c5d3cf; cursor:default; background:transparent; border-color:transparent; }
+  .cal-day.muted:hover { border-color:transparent; }
+  .cal-day.today { border-color: var(--mint); background:#eafaf6; font-weight:700; }
+  .cal-day.sel { background: linear-gradient(135deg,var(--mint),var(--sky)); color:#fff; border-color:transparent; font-weight:700; }
+  .cal-day.has::after { content:""; position:absolute; bottom:7px; width:6px; height:6px; border-radius:50%; background: var(--warn); }
+  .cal-day.sel.has::after { background:#fff; }
+
+  @media (max-width: 720px) {
+    .todo-grid, .todo-row { grid-template-columns: 1fr 1fr; }
+    .todo-row { grid-template-columns: 1fr 1fr; }
+    .todo-text { grid-column: 1 / -1; }
+    .clock-time { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <div class="brand"><span class="dot"></span>清新工作台</div>
+    <button class="tab active" data-view="plan">每日计划</button>
+    <button class="tab" data-view="todo">待做事项</button>
+    <button class="tab" data-view="idea">灵感</button>
+    <button class="tab" data-view="app">APP分享</button>
+  </nav>
+  <div class="syncbar">
+    <span class="sync-status" id="sync-status">连接中…</span>
+    <span class="sync-code">同步码 <b id="sync-code">—</b></span>
+    <button class="sbtn" id="sync-copy">复制</button>
+    <button class="sbtn" id="sync-join">加入其他设备</button>
+    <button class="sbtn" id="sync-now">立即同步</button>
+    <button class="sbtn" id="sync-export">导出</button>
+    <button class="sbtn" id="sync-import">导入</button>
+    <span class="autobk">自动备份
+      <select id="autobackup">
+        <option value="off">关闭</option>
+        <option value="daily">每天一次</option>
+        <option value="open">每次打开</option>
+      </select>
+      <span id="autobk-status"></span>
+    </span>
+    <input type="file" id="sync-file" accept="application/json,.json" style="display:none" />
+  </div>
+</header>
+
+<main>
+  <!-- 每日计划 -->
+  <section class="view active" id="view-plan">
+    <div class="clock-card">
+      <div>
+        <div class="clock-date" id="plan-date">--</div>
+        <div class="clock-week" id="plan-week">--</div>
+      </div>
+      <div class="clock-time" id="plan-time">--:--:--</div>
+      <div class="clock-tag" id="plan-tag">今日</div>
+    </div>
+
+    <div class="viewbar">
+      <span>正在查看：<b id="plan-viewdate">--</b></span>
+      <button class="btn ghost" id="plan-backtoday">回到今天</button>
+    </div>
+
+    <div class="panel">
+      <h2>🗓️ 日历</h2>
+      <div class="sub">点选日期查看当天计划，有记录的日期会标亮点</div>
+      <div class="cal-head">
+        <button class="btn ghost" id="cal-prev">‹ 上月</button>
+        <div class="cal-title" id="cal-title">--</div>
+        <button class="btn ghost" id="cal-next">下月 ›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📅 当日计划</h2>
+      <div class="sub">勾选左侧圆圈标记完成情况，数据自动保存</div>
+      <div class="add-row">
+        <input type="text" id="plan-input" class="grow" placeholder="今天要完成的一件事…" />
+        <button class="btn" id="plan-add">添加</button>
+        <button class="btn ghost" id="plan-clear">清空</button>
+      </div>
+      <div id="plan-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🌿 次日安排</h2>
+      <div class="sub">查看当天为之后做的规划</div>
+      <div class="add-row">
+        <input type="text" id="tomorrow-input" class="grow" placeholder="明天计划安排…" />
+        <button class="btn" id="tomorrow-add">添加</button>
+        <button class="btn ghost" id="tomorrow-clear">清空</button>
+      </div>
+      <div id="tomorrow-list"></div>
+    </div>
+  </section>
+
+  <!-- 待做事项 -->
+  <section class="view" id="view-todo">
+    <div class="panel">
+      <h2>✅ 待做事项</h2>
+      <div class="sub">设置起日期与截止日期，逾期会自动高亮提醒</div>
+      <div class="todo-grid" style="margin-bottom:14px;">
+        <input type="date" id="todo-start" />
+        <input type="date" id="todo-deadline" />
+        <input type="text" id="todo-text" class="grow" placeholder="要做什么？" />
+        <button class="btn" id="todo-add">添加</button>
+        <button class="btn ghost" id="todo-clear">清空</button>
+      </div>
+      <div class="todo-head" style="display:grid; grid-template-columns:130px 130px 1fr auto auto; gap:10px;">
+        <span>起日期</span><span>截止日期</span><span>内容</span><span>状态</span><span></span>
+      </div>
+      <div id="todo-list"></div>
+    </div>
+  </section>
+
+  <!-- 灵感 -->
+  <section class="view" id="view-idea">
+    <div class="panel">
+      <h2>💡 灵感收集</h2>
+      <div class="sub">随手记录，可随时增删；最后一键跳转创作平台</div>
+      <div class="add-row">
+        <input type="date" id="idea-date" />
+        <input type="text" id="idea-text" class="grow" placeholder="一个灵感、一句文案、一个点子…" />
+        <button class="btn" id="idea-add">添加</button>
+        <button class="btn ghost" id="idea-clear">清空</button>
+      </div>
+      <div id="idea-list"></div>
+
+      <div class="sec-title"><span class="bar"></span>快捷跳转平台</div>
+      <div class="jump-bar">
+        <a class="jump" href="https://www.xiaohongshu.com" target="_blank" rel="noopener"><span class="ic">📕</span>小红书</a>
+        <a class="jump" href="https://www.douyin.com" target="_blank" rel="noopener"><span class="ic">🎵</span>抖音</a>
+        <a class="jump" href="https://channels.weixin.qq.com" target="_blank" rel="noopener"><span class="ic">🟢</span>视频号</a>
+        <a class="jump" href="https://www.bilibili.com" target="_blank" rel="noopener"><span class="ic">📺</span>哔哩哔哩</a>
+        <a class="jump" href="https://weibo.com" target="_blank" rel="noopener"><span class="ic">🌐</span>微博</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP分享 -->
+  <section class="view" id="view-app">
+    <div class="panel">
+      <h2>🔗 APP分享</h2>
+      <div class="app-hint">手机端点击可直接唤起对应 APP；电脑端将打开该 APP 的网页版。</div>
+      <div class="app-grid" id="app-list"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const store = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set(k, v, silent) { localStorage.setItem(k, JSON.stringify(v)); if (!silent && Sync.ready) Sync.schedulePush(); }
+  };
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  /* ---------- 云端同步 (Supabase) ---------- */
+  const SB = {
+    url: "https://gmvgtiyolkjhddjaqahj.supabase.co",
+    key: "sb_publishable_aVnmuy_r0C8OuvZVET5djA_zsIV6mjy"
+  };
+  const Sync = {
+    ready: false,
+    boardId: localStorage.getItem("wb_board") || (function () { const id = "wb_" + uid() + uid(); localStorage.setItem("wb_board", id); return id; })(),
+    lastPush: 0,
+    onRemote: null,
+    headers() { return { "apikey": SB.key, "Authorization": "Bearer " + SB.key, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }; },
+    async fetchRow() {
+      try {
+        const r = await fetch(SB.url + "/rest/v1/wb_data?id=eq." + encodeURIComponent(this.boardId) + "&select=*", { headers: this.headers() });
+        if (!r.ok) return null;
+        const arr = await r.json();
+        return arr && arr[0] ? arr[0] : null;
+      } catch (e) { return null; }
+    },
+    async push() {
+      if (!this.ready) return;
+      const payload = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf("wb_") === 0 && k !== "wb_board") {
+          try { payload[k] = JSON.parse(localStorage.getItem(k)); } catch (e) { payload[k] = localStorage.getItem(k); }
+        }
+      }
+      try {
+        setStatus("同步中…");
+        const r = await fetch(SB.url + "/rest/v1/wb_data", {
+          method: "POST", headers: this.headers(),
+          body: JSON.stringify({ id: this.boardId, payload: payload, updated_at: new Date().toISOString() })
+        });
+        if (r.ok) { this.lastPush = Date.now(); setStatus("已同步 " + timeNow()); }
+        else setStatus("同步失败");
+      } catch (e) { setStatus("离线，稍后重试"); }
+    },
+    _t: null,
+    schedulePush() { clearTimeout(this._t); this._t = setTimeout(() => this.push(), 700); },
+    async pull() {
+      const row = await this.fetchRow();
+      if (!row) return;
+      const remote = new Date(row.updated_at).getTime();
+      if (remote <= this.lastPush) return;
+      if (this.onRemote) this.onRemote(row.payload || {});
+      this.lastPush = remote;
+    },
+    async init() {
+      const row = await this.fetchRow();
+      if (row && row.payload) {
+        Object.keys(row.payload).forEach((k) => { if (k !== "wb_board") store.set(k, row.payload[k], true); });
+      } else {
+        await this.push();
+      }
+      this.ready = true;
+      this.lastPush = Date.now();
+      setStatus("已同步 " + timeNow());
+      setInterval(() => this.pull(), 15000);
+    }
+  };
+  function setStatus(t) { const el = document.getElementById("sync-status"); if (el) el.textContent = t; }
+  function timeNow() { const d = new Date(); const p = (n) => String(n).padStart(2, "0"); return p(d.getHours()) + ":" + p(d.getMinutes()); }
+  function showBoard() { const el = document.getElementById("sync-code"); if (el) el.textContent = Sync.boardId; }
+
+  Sync.init().finally(function () {
+  /* ---------- 导航切换 ---------- */
+  document.querySelectorAll(".tab").forEach((t) => {
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((x) => x.classList.remove("active"));
+      document.querySelectorAll(".view").forEach((x) => x.classList.remove("active"));
+      t.classList.add("active");
+      $("#view-" + t.dataset.view).classList.add("active");
+    });
+  });
+
+  /* ---------- 实时时钟 ---------- */
+  const weekCN = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+  function tick() {
+    const d = new Date();
+    $("#plan-date").textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+    $("#plan-week").textContent = weekCN[d.getDay()];
+    const p = (n) => String(n).padStart(2, "0");
+    $("#plan-time").textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- 每日计划 ---------- */
+  let plans = store.get("wb_plans", {});
+  const curDate = todayStr();
+  let viewDate = curDate;
+  const ensurePlan = () => { if (!plans[viewDate]) plans[viewDate] = { today: [], tomorrow: [] }; };
+  ensurePlan();
+
+  function renderPlan() {
+    const data = plans[viewDate];
+    $("#plan-viewdate").textContent = viewDate;
+    const pl = $("#plan-list"); pl.innerHTML = "";
+    if (!data.today.length) pl.innerHTML = '<div class="empty">这一天还没安排～</div>';
+    data.today.forEach((it) => pl.appendChild(makeItem(it, "today")));
+    const tl = $("#tomorrow-list"); tl.innerHTML = "";
+    if (!data.tomorrow.length) tl.innerHTML = '<div class="empty">这一天没有明日安排</div>';
+    data.tomorrow.forEach((it) => tl.appendChild(makeItem(it, "tomorrow")));
+  }
+  function makeItem(it, key) {
+    const row = document.createElement("div");
+    row.className = "item" + (it.done ? " done" : "");
+    const chk = document.createElement("div");
+    chk.className = "check"; chk.textContent = it.done ? "✓" : "";
+    chk.onclick = () => { it.done = !it.done; savePlan(); renderPlan(); };
+    const txt = document.createElement("div"); txt.className = "text"; txt.textContent = it.text;
+    const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+    del.onclick = () => { plans[viewDate][key] = plans[viewDate][key].filter((x) => x.id !== it.id); savePlan(); renderPlan(); renderCalendar(); };
+    row.append(chk, txt, del); return row;
+  }
+  function savePlan() { store.set("wb_plans", plans); }
+  $("#plan-add").onclick = () => {
+    const v = $("#plan-input").value.trim(); if (!v) return;
+    ensurePlan(); plans[viewDate].today.push({ id: uid(), text: v, done: false });
+    $("#plan-input").value = ""; savePlan(); renderPlan(); renderCalendar();
+  };
+  $("#plan-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#plan-add").click(); });
+  $("#tomorrow-add").onclick = () => {
+    const v = $("#tomorrow-input").value.trim(); if (!v) return;
+    ensurePlan(); plans[viewDate].tomorrow.push({ id: uid(), text: v, done: false });
+    $("#tomorrow-input").value = ""; savePlan(); renderPlan(); renderCalendar();
+  };
+  $("#tomorrow-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#tomorrow-add").click(); });
+  $("#plan-clear").onclick = () => {
+    if (!plans[viewDate].today.length) return;
+    if (confirm("确定清空这一天的计划？")) { plans[viewDate].today = []; savePlan(); renderPlan(); renderCalendar(); }
+  };
+  $("#tomorrow-clear").onclick = () => {
+    if (!plans[viewDate].tomorrow.length) return;
+    if (confirm("确定清空这一天的明日安排？")) { plans[viewDate].tomorrow = []; savePlan(); renderPlan(); renderCalendar(); }
+  };
+
+  /* ---------- 日历 ---------- */
+  let calY = new Date().getFullYear();
+  let calM = new Date().getMonth();
+  const dowCN = ["日", "一", "二", "三", "四", "五", "六"];
+  function renderCalendar() {
+    $("#cal-title").textContent = `${calY}年${calM + 1}月`;
+    const grid = $("#cal-grid"); grid.innerHTML = "";
+    dowCN.forEach((d) => { const c = document.createElement("div"); c.className = "cal-dow"; c.textContent = d; grid.appendChild(c); });
+    const startDow = new Date(calY, calM, 1).getDay();
+    const daysInMonth = new Date(calY, calM + 1, 0).getDate();
+    const prevDays = new Date(calY, calM, 0).getDate();
+    for (let i = startDow - 1; i >= 0; i--) {
+      const c = document.createElement("div"); c.className = "cal-day muted"; c.textContent = prevDays - i; grid.appendChild(c);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = `${calY}-${String(calM + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const c = document.createElement("div"); c.className = "cal-day"; c.textContent = d;
+      if (plans[ds] && (plans[ds].today.length || plans[ds].tomorrow.length)) c.classList.add("has");
+      if (ds === curDate) c.classList.add("today");
+      if (ds === viewDate) c.classList.add("sel");
+      c.onclick = () => { viewDate = ds; ensurePlan(); renderPlan(); renderCalendar(); };
+      grid.appendChild(c);
+    }
+    const trail = (7 - ((startDow + daysInMonth) % 7)) % 7;
+    for (let i = 1; i <= trail; i++) {
+      const c = document.createElement("div"); c.className = "cal-day muted"; c.textContent = i; grid.appendChild(c);
+    }
+  }
+  $("#cal-prev").onclick = () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCalendar(); };
+  $("#cal-next").onclick = () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCalendar(); };
+  $("#plan-backtoday").onclick = () => {
+    viewDate = curDate; calY = new Date().getFullYear(); calM = new Date().getMonth();
+    ensurePlan(); renderPlan(); renderCalendar();
+  };
+
+  renderPlan();
+  renderCalendar();
+
+  /* ---------- 待做事项 ---------- */
+  let todos = store.get("wb_todos", []);
+  function renderTodos() {
+    const list = $("#todo-list"); list.innerHTML = "";
+    if (!todos.length) { list.innerHTML = '<div class="empty">暂无待做事项</div>'; return; }
+    const today = todayStr();
+    [...todos].sort((a, b) => (a.deadline > b.deadline ? 1 : -1)).forEach((it) => {
+      const overdue = !it.done && it.deadline && it.deadline < today;
+      const row = document.createElement("div");
+      row.className = "todo-row" + (it.done ? " done" : "") + (overdue ? " overdue" : "");
+      const s = document.createElement("div"); s.className = "date-pill"; s.textContent = it.start || "—";
+      const d = document.createElement("div"); d.className = "date-pill"; d.textContent = it.deadline || "—";
+      const t = document.createElement("div"); t.className = "todo-text"; t.textContent = it.text;
+      const badge = document.createElement("div");
+      badge.className = "badge " + (it.done ? "ok" : overdue ? "late" : "prog");
+      badge.textContent = it.done ? "已完成" : overdue ? "已逾期" : "进行中";
+      badge.style.cursor = "pointer";
+      badge.onclick = () => { it.done = !it.done; store.set("wb_todos", todos); renderTodos(); };
+      const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+      del.onclick = () => { todos = todos.filter((x) => x.id !== it.id); store.set("wb_todos", todos); renderTodos(); };
+      row.append(s, d, t, badge, del); list.appendChild(row);
+    });
+  }
+  $("#todo-add").onclick = () => {
+    const text = $("#todo-text").value.trim();
+    if (!text) return;
+    todos.push({ id: uid(), start: $("#todo-start").value, deadline: $("#todo-deadline").value, text, done: false });
+    $("#todo-text").value = ""; store.set("wb_todos", todos); renderTodos();
+  };
+  $("#todo-text").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#todo-add").click(); });
+  $("#todo-clear").onclick = () => {
+    if (!todos.length) return;
+    if (confirm("确定清空全部待做事项？")) { todos = []; store.set("wb_todos", todos); renderTodos(); }
+  };
+  renderTodos();
+
+  /* ---------- 灵感 ---------- */
+  let ideas = store.get("wb_ideas", []);
+  $("#idea-date").value = curDate;
+  function renderIdeas() {
+    const list = $("#idea-list"); list.innerHTML = "";
+    if (!ideas.length) { list.innerHTML = '<div class="empty">灵感还在路上，记录第一条吧</div>'; return; }
+    ideas.sort((a, b) => (a.date < b.date ? 1 : -1)).forEach((it) => {
+      const row = document.createElement("div"); row.className = "idea-row";
+      const dt = document.createElement("div"); dt.className = "idea-date"; dt.textContent = it.date;
+      const tx = document.createElement("div"); tx.className = "idea-text"; tx.textContent = it.text;
+      const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+      del.onclick = () => { ideas = ideas.filter((x) => x.id !== it.id); store.set("wb_ideas", ideas); renderIdeas(); };
+      row.append(dt, tx, del); list.appendChild(row);
+    });
+  }
+  $("#idea-add").onclick = () => {
+    const text = $("#idea-text").value.trim(); if (!text) return;
+    ideas.push({ id: uid(), date: $("#idea-date").value || curDate, text });
+    $("#idea-text").value = ""; store.set("wb_ideas", ideas); renderIdeas();
+  };
+  $("#idea-text").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#idea-add").click(); });
+  $("#idea-clear").onclick = () => {
+    if (!ideas.length) return;
+    if (confirm("确定清空全部灵感？")) { ideas = []; store.set("wb_ideas", ideas); renderIdeas(); }
+  };
+  renderIdeas();
+
+  function applyRemote(payload) {
+    Object.keys(payload).forEach((k) => {
+      if (k === "wb_board") return;
+      if (k === "wb_plans") plans = payload.plans;
+      else if (k === "wb_todos") todos = payload.todos;
+      else if (k === "wb_ideas") ideas = payload.ideas;
+      store.set(k, payload[k], true);
+    });
+    if (typeof renderPlan === "function") renderPlan();
+    if (typeof renderCalendar === "function") renderCalendar();
+    if (typeof renderTodos === "function") renderTodos();
+    if (typeof renderIdeas === "function") renderIdeas();
+  }
+  showBoard();
+  $("#sync-copy").onclick = function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(Sync.boardId).then(function(){ setStatus("已复制同步码"); })
+        .catch(function(){ prompt("复制此同步码到其它设备：", Sync.boardId); });
+    } else { prompt("复制此同步码到其它设备：", Sync.boardId); }
+  };
+  $("#sync-join").onclick = function () {
+    const code = prompt("粘贴其它设备的同步码，加入同一份数据：");
+    if (code && code.trim()) { localStorage.setItem("wb_board", code.trim()); location.reload(); }
+  };
+  $("#sync-now").onclick = function () { Sync.push().then(function(){ return Sync.pull(); }); };
+
+  /* 导出 / 导入备份 */
+  function exportData() {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf("wb_") === 0) {
+        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch (e) { data[k] = localStorage.getItem(k); }
+      }
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    const d = new Date(), p = (n) => String(n).padStart(2, "0");
+    a.href = URL.createObjectURL(blob);
+    a.download = "工作台备份_" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setStatus("已导出备份");
+  }
+  function importData(file) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!confirm("导入会用备份覆盖当前数据并同步到云端，确定继续？")) return;
+        Object.keys(data).forEach((k) => {
+          if (k.indexOf("wb_") === 0 && k !== "wb_board") store.set(k, data[k], true);
+        });
+        plans = store.get("wb_plans", {});
+        todos = store.get("wb_todos", []);
+        ideas = store.get("wb_ideas", []);
+        renderPlan(); renderCalendar(); renderTodos(); renderIdeas();
+        Sync.push();
+        setStatus("已导入并同步");
+      } catch (e) { alert("文件格式有误，导入失败"); }
+    };
+    reader.readAsText(file);
+  }
+  $("#sync-export").onclick = exportData;
+  $("#sync-import").onclick = function () { $("#sync-file").click(); };
+  $("#sync-file").addEventListener("change", function (e) {
+    const f = e.target.files && e.target.files[0];
+    if (f) importData(f);
+    e.target.value = "";
+  });
+
+  /* 自动备份（定时把数据导出成 JSON 存到你电脑，脱离任何账号也能恢复） */
+  const autobkSel = $("#autobackup");
+  const autobkStatus = $("#autobk-status");
+  function fmtTime(ts) {
+    if (!ts) return "从未";
+    const d = new Date(Number(ts)), p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function updateAutobkStatus() {
+    const last = Number(localStorage.getItem("wb_lastbackup") || 0);
+    autobkStatus.innerHTML = "上次 <b>" + fmtTime(last) + "</b>";
+  }
+  function runAutoBackup() {
+    const mode = autobkSel.value;
+    if (mode === "off") { updateAutobkStatus(); return; }
+    const last = Number(localStorage.getItem("wb_lastbackup") || 0);
+    const now = Date.now();
+    if (mode === "daily" && last && now - last < 24 * 3600 * 1000) { updateAutobkStatus(); return; }
+    exportData();
+    localStorage.setItem("wb_lastbackup", String(now));
+    updateAutobkStatus();
+  }
+  autobkSel.value = localStorage.getItem("wb_autobackup") || "daily";
+  autobkSel.addEventListener("change", function () {
+    localStorage.setItem("wb_autobackup", autobkSel.value);
+    if (autobkSel.value !== "off") runAutoBackup(); else updateAutobkStatus();
+  });
+  updateAutobkStatus();
+  setTimeout(runAutoBackup, 1500);
+
+  /* ---------- APP分享（URL Scheme 唤起手机APP） ---------- */
+  const APPS = [
+    { name: "哔哩哔哩", ic: "📺", scheme: "bilibili://", web: "https://www.bilibili.com", cat: "内容娱乐" },
+    { name: "抖音", ic: "🎵", scheme: "snssdk1128://", web: "https://www.douyin.com", cat: "内容娱乐" },
+    { name: "小红书", ic: "📕", scheme: "xhsdiscover://", web: "https://www.xiaohongshu.com", cat: "内容娱乐" },
+    { name: "喜马拉雅", ic: "🎧", scheme: "iting://", web: "https://www.ximalaya.com", cat: "内容娱乐" },
+    { name: "YY", ic: "🎙️", scheme: "yymobile://", web: "https://www.yy.com", cat: "内容娱乐" },
+    { name: "京东", ic: "🛒", scheme: "openapp.jdmobile://", web: "https://m.jd.com", cat: "购物" },
+    { name: "淘宝", ic: "🛍️", scheme: "taobao://", web: "https://www.taobao.com", cat: "购物" },
+    { name: "拼多多", ic: "📦", scheme: "pinduoduo://", web: "https://mobile.yangkeduo.com", cat: "购物" },
+    { name: "支付宝", ic: "💙", scheme: "alipay://", web: "https://www.alipay.com", cat: "金融" },
+    { name: "京东金融", ic: "🏦", scheme: "jrjd://", web: "https://jr.jd.com", cat: "金融" },
+    { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具" }
+  ];
+  const APP_CATS = ["内容娱乐", "购物", "金融", "工具"];
+  function openApp(app) {
+    if (!app.scheme) { window.location.href = app.web; return; }
+    let left = false;
+    const onHide = () => { left = true; };
+    document.addEventListener("visibilitychange", onHide);
+    window.location.href = app.scheme;
+    setTimeout(() => {
+      document.removeEventListener("visibilitychange", onHide);
+      if (!left) window.location.href = app.web;
+    }, 1500);
+  }
+  (function renderApps() {
+    const box = document.getElementById("app-list");
+    if (!box) return;
+    APP_CATS.forEach((cat) => {
+      const items = APPS.filter((a) => a.cat === cat);
+      if (!items.length) return;
+      const title = document.createElement("div");
+      title.className = "sec-title";
+      title.innerHTML = '<span class="bar"></span>' + cat;
+      box.appendChild(title);
+      const grid = document.createElement("div");
+      grid.className = "app-grid";
+      items.forEach((a) => {
+        const card = document.createElement("div");
+        card.className = "app-card";
+        card.innerHTML = '<div class="app-ic">' + a.ic + '</div><div class="app-name">' + a.name + "</div>";
+        card.onclick = () => openApp(a);
+        grid.appendChild(card);
+      });
+      box.appendChild(grid);
+    });
+  })();
+
+  Sync.onRemote = applyRemote;
+  });
+})();
+</script>
+</body>
+</html>
