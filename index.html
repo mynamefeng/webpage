@@ -242,10 +242,31 @@
 
   /* 灵感 */
   .idea-row { display:flex; align-items:flex-start; gap:12px; background:#fbfdfc; border:1.5px solid var(--line); border-radius:14px; padding:13px 16px; margin-bottom:10px;}
-  .idea-date { font-size:12px; color:#fff; background:var(--sky); padding:4px 11px; border-radius:12px; white-space:nowrap; font-weight:600; flex-shrink:0;}
   .idea-text { flex:1; font-size:15px; white-space:pre-wrap; word-break:break-word;}
+  /* 灵感：分组汇总 + 多选 + 重点 */
+  .idea-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:14px 0 10px; }
+  .idea-toolbar .btn.active { background: linear-gradient(135deg, var(--mint), var(--sky)); color:#fff; border-color:transparent; }
+  .idea-summary { font-size:13px; color:var(--ink-soft); margin-left:auto; }
+  .idea-selcount { font-size:13px; color:var(--mint-deep); font-weight:700; }
+  .idea-group { margin-bottom:14px; }
+  .idea-group-head { display:flex; align-items:center; gap:10px; margin:6px 2px 8px; }
+  .idea-group-date { font-size:13.5px; font-weight:800; color:var(--mint-deep); }
+  .idea-group-count { font-size:12px; color:var(--ink-soft); background:#eef6f3; border-radius:999px; padding:2px 10px; }
+  .idea-row.idea-key { background: linear-gradient(135deg,#fff8e6,#fffdf6); border-color:#f0c869; }
+  .idea-row.idea-key .idea-text { font-weight:700; color:#7a5a00; }
+  .idea-row.idea-sel { border-color:var(--mint); box-shadow:0 0 0 2px rgba(94,198,184,.25); }
+  .idea-check { width:18px; height:18px; margin-top:3px; flex-shrink:0; cursor:pointer; accent-color:var(--mint); }
+  .idea-key-badge { font-size:12px; font-weight:700; color:#a8791a; background:#fdeec2; border-radius:999px; padding:2px 10px; flex-shrink:0; }
+  /* 通用确认弹窗（避开沙箱拦截原生 confirm） */
+  .wb-confirm-mask { position:fixed; inset:0; background:rgba(47,79,74,.45); backdrop-filter:blur(2px); display:none; align-items:center; justify-content:center; z-index:80; }
+  .wb-confirm-mask.open { display:flex; }
+  .wb-confirm-box { background:#fff; border-radius:18px; padding:22px; max-width:320px; width:86%; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+  .wb-confirm-msg { font-size:15px; color:var(--ink); line-height:1.6; margin-bottom:18px; }
+  .wb-confirm-btns { display:flex; gap:10px; }
+  .wb-confirm-btns .btn { flex:1; }
 
-  .jump-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+  /* 灵感：平台快捷跳转 */
+  .jump-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
   .jump {
     display:flex; align-items:center; gap:8px;
     text-decoration:none;
@@ -257,6 +278,7 @@
     transition: all .2s;
   }
   .jump:hover { border-color: var(--mint); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .jump .ic { font-size:18px; }
 
   .app-wrap { margin-top: 6px; }
   .app-cat-label { font-size: 13px; font-weight: 600; color: var(--mint); margin: 16px 0 8px; padding-left: 10px; border-left: 3px solid var(--mint); }
@@ -314,7 +336,6 @@
   .app-ic { font-size:26px; line-height:1; }
   .app-name { font-size:14px; font-weight:600; color: var(--ink); }
   .app-hint { color: var(--ink-soft); font-size:13px; margin-bottom:14px; }
-  .jump .ic { font-size:18px; }
 
   .empty { color: var(--ink-soft); font-size: 14px; text-align:center; padding: 24px; }
 
@@ -493,56 +514,6 @@
     .edu-account .edu-btn { width: 100%; }
   }
 
-  /* ===== 碎碎念（轻量日记 / 灵感备忘录）===== */
-  .sui-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 14px; }
-  .sui-bar .grow { flex: 1 1 200px; min-width: 0; }
-  .sui-bar input[type="search"] { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 15px; outline: none; background: #fbfdfc; }
-  .sui-bar input[type="search"]:focus { border-color: var(--mint); }
-  .sui-cats { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; margin-bottom: 12px; }
-  .sui-cats::-webkit-scrollbar { height: 0; }
-  .sui-cat { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-weight: 600; font-size: 13.5px; padding: 7px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: all .2s; }
-  .sui-cat.active { background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(94,198,184,.3); }
-  .sui-card { position: relative; background: #fff; border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: box-shadow .2s, transform .12s; }
-  .sui-card:hover { box-shadow: var(--shadow); }
-  .sui-card:active { transform: scale(.995); }
-  .sui-card.starred { border-color: #f5d77a; }
-  .sui-card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .sui-time { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .sui-badge { display: inline-block; font-size: 12px; color: var(--mint-deep); background: #eef6f3; border-radius: 999px; padding: 3px 10px; font-weight: 600; }
-  .sui-preview { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; padding-right: 26px; }
-  .sui-card .sui-star { position: absolute; top: 12px; right: 12px; font-size: 18px; color: #f5b400; border: none; background: transparent; cursor: pointer; line-height: 1; padding: 2px 6px; }
-  .sui-empty { text-align: center; color: var(--ink-soft); padding: 30px 16px; font-size: 14px; line-height: 1.7; }
-  .sui-count { font-size: 13px; color: var(--ink-soft); }
-
-  /* 详情 / 编辑弹窗 */
-  .sui-modal-mask { position: fixed; inset: 0; background: rgba(47,79,74,.45); backdrop-filter: blur(3px); display: none; align-items: flex-end; justify-content: center; z-index: 60; padding: 0; }
-  .sui-modal-mask.open { display: flex; }
-  .sui-modal { background: #fff; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 22px; box-shadow: 0 -10px 40px rgba(0,0,0,.2); animation: suiUp .3s ease; }
-  @keyframes suiUp { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
-  .sui-modal h3 { font-size: 17px; color: var(--mint-deep); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .sui-modal .sui-close { border: none; background: var(--line); color: var(--ink-soft); width: 30px; height: 30px; border-radius: 50%; font-size: 15px; cursor: pointer; flex: 0 0 auto; }
-  .sui-modal .sui-close:hover { background: #d9ece8; }
-  .sui-modal-time { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 16px; }
-  .sui-field { margin-bottom: 14px; }
-  .sui-field > label { display: block; font-size: 13px; color: var(--ink-soft); font-weight: 600; margin-bottom: 6px; }
-  .sui-modal textarea { width: 100%; min-height: 150px; }
-  .sui-catpick { display: flex; gap: 8px; flex-wrap: wrap; }
-  .sui-catpick button { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-size: 13px; padding: 6px 13px; border-radius: 999px; cursor: pointer; transition: all .2s; }
-  .sui-catpick button.on { background: var(--mint); color: #fff; border-color: transparent; }
-  .sui-actions { display: flex; gap: 10px; margin-top: 6px; }
-  .sui-actions .btn { flex: 1; font-size: 14px; }
-  .btn.danger { background: #fff; color: #e26a6a; border: 1.5px solid #f3c9c9; }
-  .btn.danger:hover { background: #fff4f4; }
-  @media (min-width: 600px) {
-    .sui-modal-mask { align-items: center; padding: 20px; }
-    .sui-modal { border-radius: 22px; }
-  }
-  @media (max-width: 720px) {
-    .sui-bar input[type="search"] { font-size: 16px; }
-    .sui-preview { font-size: 15px; }
-    .sui-card { padding: 14px 16px; }
-  }
-
   </style>
 </head>
 <body>
@@ -554,7 +525,6 @@
       <button class="tab" data-view="todo">待做事项</button>
       <button class="tab" data-view="idea">灵感</button>
       <button class="tab" data-view="habit">习惯打卡</button>
-      <button class="tab" data-view="suisui">💬 碎碎念</button>
     </div>
     <div class="nav-box nav-box-b">
       <button class="tab" data-view="app">APP分享</button>
@@ -649,22 +619,29 @@
   <section class="view" id="view-idea">
     <div class="panel">
       <h2>💡 灵感收集</h2>
-      <div class="sub">随手记录，可随时增删；最后一键跳转创作平台</div>
+      <div class="sub">随手记录灵感、文案与点子，可随时增删</div>
       <div class="add-row">
         <input type="date" id="idea-date" />
         <input type="text" id="idea-text" class="grow" placeholder="一个灵感、一句文案、一个点子…" />
         <button class="btn" id="idea-add">添加</button>
         <button class="btn ghost" id="idea-clear">清空</button>
       </div>
+      <div class="idea-toolbar">
+        <button class="btn ghost" id="idea-multi">☑ 多选</button>
+        <button class="btn ghost" id="idea-selall" style="display:none">全选 / 取消</button>
+        <button class="btn" id="idea-mark-key" style="display:none">★ 标记重点</button>
+        <button class="btn ghost" id="idea-unmark-key" style="display:none">☆ 取消重点</button>
+        <span class="idea-selcount" id="idea-selcount"></span>
+        <span class="idea-summary" id="idea-summary"></span>
+      </div>
       <div id="idea-list"></div>
 
       <div class="sec-title"><span class="bar"></span>快捷跳转平台</div>
       <div class="jump-bar">
-        <a class="jump" href="https://www.xiaohongshu.com" target="_blank" rel="noopener"><span class="ic">📕</span>小红书</a>
-        <a class="jump" href="https://www.douyin.com" target="_blank" rel="noopener"><span class="ic">🎵</span>抖音</a>
-        <a class="jump" href="https://channels.weixin.qq.com" target="_blank" rel="noopener"><span class="ic">🟢</span>视频号</a>
-        <a class="jump" href="https://www.bilibili.com" target="_blank" rel="noopener"><span class="ic">📺</span>哔哩哔哩</a>
-        <a class="jump" href="https://weibo.com" target="_blank" rel="noopener"><span class="ic">🌐</span>微博</a>
+        <a class="jump" href="https://www.douyin.com/hot" data-scheme="snssdk1128://" data-web="https://www.douyin.com/hot" data-name="抖音" target="_blank" rel="noopener" title="抖音热点宝：赛道爆款、上升热点、低粉爆款选题（手机端优先唤起 APP）"><span class="ic">🎵</span>抖音 · 热点宝</a>
+        <a class="jump" href="https://www.xiaohongshu.com/explore" data-scheme="xhsdiscover://" data-web="https://www.xiaohongshu.com/explore" data-name="小红书" target="_blank" rel="noopener" title="小红书笔记灵感 + 平台热榜：种草类热门选题（手机端优先唤起 APP）"><span class="ic">📕</span>小红书 · 笔记灵感</a>
+        <a class="jump" href="https://www.bilibili.com/v/popular/rank/all" data-scheme="bilibili://" data-web="https://www.bilibili.com/v/popular/rank/all" data-name="哔哩哔哩" target="_blank" rel="noopener" title="B站热门榜单：全站热点视频与话题（手机端优先唤起 APP）"><span class="ic">📺</span>哔哩哔哩 · 热门榜</a>
+        <a class="jump" href="https://s.weibo.com/top/summary" data-scheme="sinaweibo://" data-web="https://s.weibo.com/top/summary" data-name="微博" target="_blank" rel="noopener" title="微博实时热搜榜：全网时事热点（手机端优先唤起 APP）"><span class="ic">🌐</span>微博 · 热搜榜</a>
       </div>
     </div>
   </section>
@@ -739,42 +716,6 @@
     <div id="edu-empty" class="edu-empty" style="display:none">未找到匹配的博主 / 渠道，换个关键词试试～</div>
   </section>
 
-  <!-- 碎碎念：轻量日记 / 灵感备忘录 -->
-  <section class="view" id="view-suisui">
-    <h2>💬 碎碎念</h2>
-    <div class="sub">轻量化日记 / 灵感备忘录，随手记录想法、日常感悟、工作灵感。点卡片看详情，可编辑、可删除、可收藏。</div>
-    <div class="sui-bar">
-      <input type="search" id="suisui-search" class="grow" placeholder="搜索碎碎念内容 / 分类…" />
-      <button class="btn ghost" id="suisui-favonly">★ 收藏</button>
-      <button class="btn" id="suisui-new">✏️ 新建碎碎念</button>
-    </div>
-    <div class="sui-cats" id="suisui-cats"></div>
-    <div class="sui-bar" style="margin:0 0 6px"><span class="sui-count" id="suisui-count"></span></div>
-    <div id="suisui-list"></div>
-  </section>
-
-  <!-- 自律督促工作站 -->
-  
-  <!-- 碎碎念详情 / 编辑弹窗 -->
-  <div class="sui-modal-mask" id="suisui-modal">
-    <div class="sui-modal">
-      <h3>✏️ 碎碎念 <button class="sui-close" id="suisui-close" title="关闭">✕</button></h3>
-      <div class="sui-modal-time" id="suisui-modal-time"></div>
-      <div class="sui-field">
-        <label>内容</label>
-        <textarea id="suisui-text" placeholder="此刻在想什么？随手记下来…"></textarea>
-      </div>
-      <div class="sui-field">
-        <label>分类标签（可选）</label>
-        <div class="sui-catpick" id="suisui-catpick"></div>
-      </div>
-      <div class="sui-actions">
-        <button class="btn ghost" id="suisui-modal-star">☆ 收藏</button>
-        <button class="btn danger" id="suisui-delete">删除</button>
-        <button class="btn" id="suisui-save">保存</button>
-      </div>
-    </div>
-  </div>
 </main>
 
 <script>
@@ -1002,30 +943,120 @@
   renderTodos();
 
   /* ---------- 灵感 ---------- */
+  /* 通用确认弹窗：避免沙箱/iframe 拦截原生 confirm */
+  function wbConfirm(msg, onYes) {
+    let mask = document.getElementById("wb-confirm-mask");
+    if (!mask) {
+      mask = document.createElement("div");
+      mask.id = "wb-confirm-mask";
+      mask.className = "wb-confirm-mask";
+      mask.innerHTML = '<div class="wb-confirm-box"><div class="wb-confirm-msg"></div><div class="wb-confirm-btns"><button class="btn ghost" data-no>取消</button><button class="btn" data-yes>确定</button></div></div>';
+      document.body.appendChild(mask);
+    }
+    mask.querySelector(".wb-confirm-msg").textContent = msg;
+    mask.classList.add("open");
+    const yes = mask.querySelector("[data-yes]");
+    const no = mask.querySelector("[data-no]");
+    yes.onclick = function () { mask.classList.remove("open"); if (onYes) onYes(); };
+    no.onclick = function () { mask.classList.remove("open"); };
+    mask.onclick = function (e) { if (e.target === mask) mask.classList.remove("open"); };
+  }
+
   let ideas = store.get("wb_ideas", []);
   $("#idea-date").value = curDate;
+  let ideaMulti = false;
+  const ideaSel = new Set();
+  const ideaListEl = $("#idea-list");
+  const ideaSummaryEl = $("#idea-summary");
+  const ideaSelCountEl = $("#idea-selcount");
+  const ideaMultiBtn = $("#idea-multi");
+  const ideaSelAllBtn = $("#idea-selall");
+
   function renderIdeas() {
-    const list = $("#idea-list"); list.innerHTML = "";
-    if (!ideas.length) { list.innerHTML = '<div class="empty">灵感还在路上，记录第一条吧</div>'; return; }
-    ideas.sort((a, b) => (a.date < b.date ? 1 : -1)).forEach((it) => {
-      const row = document.createElement("div"); row.className = "idea-row";
-      const dt = document.createElement("div"); dt.className = "idea-date"; dt.textContent = it.date;
-      const tx = document.createElement("div"); tx.className = "idea-text"; tx.textContent = it.text;
-      const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
-      del.onclick = () => { ideas = ideas.filter((x) => x.id !== it.id); store.set("wb_ideas", ideas); renderIdeas(); };
-      row.append(dt, tx, del); list.appendChild(row);
+    ideaListEl.innerHTML = "";
+    ideas.forEach(function (it) { it.key = !!it.key; });
+    const dates = {};
+    let keyCount = 0;
+    ideas.forEach(function (it) { dates[it.date] = (dates[it.date] || 0) + 1; if (it.key) keyCount++; });
+    if (ideaSummaryEl) ideaSummaryEl.textContent = "共 " + ideas.length + " 条 · 覆盖 " + Object.keys(dates).length + " 个日期 · 重点 " + keyCount + " 条";
+    if (ideaSelCountEl) ideaSelCountEl.textContent = ideaMulti ? ("已选 " + ideaSel.size + " 项") : "";
+
+    if (!ideas.length) { ideaListEl.innerHTML = '<div class="empty">灵感还在路上，记录第一条吧</div>'; return; }
+
+    // 按日期分组汇总（满足「汇总全部日期下的内容」）
+    const sortedDates = Object.keys(dates).sort(function (a, b) { return a < b ? 1 : -1; });
+    sortedDates.forEach(function (d) {
+      const group = document.createElement("div");
+      group.className = "idea-group";
+      const head = document.createElement("div");
+      head.className = "idea-group-head";
+      head.innerHTML = '<span class="idea-group-date">📅 ' + esc(d) + '</span><span class="idea-group-count">' + dates[d] + ' 条</span>';
+      group.appendChild(head);
+
+      ideas.filter(function (it) { return it.date === d; }).sort(function (a, b) { return (a.id < b.id ? 1 : -1); }).forEach(function (it) {
+        const row = document.createElement("div");
+        row.className = "idea-row" + (it.key ? " idea-key" : "") + (ideaSel.has(it.id) ? " idea-sel" : "");
+        if (ideaMulti) {
+          const chk = document.createElement("input");
+          chk.type = "checkbox"; chk.className = "idea-check"; chk.checked = ideaSel.has(it.id);
+          chk.onclick = function (e) { e.stopPropagation(); toggleIdeaSel(it.id); };
+          row.appendChild(chk);
+        }
+        if (it.key) {
+          const badge = document.createElement("span");
+          badge.className = "idea-key-badge"; badge.textContent = "★ 重点";
+          row.appendChild(badge);
+        }
+        const tx = document.createElement("div"); tx.className = "idea-text"; tx.textContent = it.text;
+        const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+        del.onclick = function (e) { e.stopPropagation(); ideas = ideas.filter(function (x) { return x.id !== it.id; }); ideaSel.delete(it.id); store.set("wb_ideas", ideas); renderIdeas(); };
+        row.appendChild(tx); row.appendChild(del);
+        if (ideaMulti) row.onclick = function () { toggleIdeaSel(it.id); };
+        group.appendChild(row);
+      });
+      ideaListEl.appendChild(group);
     });
   }
-  $("#idea-add").onclick = () => {
+  function toggleIdeaSel(id) { if (ideaSel.has(id)) ideaSel.delete(id); else ideaSel.add(id); renderIdeas(); }
+  function setIdeaKey(val) {
+    if (!ideaSel.size) { if (typeof showToast === "function") showToast("先点「☑ 多选」勾选要标记的内容"); return; }
+    ideas.forEach(function (it) { if (ideaSel.has(it.id)) it.key = val; });
+    store.set("wb_ideas", ideas);
+    ideaSel.clear();
+    renderIdeas();
+    if (typeof showToast === "function") showToast(val ? "已标记为「重点」★" : "已取消「重点」");
+  }
+  function toggleIdeaMulti() {
+    ideaMulti = !ideaMulti;
+    ideaMultiBtn.classList.toggle("active", ideaMulti);
+    ideaMultiBtn.textContent = ideaMulti ? "☑ 多选中" : "☑ 多选";
+    if (!ideaMulti) ideaSel.clear();
+    ideaSelAllBtn.style.display = ideaMulti ? "" : "none";
+    $("#idea-mark-key").style.display = ideaMulti ? "" : "none";
+    $("#idea-unmark-key").style.display = ideaMulti ? "" : "none";
+    renderIdeas();
+  }
+  function ideaToggleSelAll() {
+    const allSelected = ideas.length && ideaSel.size === ideas.length;
+    if (allSelected) ideaSel.clear(); else ideas.forEach(function (it) { ideaSel.add(it.id); });
+    renderIdeas();
+  }
+
+  $("#idea-add").onclick = function () {
     const text = $("#idea-text").value.trim(); if (!text) return;
-    ideas.push({ id: uid(), date: $("#idea-date").value || curDate, text });
+    ideas.push({ id: uid(), date: $("#idea-date").value || curDate, text: text, key: false });
     $("#idea-text").value = ""; store.set("wb_ideas", ideas); renderIdeas();
   };
-  $("#idea-text").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#idea-add").click(); });
-  $("#idea-clear").onclick = () => {
+  $("#idea-text").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#idea-add").click(); });
+  $("#idea-clear").onclick = function () {
     if (!ideas.length) return;
-    if (confirm("确定清空全部灵感？")) { ideas = []; store.set("wb_ideas", ideas); renderIdeas(); }
+    wbConfirm("确定清空全部灵感？此操作不可恢复。", function () { ideas = []; ideaSel.clear(); store.set("wb_ideas", ideas); renderIdeas(); });
   };
+  ideaMultiBtn.onclick = toggleIdeaMulti;
+  ideaSelAllBtn.onclick = ideaToggleSelAll;
+  $("#idea-mark-key").onclick = function () { setIdeaKey(true); };
+  $("#idea-unmark-key").onclick = function () { setIdeaKey(false); };
+
   renderIdeas();
 
   function applyRemote(payload) {
@@ -1152,6 +1183,14 @@
       box.appendChild(grid);
     });
   })();
+
+  /* 灵感模块平台快捷跳转：手机端优先唤起 APP（避开网页广告/非 APP 内页），未安装再回落网页 */
+  document.addEventListener("click", function (e) {
+    var j = e.target && e.target.closest ? e.target.closest("a.jump") : null;
+    if (!j || !j.dataset || !j.dataset.scheme) return;
+    e.preventDefault();
+    openApp({ scheme: j.dataset.scheme, web: j.dataset.web, name: j.dataset.name });
+  });
 
   /* ---------- 习惯打卡 ---------- */
   let habits = store.get("wb_habits", []);
@@ -1948,187 +1987,6 @@
     var t = document.querySelector('.tab[data-view="edu"]'); if (t) t.click();
   };
 
-  /* ===== 碎碎念（轻量日记 / 灵感备忘录）===== */
-  var SUI_CATS = ["工作灵感", "日常感悟", "剪辑想法", "运动记录"];
-  var suiItems = store.get("wb_suisui", []);
-  function saveSui() { store.set("wb_suisui", suiItems); }
-  function suiFmt(iso) {
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return "";
-    var p = function (n) { return n < 10 ? "0" + n : "" + n; };
-    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
-  }
-  function suiNow() { return new Date().toISOString(); }
-
-  var suiCur = { id: null, cat: "", star: false };
-  var suiFilterCat = "all";
-  var suiFavOnly = false;
-  var suiQuery = "";
-  var suiListEl, suiSearchEl, suiCatsEl, suiFavBtn, suiCountEl, suiModal, suiText, suiCatWrap, suiModalStar, suiSaveBtn, suiDelBtn, suiCloseBtn, suiModalTime;
-
-  function renderSuiList() {
-    if (!suiListEl) return;
-    suiListEl.innerHTML = "";
-    var q = suiQuery.trim().toLowerCase();
-    var filtered = suiItems.filter(function (it) {
-      if (suiFilterCat !== "all" && it.cat !== suiFilterCat) return false;
-      if (suiFavOnly && !it.star) return false;
-      if (q && (it.text + " " + (it.cat || "")).toLowerCase().indexOf(q) < 0) return false;
-      return true;
-    });
-    filtered.sort(function (a, b) { return new Date(b.created) - new Date(a.created); });
-    if (suiCountEl) suiCountEl.textContent = filtered.length ? ("共 " + filtered.length + " 条") : "";
-    if (!filtered.length) {
-      var empty = document.createElement("div");
-      empty.className = "sui-empty";
-      empty.textContent = suiItems.length ? "没有符合条件的碎碎念，换个筛选或关键词试试～" : "还没有碎碎念，点「✏️ 新建碎碎念」记下第一条吧～";
-      suiListEl.appendChild(empty);
-      return;
-    }
-    filtered.forEach(function (it) {
-      var card = document.createElement("div");
-      card.className = "sui-card" + (it.star ? " starred" : "");
-      var badge = it.cat ? '<span class="sui-badge">' + esc(it.cat) + '</span>' : "";
-      card.innerHTML =
-        '<div class="sui-card-top"><span class="sui-time">🕒 ' + esc(suiFmt(it.created)) + '</span>' + badge + '</div>' +
-        '<div class="sui-preview">' + esc(it.text) + '</div>' +
-        '<button class="sui-star" data-id="' + it.id + '" title="收藏"> ' + (it.star ? "★" : "☆") + '</button>';
-      card.onclick = function () { openSui(it.id); };
-      var starBtn = card.querySelector(".sui-star");
-      starBtn.onclick = function (e) { e.stopPropagation(); toggleSuiStar(it.id); };
-      suiListEl.appendChild(card);
-    });
-  }
-
-  function toggleSuiStar(id) {
-    var it = suiItems.find(function (x) { return x.id === id; });
-    if (!it) return;
-    it.star = !it.star;
-    saveSui();
-    renderSuiList();
-  }
-
-  function openSui(id) {
-    var it = suiItems.find(function (x) { return x.id === id; });
-    if (!it) return;
-    suiCur = { id: it.id, cat: it.cat || "", star: !!it.star };
-    suiText.value = it.text;
-    suiText.style.borderColor = "";
-    suiModalTime.textContent = "创建于 " + suiFmt(it.created) + (it.updated && it.updated !== it.created ? "（编辑于 " + suiFmt(it.updated) + "）" : "");
-    renderSuiCatPick();
-    suiModalStar.textContent = it.star ? "★ 已收藏" : "☆ 收藏";
-    suiModalStar.classList.toggle("on", it.star);
-    suiDelBtn.style.display = "";
-    suiModal.classList.add("open");
-    suiText.focus();
-  }
-  function openNewSui() {
-    suiCur = { id: null, cat: "", star: false };
-    suiText.value = "";
-    suiText.style.borderColor = "";
-    suiModalTime.textContent = "";
-    renderSuiCatPick();
-    suiModalStar.textContent = "☆ 收藏";
-    suiModalStar.classList.remove("on");
-    suiDelBtn.style.display = "none";
-    suiModal.classList.add("open");
-    suiText.focus();
-  }
-  function renderSuiCatPick() {
-    suiCatWrap.innerHTML = "";
-    SUI_CATS.forEach(function (c) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.textContent = c;
-      b.className = suiCur.cat === c ? "on" : "";
-      b.onclick = function () { suiCur.cat = c; renderSuiCatPick(); };
-      suiCatWrap.appendChild(b);
-    });
-  }
-  function closeSui() { suiModal.classList.remove("open"); }
-
-  function saveSuiModal() {
-    var text = suiText.value.trim();
-    if (!text) { suiText.focus(); suiText.style.borderColor = "var(--warn)"; return; }
-    suiText.style.borderColor = "";
-    if (suiCur.id) {
-      var it = suiItems.find(function (x) { return x.id === suiCur.id; });
-      if (it) { it.text = text; it.cat = suiCur.cat; it.star = suiCur.star; it.updated = suiNow(); }
-    } else {
-      suiItems.push({ id: uid(), text: text, cat: suiCur.cat, star: suiCur.star, created: suiNow(), updated: suiNow() });
-    }
-    saveSui();
-    closeSui();
-    renderSuiList();
-  }
-  function deleteSui() {
-    if (!suiCur.id) return;
-    if (!confirm("确定删除这条碎碎念吗？此操作不可恢复。")) return;
-    suiItems = suiItems.filter(function (x) { return x.id !== suiCur.id; });
-    saveSui();
-    closeSui();
-    renderSuiList();
-  }
-  function toggleModalStar() {
-    suiCur.star = !suiCur.star;
-    suiModalStar.textContent = suiCur.star ? "★ 已收藏" : "☆ 收藏";
-    suiModalStar.classList.toggle("on", suiCur.star);
-  }
-
-  function renderSuiCats() {
-    if (!suiCatsEl) return;
-    suiCatsEl.innerHTML = "";
-    var opts = [{ k: "all", t: "全部" }].concat(SUI_CATS.map(function (c) { return { k: c, t: c }; }));
-    opts.forEach(function (o) {
-      var b = document.createElement("button");
-      b.className = "sui-cat" + (suiFilterCat === o.k ? " active" : "");
-      b.textContent = o.t;
-      b.onclick = function () { suiFilterCat = o.k; renderSuiCats(); renderSuiList(); };
-      suiCatsEl.appendChild(b);
-    });
-  }
-
-  function initSui() {
-    suiListEl = document.getElementById("suisui-list");
-    suiSearchEl = document.getElementById("suisui-search");
-    suiCatsEl = document.getElementById("suisui-cats");
-    suiFavBtn = document.getElementById("suisui-favonly");
-    suiCountEl = document.getElementById("suisui-count");
-    suiModal = document.getElementById("suisui-modal");
-    suiText = document.getElementById("suisui-text");
-    suiCatWrap = document.getElementById("suisui-catpick");
-    suiModalStar = document.getElementById("suisui-modal-star");
-    suiSaveBtn = document.getElementById("suisui-save");
-    suiDelBtn = document.getElementById("suisui-delete");
-    suiCloseBtn = document.getElementById("suisui-close");
-    suiModalTime = document.getElementById("suisui-modal-time");
-
-    var newBtn = document.getElementById("suisui-new");
-    if (newBtn) newBtn.onclick = openNewSui;
-    if (suiSearchEl) suiSearchEl.oninput = function () { suiQuery = suiSearchEl.value; renderSuiList(); };
-    if (suiFavBtn) suiFavBtn.onclick = function () { suiFavOnly = !suiFavOnly; suiFavBtn.classList.toggle("active", suiFavOnly); renderSuiList(); };
-    suiCloseBtn.onclick = closeSui;
-    suiSaveBtn.onclick = saveSuiModal;
-    suiDelBtn.onclick = deleteSui;
-    suiModalStar.onclick = toggleModalStar;
-    suiModal.onclick = function (e) { if (e.target === suiModal) closeSui(); };
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && suiModal.classList.contains("open")) closeSui(); });
-
-    renderSuiCats();
-    renderSuiList();
-  }
-  initSui();
-  window.addSuisuiNote = function (text, cat) {
-    text = (text || "").trim();
-    if (!text) return false;
-    suiItems.push({ id: uid(), text: text, cat: cat || "", star: false, created: suiNow(), updated: suiNow() });
-    saveSui();
-    renderSuiList();
-    return true;
-  };
-  window.openSuisuiNew = openNewSui;
-
-  /* ===== 自律督促工作站（不纵容摆烂 · 聚焦行动）===== */
 })();
 
 </script>
