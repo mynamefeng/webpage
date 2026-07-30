@@ -22,12 +22,14 @@
     --shadow: 0 8px 24px rgba(93, 178, 184, 0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { overflow-x: hidden; }
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
     background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
     color: var(--ink);
     min-height: 100vh;
     padding: 0 0 60px;
+    overflow-x: hidden;
   }
 
   /* 顶部导航 */
@@ -78,6 +80,23 @@
     background: linear-gradient(135deg, var(--mint), var(--sky));
     color: #fff;
     box-shadow: 0 6px 16px rgba(94,198,184,.35);
+  }
+  .nav-group {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    color: var(--mint-deep);
+    opacity: .5;
+    padding: 0 4px 0 2px;
+    align-self: center;
+    white-space: nowrap;
+  }
+  .nav-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    margin: 0 8px;
+    align-self: center;
   }
 
   main { max-width: 1080px; margin: 26px auto 0; padding: 0 22px; }
@@ -242,7 +261,10 @@
   }
   .jump:hover { border-color: var(--mint); transform: translateY(-2px); box-shadow: var(--shadow); }
 
-  .app-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(118px,1fr)); gap:12px; margin-top:6px; }
+  .app-wrap { margin-top: 6px; }
+  .app-cat-label { font-size: 13px; font-weight: 600; color: var(--mint); margin: 16px 0 8px; padding-left: 10px; border-left: 3px solid var(--mint); }
+  .app-cat-label:first-child { margin-top: 2px; }
+  .app-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(84px,1fr)); gap:10px; margin-top:0; align-content: start; }
   .app-card {
     display:flex; flex-direction:column; align-items:center; gap:8px;
     background: linear-gradient(135deg, #fff, #f3fbf9);
@@ -270,6 +292,8 @@
   .feed-tab { border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px; }
   .feed-tab.active, .feed-tab:hover { border-color: var(--mint); color: var(--mint-deep); background: #eef6f3; }
   .feed-grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .feed-group-head { font-size: 14px; font-weight: 700; color: var(--mint-deep); margin: 16px 0 10px; padding-left: 8px; border-left: 3px solid var(--mint); }
+  .feed-group-head:first-of-type { margin-top: 4px; }
   .vcard { display: block; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden; text-decoration: none; color: var(--ink); transition: transform .15s, box-shadow .15s; }
   .vcard:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(40,170,140,.15); }
   .vcard-thumb { position: relative; aspect-ratio: 16 / 10; background: #eef2f1 center/cover no-repeat; }
@@ -282,6 +306,11 @@
   .vcard-sub { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; font-size: 12px; color: var(--ink-soft); }
   .feed-cat-head { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
   .feed-cat-head .ic { font-size: 18px; }
+  .kcard { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; padding: 16px; min-height: 100px; justify-content: center; text-decoration: none; color: var(--ink); transition: transform .15s, box-shadow .15s, border-color .15s; }
+  .kcard:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(40,170,140,.15); border-color: var(--mint); }
+  .kcard-ic { width: 34px; height: 34px; border-radius: 50%; background: #eef6f3; color: var(--mint-deep); display: grid; place-items: center; font-size: 15px; }
+  .kcard-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .kcard-sub { font-size: 12.5px; color: var(--mint-deep); font-weight: 600; }
   .feed-cat-head .cached { font-size: 11px; font-weight: 400; color: var(--ink-soft); background: #eef4f1; border-radius: 8px; padding: 1px 8px; }
   .hot-fallback { font-size: 13px; color: var(--ink-soft); padding: 6px 2px; }
   .hot-fallback a { color: var(--mint-deep); font-weight: 700; text-decoration: none; }
@@ -318,6 +347,12 @@
   .cal-month .mt { font-size: 12px; font-weight: 700; color: var(--mint-deep); text-align: center; margin-bottom: 6px; }
   .cal-year-total { margin-top: 14px; text-align: center; font-weight: 700; color: var(--mint-deep); }
   .habit-sel { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 10px; font-size: 14px; color: var(--ink); background: #fbfdfc; outline: none; }
+  .habit-time-input { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 10px; font-size: 14px; color: var(--ink); background: #fbfdfc; outline: none; }
+  .habit-time-input::-webkit-calendar-picker-indicator { cursor: pointer; }
+  .habit-remind { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ink-soft); }
+  .habit-remind .habit-time-input { padding: 6px 8px; font-size: 13px; }
+  .wb-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: rgba(20,30,28,.92); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 9999; max-width: 86vw; text-align: center; }
+  .wb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .rec-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
   .rec-bar .btn.active { background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; border-color: var(--mint); }
   .rec-tip { font-size: 12px; color: var(--ink-soft); }
@@ -375,25 +410,160 @@
   .cal-day.sel.has::after { background:#fff; }
 
   @media (max-width: 720px) {
-    .todo-grid, .todo-row { grid-template-columns: 1fr 1fr; }
-    .todo-row { grid-template-columns: 1fr 1fr; }
-    .todo-text { grid-column: 1 / -1; }
     .clock-time { font-size: 28px; }
+
+    /* 待做事项：添加表单 —— 日期并排、文本满宽、按钮并排 */
+    .todo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .todo-grid #todo-start { grid-column: 1; }
+    .todo-grid #todo-deadline { grid-column: 2; }
+    .todo-grid #todo-text { grid-column: 1 / -1; }
+    .todo-grid #todo-add { grid-column: 1; }
+    .todo-grid #todo-clear { grid-column: 2; }
+
+    /* 待做事项：列表卡片 —— 文本居顶、删除右上、日期并排、状态底部 */
+    .todo-head { display: none; }
+    .todo-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+      padding: 14px;
+    }
+    .todo-text { order: 1; flex: 1 1 auto; min-width: 0; font-size: 16px; font-weight: 500; word-break: break-word; }
+    .del { order: 2; flex: 0 0 auto; font-size: 18px; padding: 6px 10px; }
+    .date-pill { order: 3; flex: 1 1 40%; font-size: 12px; }
+    .date-pill + .date-pill { order: 4; }
+    .badge { order: 5; flex: 0 0 auto; }
+
+    /* APP分享：手机端每行固定列数铺满 */
+    .app-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .app-name { font-size: 13px; }
+
+    /* 精神食粮：手机端每行 2 张卡片铺满 */
+    .feed-grid-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kcard { min-height: 92px; padding: 14px; }
+
+    /* 导航：手机端隐藏分组标签、收紧间距，四个工具项仍连续 */
+    .nav { padding: 12px 14px; gap: 6px; }
+    .nav-group { display: none; }
+    .nav-sep { margin: 0 4px; height: 20px; }
+    .tab { padding: 8px 13px; font-size: 14px; }
+    .kcard-title { font-size: 14px; }
   }
-</style>
+  /* ===== 教育口播短视频资料库 ===== */
+  .edu-search { display: flex; gap: 10px; margin: 8px 0 14px; flex-wrap: wrap; }
+  .edu-search input { flex: 1 1 220px; min-width: 0; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 15px; outline: none; background: #fbfdfc; }
+  .edu-search input:focus { border-color: var(--mint); }
+  #edu-favonly.active { border-color: var(--mint); color: var(--mint-deep); background: #eef6f3; }
+  .edu-tabs { display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; margin-bottom: 14px; }
+  .edu-tabs::-webkit-scrollbar { height: 0; }
+  .edu-panel { display: block; }
+  .acc { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; margin-bottom: 14px; overflow: hidden; }
+  .acc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 15px 16px; cursor: pointer; font-weight: 700; font-size: 15.5px; color: var(--ink); user-select: none; }
+  .acc-head .chev { color: var(--mint-deep); transition: transform .2s; font-size: 13px; }
+  .acc.open .acc-head .chev { transform: rotate(180deg); }
+  .acc-body { display: none; padding: 4px 16px 16px; border-top: 1px solid var(--line); }
+  .acc.open .acc-body { display: block; }
+  .edu-blog { border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; margin: 12px 0; background: #fbfdfc; }
+  .edu-blog-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .edu-blog-name { font-size: 17px; font-weight: 800; color: var(--ink); }
+  .edu-star { border: none; background: transparent; font-size: 20px; cursor: pointer; color: #d8a900; line-height: 1; padding: 2px 6px; }
+  .edu-star.on { color: #f5b400; }
+  .edu-badge { display: inline-block; margin: 8px 0; font-size: 12px; color: var(--mint-deep); background: #eef6f3; border-radius: 999px; padding: 3px 10px; font-weight: 600; }
+  .edu-row { display: flex; gap: 10px; margin: 7px 0; font-size: 14.5px; line-height: 1.6; }
+  .edu-k { flex: 0 0 64px; color: var(--ink-soft); font-weight: 600; }
+  .edu-row > span:last-child { flex: 1; color: var(--ink); }
+  .edu-btn { margin-top: 10px; border: none; background: var(--mint); color: #fff; font-weight: 700; font-size: 14.5px; padding: 10px 16px; border-radius: 12px; cursor: pointer; }
+  .edu-btn.sm { padding: 8px 14px; font-size: 13.5px; }
+  .edu-btn:hover { background: var(--mint-deep); }
+  .edu-account { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 12px 0; background: #fbfdfc; }
+  .edu-account-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .edu-ul { margin: 6px 0; padding-left: 20px; }
+  .edu-ul li { font-size: 14.5px; line-height: 1.8; margin: 4px 0; }
+  .edu-check { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.6; margin: 10px 0; cursor: pointer; }
+  .edu-check input { margin-top: 4px; width: 17px; height: 17px; accent-color: var(--mint); flex: 0 0 auto; }
+  .edu-check.done span { color: var(--ink-soft); text-decoration: line-through; }
+  .edu-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 13.5px; }
+  .edu-table th, .edu-table td { border: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top; }
+  .edu-table th { background: #eef6f3; color: var(--mint-deep); }
+  .edu-ol { margin: 6px 0; padding-left: 22px; }
+  .edu-ol li { font-size: 14px; line-height: 1.8; margin: 4px 0; }
+  .edu-empty { text-align: center; color: var(--ink-soft); padding: 24px; font-size: 14px; }
+  @media (max-width: 720px) {
+    .edu-search input { font-size: 16px; }
+    .edu-blog-name { font-size: 16px; }
+    .edu-row { font-size: 14px; }
+    .acc-head { font-size: 15px; padding: 14px; }
+    .edu-blog { padding: 12px; }
+    .edu-account { flex-direction: column; align-items: stretch; }
+    .edu-account .edu-btn { width: 100%; }
+  }
+
+  /* ===== 碎碎念（轻量日记 / 灵感备忘录）===== */
+  .sui-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 6px 0 14px; }
+  .sui-bar .grow { flex: 1 1 200px; min-width: 0; }
+  .sui-bar input[type="search"] { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 15px; outline: none; background: #fbfdfc; }
+  .sui-bar input[type="search"]:focus { border-color: var(--mint); }
+  .sui-cats { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; margin-bottom: 12px; }
+  .sui-cats::-webkit-scrollbar { height: 0; }
+  .sui-cat { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-weight: 600; font-size: 13.5px; padding: 7px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: all .2s; }
+  .sui-cat.active { background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(94,198,184,.3); }
+  .sui-card { position: relative; background: #fff; border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 18px; margin-bottom: 14px; cursor: pointer; transition: box-shadow .2s, transform .12s; }
+  .sui-card:hover { box-shadow: var(--shadow); }
+  .sui-card:active { transform: scale(.995); }
+  .sui-card.starred { border-color: #f5d77a; }
+  .sui-card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .sui-time { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .sui-badge { display: inline-block; font-size: 12px; color: var(--mint-deep); background: #eef6f3; border-radius: 999px; padding: 3px 10px; font-weight: 600; }
+  .sui-preview { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; padding-right: 26px; }
+  .sui-card .sui-star { position: absolute; top: 12px; right: 12px; font-size: 18px; color: #f5b400; border: none; background: transparent; cursor: pointer; line-height: 1; padding: 2px 6px; }
+  .sui-empty { text-align: center; color: var(--ink-soft); padding: 30px 16px; font-size: 14px; line-height: 1.7; }
+  .sui-count { font-size: 13px; color: var(--ink-soft); }
+
+  /* 详情 / 编辑弹窗 */
+  .sui-modal-mask { position: fixed; inset: 0; background: rgba(47,79,74,.45); backdrop-filter: blur(3px); display: none; align-items: flex-end; justify-content: center; z-index: 60; padding: 0; }
+  .sui-modal-mask.open { display: flex; }
+  .sui-modal { background: #fff; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 22px; box-shadow: 0 -10px 40px rgba(0,0,0,.2); animation: suiUp .3s ease; }
+  @keyframes suiUp { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
+  .sui-modal h3 { font-size: 17px; color: var(--mint-deep); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .sui-modal .sui-close { border: none; background: var(--line); color: var(--ink-soft); width: 30px; height: 30px; border-radius: 50%; font-size: 15px; cursor: pointer; flex: 0 0 auto; }
+  .sui-modal .sui-close:hover { background: #d9ece8; }
+  .sui-modal-time { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 16px; }
+  .sui-field { margin-bottom: 14px; }
+  .sui-field > label { display: block; font-size: 13px; color: var(--ink-soft); font-weight: 600; margin-bottom: 6px; }
+  .sui-modal textarea { width: 100%; min-height: 150px; }
+  .sui-catpick { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sui-catpick button { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-size: 13px; padding: 6px 13px; border-radius: 999px; cursor: pointer; transition: all .2s; }
+  .sui-catpick button.on { background: var(--mint); color: #fff; border-color: transparent; }
+  .sui-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .sui-actions .btn { flex: 1; font-size: 14px; }
+  .btn.danger { background: #fff; color: #e26a6a; border: 1.5px solid #f3c9c9; }
+  .btn.danger:hover { background: #fff4f4; }
+  @media (min-width: 600px) {
+    .sui-modal-mask { align-items: center; padding: 20px; }
+    .sui-modal { border-radius: 22px; }
+  }
+  @media (max-width: 720px) {
+    .sui-bar input[type="search"] { font-size: 16px; }
+    .sui-preview { font-size: 15px; }
+    .sui-card { padding: 14px 16px; }
+  }
+
+  </style>
 </head>
 <body>
 <header>
   <nav class="nav">
     <div class="brand"><span class="dot"></span>清新工作台</div>
+    <span class="nav-group">🧰 我的工具</span>
     <button class="tab active" data-view="plan">每日计划</button>
     <button class="tab" data-view="todo">待做事项</button>
-    <button class="tab" data-view="idea">灵感</button>
     <button class="tab" data-view="app">APP分享</button>
     <button class="tab" data-view="habit">习惯打卡</button>
+    <span class="nav-sep"></span>
+    <span class="nav-group">✨ 内容灵感</span>
+    <button class="tab" data-view="idea">灵感</button>
     <button class="tab" data-view="hot">热点</button>
     <button class="tab" data-view="feed">精神食粮</button>
-  </nav>
+    <button class="tab" data-view="edu">🎓 教育口播</button>
+    <button class="tab" data-view="suisui">💬 碎碎念</button>  </nav>
   <div class="syncbar">
     <span class="sync-status" id="sync-status">连接中…</span>
     <span class="sync-code">同步码 <b id="sync-code">—</b></span>
@@ -505,7 +675,7 @@
     <div class="panel">
       <h2>🔗 APP分享</h2>
       <div class="app-hint">手机端点击可直接唤起对应 APP；电脑端将打开该 APP 的网页版。</div>
-      <div class="app-grid" id="app-list"></div>
+      <div class="app-wrap" id="app-list"></div>
     </div>
   </section>
 
@@ -513,13 +683,14 @@
   <section class="view" id="view-habit">
     <div class="panel">
       <h2>✅ 习惯打卡</h2>
-      <div class="sub">添加习惯，可选「每天1次」或「每天多次」；自动累计次数，可查看所有习惯合并的月 / 年打卡记录</div>
+      <div class="sub">添加习惯，可选「每天1次」或「每天多次」；设置提醒时间后到点会弹提醒（已打卡当天不打扰）；自动累计次数，可查看所有习惯合并的月 / 年打卡记录</div>
       <div class="add-row">
         <input type="text" id="habit-input" class="grow" placeholder="例如：每天喝水 / 读书30分钟 / 运动…" />
         <select id="habit-perday" class="habit-sel">
           <option value="once">每天1次</option>
           <option value="multi">每天多次</option>
         </select>
+        <input type="time" id="habit-time" class="habit-time-input" title="提醒时间（可选）" />
         <button class="btn" id="habit-add">添加</button>
       </div>
       <div class="rec-bar">
@@ -545,15 +716,66 @@
   <!-- 精神食粮 -->
   <section class="view" id="view-feed">
     <h2>🍱 精神食粮</h2>
-    <div class="sub">全网热门的运动教学 / 化妆 / 健身身材视频，实时更新；点卡片直接跳 B站观看。每 5 分钟自动刷新，也可点「刷新 / 换一批」。</div>
+    <div class="sub">全网热门的运动 / 化妆视频，按种类分组实时更新（泡沫轴放松、跳操、力量训练、瑜伽等）；点卡片直接跳 B站观看。每 5 分钟自动刷新，也可点「刷新 / 换一批」。</div>
     <div class="feed-tabs" id="feed-tabs"></div>
     <div class="hot-bar">
       <button class="btn" id="feed-refresh">🔄 刷新</button>
       <button class="btn ghost" id="feed-next">🔁 换一批</button>
+      <a class="btn ghost" href="https://space.bilibili.com/431264165/favlist" target="_blank" rel="noopener" style="text-decoration:none">📺 我的B站收藏</a>
       <span class="hot-tip" id="feed-tip"></span>
     </div>
     <div id="feed-grid"></div>
   </section>
+
+  <!-- 教育口播短视频资料库 -->
+  <section class="view" id="view-edu">
+    <h2>🎓 教育口播短视频资料库</h2>
+    <div class="sub">对标案例、剪辑学习渠道、训练方案、避坑清单、素材附件，一站收藏。点卡片展开详情，点「前往观看视频」直达学习。</div>
+    <div class="edu-search">
+      <input type="search" id="edu-search" placeholder="搜索博主名称 / 剪辑关键词…" />
+      <button class="btn ghost" id="edu-favonly">★ 只看收藏</button>
+    </div>
+    <div class="edu-tabs" id="edu-tabs"></div>
+    <div id="edu-content"></div>
+    <div id="edu-empty" class="edu-empty" style="display:none">未找到匹配的博主 / 渠道，换个关键词试试～</div>
+  </section>
+
+  <!-- 碎碎念：轻量日记 / 灵感备忘录 -->
+  <section class="view" id="view-suisui">
+    <h2>💬 碎碎念</h2>
+    <div class="sub">轻量化日记 / 灵感备忘录，随手记录想法、日常感悟、工作灵感。点卡片看详情，可编辑、可删除、可收藏。</div>
+    <div class="sui-bar">
+      <input type="search" id="suisui-search" class="grow" placeholder="搜索碎碎念内容 / 分类…" />
+      <button class="btn ghost" id="suisui-favonly">★ 收藏</button>
+      <button class="btn" id="suisui-new">✏️ 新建碎碎念</button>
+    </div>
+    <div class="sui-cats" id="suisui-cats"></div>
+    <div class="sui-bar" style="margin:0 0 6px"><span class="sui-count" id="suisui-count"></span></div>
+    <div id="suisui-list"></div>
+  </section>
+
+  <!-- 自律督促工作站 -->
+  
+  <!-- 碎碎念详情 / 编辑弹窗 -->
+  <div class="sui-modal-mask" id="suisui-modal">
+    <div class="sui-modal">
+      <h3>✏️ 碎碎念 <button class="sui-close" id="suisui-close" title="关闭">✕</button></h3>
+      <div class="sui-modal-time" id="suisui-modal-time"></div>
+      <div class="sui-field">
+        <label>内容</label>
+        <textarea id="suisui-text" placeholder="此刻在想什么？随手记下来…"></textarea>
+      </div>
+      <div class="sui-field">
+        <label>分类标签（可选）</label>
+        <div class="sui-catpick" id="suisui-catpick"></div>
+      </div>
+      <div class="sui-actions">
+        <button class="btn ghost" id="suisui-modal-star">☆ 收藏</button>
+        <button class="btn danger" id="suisui-delete">删除</button>
+        <button class="btn" id="suisui-save">保存</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -641,7 +863,7 @@
       t.classList.add("active");
       $("#view-" + t.dataset.view).classList.add("active");
       if (t.dataset.view === "hot") loadAllHot(false);
-      if (t.dataset.view === "feed") loadFeed();
+      if (t.dataset.view === "feed") renderFeed();
     });
   });
 
@@ -882,23 +1104,22 @@
 
   /* ---------- APP分享（URL Scheme 唤起手机APP） ---------- */
   const APPS = [
-    { name: "哔哩哔哩", ic: "📺", scheme: "bilibili://", web: "https://www.bilibili.com", cat: "内容娱乐" },
-    { name: "抖音", ic: "🎵", scheme: "snssdk1128://", web: "https://www.douyin.com", cat: "内容娱乐" },
-    { name: "小红书", ic: "📕", scheme: "xhsdiscover://", web: "https://www.xiaohongshu.com", cat: "内容娱乐" },
-    { name: "喜马拉雅", ic: "🎧", scheme: "iting://", web: "https://www.ximalaya.com", cat: "内容娱乐" },
-    { name: "YY", ic: "🎙️", scheme: "yymobile://", web: "https://www.yy.com", cat: "内容娱乐" },
-    { name: "京东", ic: "🛒", scheme: "openapp.jdmobile://", web: "https://m.jd.com", cat: "购物" },
-    { name: "淘宝", ic: "🛍️", scheme: "taobao://", web: "https://www.taobao.com", cat: "购物" },
-    { name: "拼多多", ic: "📦", scheme: "pinduoduo://", web: "https://mobile.yangkeduo.com", cat: "购物" },
-    { name: "美团", ic: "🍜", scheme: "imeituan://", web: "https://www.meituan.com", cat: "购物" },
-    { name: "闲鱼", ic: "🐟", scheme: "fleamarket://", web: "https://www.goofish.com", cat: "购物" },
-    { name: "山姆会员商店", ic: "🏬", scheme: "samsclub://", web: "https://www.samsclub.cn", cat: "购物" },
-    { name: "支付宝", ic: "💙", scheme: "alipay://", web: "https://www.alipay.com", cat: "金融" },
-    { name: "京东金融", ic: "🏦", scheme: "jrjd://", web: "https://jr.jd.com", cat: "金融" },
-    { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具" },
-    { name: "百度网盘", ic: "☁️", scheme: "baidunetdisk://", web: "https://pan.baidu.com", cat: "工具" }
+    { name: "哔哩哔哩", ic: "📺", scheme: "bilibili://", web: "https://www.bilibili.com", cat: "影音娱乐" },
+    { name: "抖音", ic: "🎵", scheme: "snssdk1128://", web: "https://www.douyin.com", cat: "影音娱乐" },
+    { name: "喜马拉雅", ic: "🎧", scheme: "iting://", web: "https://www.ximalaya.com", cat: "影音娱乐" },
+    { name: "YY", ic: "🎙️", scheme: "yymobile://", web: "https://www.yy.com", cat: "影音娱乐" },
+    { name: "小红书", ic: "📕", scheme: "xhsdiscover://", web: "https://www.xiaohongshu.com", cat: "影音娱乐" },
+    { name: "美团", ic: "🍜", scheme: "imeituan://", web: "https://www.meituan.com", cat: "购物消费" },
+    { name: "闲鱼", ic: "🐟", scheme: "fleamarket://", web: "https://www.goofish.com", cat: "购物消费" },
+    { name: "山姆会员商店", ic: "🏬", scheme: "samsclub://", web: "https://www.samsclub.cn", cat: "购物消费" },
+    { name: "支付宝", ic: "💙", scheme: "alipay://", web: "https://www.alipay.com", cat: "购物消费" },
+    { name: "京东金融", ic: "🏦", scheme: "jrjd://", web: "https://jr.jd.com", cat: "购物消费" },
+    { name: "京东", ic: "🛒", scheme: "openapp.jdmobile://", web: "https://www.jd.com", cat: "购物消费" },
+    { name: "淘宝", ic: "🛍️", scheme: "taobao://", web: "https://www.taobao.com", cat: "购物消费" },
+    { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具素材" },
+    { name: "百度网盘", ic: "☁️", scheme: "baidunetdisk://", web: "https://pan.baidu.com", cat: "工具素材" }
   ];
-  const APP_CATS = ["内容娱乐", "购物", "金融", "工具"];
+  const APP_CATS = ["影音娱乐", "购物消费", "工具素材"];
   function openApp(app) {
     if (!app.scheme) { window.location.href = app.web; return; }
     let left = false;
@@ -916,10 +1137,10 @@
     APP_CATS.forEach((cat) => {
       const items = APPS.filter((a) => a.cat === cat);
       if (!items.length) return;
-      const title = document.createElement("div");
-      title.className = "sec-title";
-      title.innerHTML = '<span class="bar"></span>' + cat;
-      box.appendChild(title);
+      const label = document.createElement("div");
+      label.className = "app-cat-label";
+      label.textContent = cat;
+      box.appendChild(label);
       const grid = document.createElement("div");
       grid.className = "app-grid";
       items.forEach((a) => {
@@ -1053,7 +1274,14 @@
       }
       const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
       del.onclick = () => { if (confirm("删除习惯「" + h.name + "」？打卡记录会一起删除")) { habits = habits.filter((x) => x.id !== h.id); saveHabits(); renderHabits(); } };
-      acts.append(btn, del);
+      const remind = document.createElement("label"); remind.className = "habit-remind";
+      remind.innerHTML = "⏰";
+      const tIn = document.createElement("input");
+      tIn.type = "time"; tIn.className = "habit-time-input"; tIn.value = h.time || "";
+      tIn.title = "提醒时间（到点会弹提醒）";
+      tIn.onchange = () => { h.time = tIn.value; saveHabits(); if (h.time) maybeRequestNotify(); };
+      remind.appendChild(tIn);
+      acts.append(remind, btn, del);
       head.append(name, cnt, acts);
       row.appendChild(head);
       list.appendChild(row);
@@ -1064,10 +1292,43 @@
   $("#habit-add").onclick = () => {
     const v = $("#habit-input").value.trim(); if (!v) return;
     const perDay = $("#habit-perday").value || "once";
-    habits.push({ id: uid(), name: v, created: todayStr(), perDay, checks: {} });
-    $("#habit-input").value = ""; saveHabits(); renderHabits();
+    const t = $("#habit-time").value || "";
+    habits.push({ id: uid(), name: v, created: todayStr(), perDay, time: t, checks: {} });
+    $("#habit-input").value = ""; $("#habit-time").value = ""; saveHabits(); renderHabits();
+    if (t) maybeRequestNotify();
   };
   $("#habit-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#habit-add").click(); });
+
+  /* 习惯打卡提醒引擎 */
+  function maybeRequestNotify() {
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") { try { Notification.requestPermission(); } catch (e) {} }
+  }
+  function showToast(msg) {
+    let t = document.getElementById("wb-toast");
+    if (!t) { t = document.createElement("div"); t.id = "wb-toast"; t.className = "wb-toast"; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 7000);
+  }
+  const habitReminded = {};
+  function habitNowHM() { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  function checkHabitReminders() {
+    const now = habitNowHM(); const today = todayStr();
+    habits.forEach((h) => {
+      if (!h.time || h.time !== now) return;
+      if (h.perDay === "once" && cntOf(h.checks || {}, today) > 0) return; // 今日已打卡则不打扰
+      const key = h.id + "_" + today + "_" + h.time;
+      if (habitReminded[key]) return;
+      habitReminded[key] = true;
+      const msg = "该打卡啦：" + h.name + (h.time ? "（" + h.time + "）" : "");
+      if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("习惯打卡提醒", { body: msg }); } catch (e) {}
+      }
+      showToast("⏰ " + msg);
+    });
+  }
+  setInterval(checkHabitReminders, 20000);
+  checkHabitReminders();
   renderHabits();
 
   Sync.onRemote = applyRemote;
@@ -1257,141 +1518,51 @@
     return p;
   }
   const FEED_CATS = [
-    { key: "sport", name: "运动教学", ic: "🏃", kws: ["健身教学", "瑜伽教学", "普拉提", "跑步训练", "拉伸放松"] },
-    { key: "makeup", name: "化妆视频", ic: "💄", kws: ["化妆教程", "新手化妆", "日常妆容", "通勤妆", "约会妆"] },
-    { key: "body", name: "健身身材", ic: "💪", kws: ["健身打卡", "马甲线", "好身材", "增肌", "减脂"] }
+    { key: "sport", name: "运动", ic: "🏃", pools: [
+      ["泡沫轴放松", "跳操", "力量训练", "瑜伽", "普拉提", "拉伸放松"],
+      ["女生居家运动", "健身操", "哑铃训练", "燃脂舞", "体态矫正", "睡前拉伸"],
+      ["帕梅拉", "刘畊宏", "美丽芭蕾", "办公室拉伸", "运动后放松", "晨间唤醒"]
+    ] },
+    { key: "makeup", name: "化妆", ic: "💄", pools: [
+      ["新手化妆", "日常妆容", "通勤妆", "约会妆", "伪素颜"],
+      ["淡妆教程", "约会妆容", "伪素颜妆", "通勤淡妆", "新手化妆教程"],
+      ["日常淡妆", "韩系妆容", "约会妆", "伪素颜", "新手化妆"]
+    ] }
   ];
-  const FEED_SEED = {"sport":{"kw":"健身教学","list":[{"title":"健体刘孟易 各肌群训练讲解【合集】","author":"健身教学","play":"9.7万","duration":"65:54","pic":"https://i0.hdslb.com/bfs/archive/34d700f214988a6801a4201c5b9edf4872941512.png","link":"https://www.bilibili.com/video/BV14V411B7F3"},{"title":"💪🏻B站版《健身新手的训练完全手册》™","author":"好人松松","play":"511.1万","duration":"56:34","pic":"https://i1.hdslb.com/bfs/archive/e426ffdb1144c95f5eef72792df45e0efc8e0d3a.jpg","link":"https://www.bilibili.com/video/BV1Hk4y187jF"},{"title":"咏春自习室 咏春拳系统教学 向前老师主讲","author":"咏春拳自习室","play":"16.2万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/18723b3cb2836d6235f9a50c16395e0b5fda0988.jpg","link":"https://www.bilibili.com/cheese/play/ss9649?query_from=0&search_id=6232589517962578835&search_query=%E5%81%A5%E8%BA%AB%E6%95%99%E5%AD%A6"},{"title":"匠造君/【零基础健身合集】解析动作发力，保证看完就会，言简意赅！","author":"匠造君","play":"54.1万","duration":"20:8","pic":"https://i2.hdslb.com/bfs/archive/38aa892329fb63d4a1512c947f4df0f244f9d958.jpg","link":"https://www.bilibili.com/video/BV1ut411L7NE"},{"title":"国内健身教程系列-健身训练技巧（全40集），针对性健身训练，健身房器材用法，健身知识、健身百科，基础健身，局部训练，锻炼腹肌，快速燃脂，在家健身，快速瘦身等","author":"深夜白鹿","play":"26.5万","duration":"202:17","pic":"https://i1.hdslb.com/bfs/archive/ebcff20c18a976c90b2211264019a67a796aa99b.jpg","link":"https://www.bilibili.com/video/BV1Db411y7SN"},{"title":"论高手赛场必备的技巧，四大技巧一定要练起来！","author":"猛男训练班","play":"12.4万","duration":"3:15","pic":"https://i2.hdslb.com/bfs/archive/3beb2e20a251bb61e515510c47799066add7856a.jpg","link":"https://www.bilibili.com/video/BV1aoVvzME6i"},{"title":"难怪这家健身房办卡的人多，原来辅助健身是这样的！","author":"SexyCoke","play":"8.9万","duration":"0:53","pic":"https://i1.hdslb.com/bfs/archive/edc3386b19530268b7137d6da29771d76c4e414d.jpg","link":"https://www.bilibili.com/video/BV1qmcsznEGy"},{"title":"【哑铃教程合集】25个动作详细讲解，看完就会！（健身必看）","author":"FitMen六六","play":"161.6万","duration":"18:7","pic":"https://i2.hdslb.com/bfs/archive/f548c5f20391e80182df651d1bf0793755154d57.jpg","link":"https://www.bilibili.com/video/BV127411i78s"},{"title":"0基础学搏击十七节自由搏击教学课","author":"咏春拳李师傅","play":"3.5万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/75b0ebe2f48f2f6479f7503a5560a6fd4441967c.jpg","link":"https://www.bilibili.com/cheese/play/ss61318?query_from=0&search_id=6232589517962578835&search_query=%E5%81%A5%E8%BA%AB%E6%95%99%E5%AD%A6"},{"title":"健身私教课，这钱不白花","author":"百变视君","play":"19.4万","duration":"0:51","pic":"https://i0.hdslb.com/bfs/archive/e0ca1c1170d4c46f5eadc1ce126b9d9e28cd71c4.png","link":"https://www.bilibili.com/video/BV1eCTvzxEX8"},{"title":"新手实操训练指南，快收藏起来！","author":"郭哥延时技巧","play":"6.4万","duration":"2:4","pic":"https://i1.hdslb.com/bfs/archive/00339fed5ca7962a43b0e4ef6ddc0fc8b74f8a49.jpg","link":"https://www.bilibili.com/video/BV1PcqBY7EvT"},{"title":"【无器械健身合集】在家健身这一个视频就够了（家庭居家必备）","author":"FitMen六六","play":"449.9万","duration":"17:52","pic":"https://i0.hdslb.com/bfs/archive/8ddfbb4ba58b32e1c3eed0fd8d771c90f804272e.jpg","link":"https://www.bilibili.com/video/BV1Gy4y1n7Pv"}]},"makeup":{"kw":"化妆教程","list":[{"title":"【化妆入门课】0基础化妆变美逆袭课！易上手|化妆技巧|化妆教程|系统课|手把手教化妆|毕业变美指南","author":"JSMN-Me","play":"307.9万","duration":"706:28","pic":"https://i1.hdslb.com/bfs/archive/13f3dbf71ada18ba13be81fe20814b6d117f2d7a.png","link":"https://www.bilibili.com/video/BV1iU4y1L7G2"},{"title":"超详细全流程步骤拆解！日常全妆教程（新老手皆宜版）","author":"姜乘澜","play":"243.5万","duration":"13:59","pic":"https://i1.hdslb.com/bfs/archive/844d18e571fa51fcaf5cbec859530c5d831b9363.jpg","link":"https://www.bilibili.com/video/BV1hk5k6yE1z"},{"title":"不用动脑的化妆教程，懒人也能秒变精致","author":"棉棉爱吃棒棒糖","play":"0","duration":"1:37","pic":"https://i2.hdslb.com/bfs/archive/95fc9b2573873baa53de583c057a8ee574d18fe4.jpg","link":"https://www.bilibili.com/video/BV1hH3C6TEqE"},{"title":"巨巨巨巨详细新手化妆教程来啦❗码住跟练~","author":"煤球球coal","play":"41.7万","duration":"13:43","pic":"https://i2.hdslb.com/bfs/archive/48c426b4583a402ed743db9725eeefbb54fcffc0.jpg","link":"https://www.bilibili.com/video/BV1dpGAz7E6f"},{"title":"新手跟练版！巨巨巨详细化妆教程，我看谁还学不会。","author":"王艺慈wyc","play":"116.5万","duration":"15:7","pic":"https://i0.hdslb.com/bfs/archive/d4f4d6bda970636024b6c071fc017d756b21aca1.jpg","link":"https://www.bilibili.com/video/BV1Kz421Z7Xc"},{"title":"《看完你就学会化妆》","author":"dao刀刀_","play":"389.4万","duration":"14:33","pic":"https://i1.hdslb.com/bfs/archive/2200201d2187398e69c3aea8db97697f5070a815.jpg","link":"https://www.bilibili.com/video/BV1qa411o7MT"},{"title":"30min全妆跟练｜真保姆级新手化妆教程｜夏日黄皮橘棕日常感亚裔妆｜均价不过百的平价彩妆推荐","author":"一颗山根痣","play":"104.6万","duration":"36:19","pic":"https://i0.hdslb.com/bfs/archive/b1f5510895e25271b3a9912820e89d07cec2d41e.jpg","link":"https://www.bilibili.com/video/BV1QZ421N7Ra"},{"title":"不剪辑！让新手看清细节的20min全妆跟练！！","author":"正义的宝妹","play":"8.2万","duration":"19:6","pic":"https://i2.hdslb.com/bfs/archive/04f6b023ad227208bf62b81a4c3fd2eeb647d9f4.jpg","link":"https://www.bilibili.com/video/BV1XKzEBBEeA"},{"title":"新手超详细5min新中式气质淡妆保姆级教程来啦，一个视频教会你！","author":"安琪教化妆","play":"3990","duration":"10:39","pic":"https://i1.hdslb.com/bfs/archive/6746ca0f4e6adebaeb3514ae5e6c655a8f3d2444.jpg","link":"https://www.bilibili.com/video/BV1RugZ6mEHC"},{"title":"热 门 化 妆 技 巧 实 测","author":"一块小排骨_","play":"86.1万","duration":"5:28","pic":"https://i2.hdslb.com/bfs/archive/223b65a2cceb4f97a7d05e6b2d293db9a08465a5.jpg","link":"https://www.bilibili.com/video/BV1yf4y1F7os"},{"title":"5min淡颜柔粉韩妆｜越素越美的氛围感神妆","author":"向南造型时尚教育","play":"900","duration":"5:26","pic":"https://i0.hdslb.com/bfs/archive/a76c3a5f481b719ec3d95c89ac2605f0f45749a0.jpg","link":"https://www.bilibili.com/video/BV1jy3T61EM7"},{"title":"新手6min跟练✨淡颜网感上镜妆~手残党也能轻松拿捏❗❗","author":"梦梦爱化妆","play":"1260","duration":"6:16","pic":"https://i0.hdslb.com/bfs/archive/a6ecd9a523a7a9f675d4bb93f9a5d099e2714474.jpg","link":"https://www.bilibili.com/video/BV1YuiRBaEkW"}]},"body":{"kw":"马甲线","list":[{"title":"躺床8分钟高效瘦腰虐腹！快速练出马甲线/沙漏腰（跟练版）","author":"叫我tina小姐姐","play":"2523.8万","duration":"10:19","pic":"https://i1.hdslb.com/bfs/archive/a82ac0fa13f1d52fb67369c9287bb0d0520d6a81.jpg","link":"https://www.bilibili.com/video/BV14p4y1X7iP"},{"title":"12分钟马甲线运动，高效瘦腰瘦肚子，亲测有效！无跳动，新手友好，无需器械【韩小四April】","author":"韩小四AprilHan","play":"1206.8万","duration":"13:39","pic":"https://i1.hdslb.com/bfs/archive/8284baa58046411dc62d3110045ced01be35d6bf.jpg","link":"https://www.bilibili.com/video/BV1D4411D7qn"},{"title":"每天5分钟，甩掉小肚子，get马甲线！亲测一周见效，躺床就能做【韩小四April】","author":"韩小四AprilHan","play":"2603.8万","duration":"15:17","pic":"https://i1.hdslb.com/bfs/archive/ce9a406b93a1f3e1af8163bd6a563ff24a70679c.jpg","link":"https://www.bilibili.com/video/BV11t4y1274C"},{"title":"暑假速成马甲线！3天2厘米！大肚腩拜拜肉没了！","author":"十斤阿","play":"7281","duration":"3:57","pic":"https://i2.hdslb.com/bfs/archive/bfc44ea4dd52518d2f1a60ee6849e146a42aef5c.jpg","link":"https://www.bilibili.com/video/BV1k5g16dEPz"},{"title":"马甲线","author":"奶瑶同学丶","play":"2.5万","duration":"0:49","pic":"https://i2.hdslb.com/bfs/archive/024a4fc594260fb70bcdfbed4b747b2d88442fc5.jpg","link":"https://www.bilibili.com/video/BV1E3zSBiEGP"},{"title":"【Pamela Reif 帕梅拉】10分钟腹部训练 | 新手友好 | 练就钢铁马甲线 | 帕老师带你运动燃脂","author":"绝味鱼腿","play":"1561.2万","duration":"10:30","pic":"https://i0.hdslb.com/bfs/archive/45b79f3b14dbb80a4d9e190aaf20af3c0ca9b2bc.jpg","link":"https://www.bilibili.com/video/BV1kA411q7cH"},{"title":"五分钟在家瘦腰运动！快速瘦肚子小蛮腰，马甲线一周现形！适合初学者【周六野Zoey】","author":"周六野Zoey","play":"4801.0万","duration":"7:51","pic":"https://i2.hdslb.com/bfs/archive/e161008a0355e91901a8cf518becfa47261c607b.jpg","link":"https://www.bilibili.com/video/BV1ax411y7zQ"},{"title":"【東黄&amp;黄庚依】对马甲线爱不释手了","author":"奶糖_补觉中","play":"2.3万","duration":"1:14","pic":"https://i1.hdslb.com/bfs/archive/9beb36901ce788eee90716bbbe18c1a4db767685.jpg","link":"https://www.bilibili.com/video/BV1dbgi6sExU"},{"title":"帕梅拉 - 10min 马甲线训练|高效虐腹训练腹肌核心|紧实腹部|无器械(Pamela Reif Official)","author":"帕梅拉PamelaReif","play":"695.5万","duration":"10:33","pic":"https://i0.hdslb.com/bfs/archive/2dcad7b7bc28573e26df66b461ab3ffda35aa6b9.jpg","link":"https://www.bilibili.com/video/BV18b4y1Q7ey"},{"title":"马甲线！","author":"我超爱吃这个","play":"4717","duration":"2:17","pic":"https://i1.hdslb.com/bfs/archive/6987aad21b979b0911d457975fa2c243aef30b8b.jpg","link":"https://www.bilibili.com/video/BV1HEcZzJEP7"},{"title":"自用｜帕梅拉20分钟腹部训练｜15天练出马甲线｜不练侧腹拒绝H型腰｜沙漏腰yyds","author":"波可比的波","play":"136.9万","duration":"20:46","pic":"https://i0.hdslb.com/bfs/archive/1302658682d586e5e5983477ad784e5600b4b767.jpg","link":"https://www.bilibili.com/video/BV1C14y157Kx"},{"title":"快速瘦腰腹‖沙漏⌛️腰+平坦小腹+马甲线（睡眠无声）","author":"诔扇","play":"17.4万","duration":"2:2","pic":"https://i1.hdslb.com/bfs/archive/38a9579fe5b48bf9db14db3634f0ded8dfbbd159.jpg","link":"https://www.bilibili.com/video/BV1FU421o7Xk"}]}};
-  let feedCat = 0, feedKwIdx = 0;
-  const feedCache = {};
-  // 从 localStorage 恢复上次的视频缓存（跨会话秒开）
-  try {
-    const savedFeed = JSON.parse(localStorage.getItem("wb_feed_cache") || "{}");
-    Object.keys(savedFeed).forEach(function (k) { if (savedFeed[k] && savedFeed[k].list && savedFeed[k].list.length) feedCache[k] = savedFeed[k]; });
-  } catch (e) {}
-  function saveFeedCache() { try { localStorage.setItem("wb_feed_cache", JSON.stringify(feedCache)); } catch (e) {} }
-  // 取「立即可显示」的数据：本地缓存 → 内置种子
-  function feedInstant(catKey) {
-    if (feedCache[catKey] && feedCache[catKey].list && feedCache[catKey].list.length) return feedCache[catKey];
-    if (typeof FEED_SEED === "object" && FEED_SEED[catKey] && FEED_SEED[catKey].list.length) return FEED_SEED[catKey];
-    return null;
-  }
-  function feedFmtCount(n) { n = Number(n) || 0; if (n >= 1e8) return (n / 1e8).toFixed(1) + "亿"; if (n >= 1e4) return (n / 1e4).toFixed(1) + "万"; return String(n); }
+  const FEED_SEED = {"sport":{"groups":[{"label":"泡沫轴放松","list":[{"title":"【自用】韩小四泡沫轴腿部放松","author":"25不摆烂","play":"163.8万","duration":"24:27","pic":"https://i1.hdslb.com/bfs/archive/561347120de6dec40d0aad969f073e0a06477f99.jpg","link":"https://www.bilibili.com/video/BV1154y1f7Gj"},{"title":"做完就细了1cm?! 站立腿部拉伸➕懒人版泡沫轴按摩，告别肌肉/水肿腿｜运动后必做！【韩小四April】","author":"韩小四AprilHan","play":"1562.6万","duration":"63:45","pic":"https://i1.hdslb.com/bfs/archive/3bd234abb919c2c2523585122f9166b9c8fb81bc.jpg","link":"https://www.bilibili.com/video/BV1Lh411m7Th"},{"title":"YOTTOY泡沫轴瑜伽柱入门到高阶教学课程","author":"YOTTOY优特","play":"1.2万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/b1a04e0636dce2b956e6ca58c24752e9d4882b94.jpg","link":"https://www.bilibili.com/cheese/play/ss460141845?query_from=0&search_id=7809551241497624903&search_query=%E6%B3%A1%E6%B2%AB%E8%BD%B4%E6%94%BE%E6%9D%BE"},{"title":"健身好物推荐，泡沫轴。可以放松全身还能辅助锻炼。","author":"大业健身","play":"1228","duration":"2:29","pic":"https://i0.hdslb.com/bfs/archive/1a1f559e540be2f687fe85f665caaad346e339db.jpg","link":"https://www.bilibili.com/video/BV1Kg3k6dEPQ"},{"title":"17分钟泡沫轴全身按摩/摆脱粗壮肌肉腿/放松全身筋膜","author":"欧阳春晓Aurora","play":"545.0万","duration":"18:15","pic":"https://i0.hdslb.com/bfs/archive/ec2a3688b613d0ecf6cd3b857559c4e7eeac530b.jpg","link":"https://www.bilibili.com/video/BV1pp4y1X7og"},{"title":"13MIN超详细泡沫轴放松教程|从头到脚都舒服✌️","author":"大越越moon","play":"55.5万","duration":"13:48","pic":"https://i0.hdslb.com/bfs/archive/ca800d96331a2b0aa5fc9946b09fc35652e60a71.jpg","link":"https://www.bilibili.com/video/BV12e4y1Z75R"},{"title":"9分钟跟练版泡沫轴放松肩背，缓解后背僵硬，改善不良体态圆肩驼背头前引","author":"黄君之","play":"83.0万","duration":"9:44","pic":"https://i0.hdslb.com/bfs/archive/d9959c961bbbefc9558bb1317c834faea8b3e121.jpg","link":"https://www.bilibili.com/video/BV1HP411H7t8"},{"title":"全网最全最专业的泡沫轴自我筋膜放松  缓解疼痛 运动前后必备。","author":"大脸老师教普拉提","play":"87.9万","duration":"42:52","pic":"https://i2.hdslb.com/bfs/archive/29ca1cf75579c3c75a61ee623ee62e6e8bb4ad52.jpg","link":"https://www.bilibili.com/video/BV1H34y1Q7TA"},{"title":"加强版泡沫轴瘦腿全教程跟练｜针对各种粗腿","author":"hogungun","play":"74.2万","duration":"14:50","pic":"https://i2.hdslb.com/bfs/archive/de24b3faba9f993c2e0b55ba63668bff8012d6d7.jpg","link":"https://www.bilibili.com/video/BV1WW4y187eL"},{"title":"泡沫轴全身松解五分钟跟练版","author":"一周五练的小飞侠","play":"1857","duration":"4:58","pic":"https://i0.hdslb.com/bfs/archive/649ae947b37a6db9b4762bdb7a47a13ac62c1562.jpg","link":"https://www.bilibili.com/video/BV1ei3g6UEMu"},{"title":"欧阳春晓17min泡沫轴按摩，去除叨b叨纯跟练版【自用】","author":"是馨伊不是新一","play":"23.8万","duration":"17:7","pic":"https://i2.hdslb.com/bfs/archive/c79087216c53187c675077acb5094f407d227f57.png","link":"https://www.bilibili.com/video/BV1pz4y1S7oZ"},{"title":"30分钟泡沫轴全身按摩，肌筋膜放松（生理期可练）（欧阳春晓30天居家维密普拉提第1天）","author":"艮沐槿","play":"5.0万","duration":"30:17","pic":"https://i0.hdslb.com/bfs/archive/f6881d3570f6d1a57d1abecfc2c1d6e8d1e85606.jpg","link":"https://www.bilibili.com/video/BV1hPA7zsEAa"}]},{"label":"跳操","list":[{"title":"快乐尊巴舞8曲连跳|快乐跳操轻松瘦身|暴汗燃脂塑形|动作简单新手可入","author":"小兔子乖乖smile","play":"35.9万","duration":"25:58","pic":"https://i2.hdslb.com/bfs/archive/e21b098c9341d1f2238304d07151e55c16cec25f.jpg","link":"https://www.bilibili.com/video/BV1Hu4y1S7D2"},{"title":"【张艺兴&amp;费教练】演唱会陪练8000步暴汗燃脂|横屏","author":"柚子桃L","play":"1.1万","duration":"46:37","pic":"https://i1.hdslb.com/bfs/archive/f34a6856116e824a59379dec8a554ffa38a01402.jpg","link":"https://www.bilibili.com/video/BV1Juq5BPEY5"},{"title":"60分钟燃脂+拉伸合集，全程无跑跳，不伤膝盖高效瘦全身💦，消耗：370大卡🔥，适合0基础、大基数的宝子。","author":"塑形的范er","play":"7.6万","duration":"59:0","pic":"https://i2.hdslb.com/bfs/archive/03ee47e3a4cba62bac6eaf4e9eac9b4537a1384e.jpg","link":"https://www.bilibili.com/video/BV1t3TYzzEWv"},{"title":"帕梅拉三部曲搭配港风DJ版 30分钟暴汗暴瘦 ！大基数慎选（易伤）！无间歇版！！！新手适度跟练 跳操过程中如有不适立刻停止！严重不适立即就医！！身体第一位！","author":"下顿不吃了嘻嘻","play":"2606","duration":"31:38","pic":"https://i2.hdslb.com/bfs/archive/806469f76f86f94464a7230805c2fbc6ca117fa1.jpg","link":"https://www.bilibili.com/video/BV1r9376JEno"},{"title":"开心的跳操","author":"家庭CEO唐总","play":"2","duration":"3:34","pic":"https://i1.hdslb.com/bfs/archive/2d9c54d3c645f323f9101c3b18312811fb4ea526.jpg","link":"https://www.bilibili.com/video/BV1fA3C6JEqM"},{"title":"【SEVENTEEN&amp;Jo】14首40minTabata燃脂训练 ｜全身燃脂 促进新陈代谢","author":"ohmylittlepuppyz","play":"42.0万","duration":"43:2","pic":"https://i2.hdslb.com/bfs/archive/2f0d3aa65a5ecc0bfcdd086bf2a178373b9fab6d.jpg","link":"https://www.bilibili.com/video/BV1Ba411f7Er"},{"title":"【29分钟燃爆心率】高强度预警！高效减脂，暴汗跳操，华语天后金曲拼盘，做自己的唱跳DIVA！| 东北赵又廷 自用混剪","author":"妖零五105","play":"3.7万","duration":"29:11","pic":"https://i1.hdslb.com/bfs/archive/65d5a6313c51e5acde19636d60e05a83725af8fb.jpg","link":"https://www.bilibili.com/video/BV1gwj36bEmB"},{"title":"【每天一虐】跟着力克体育跳操——(合集来喽)20首歌无重复60分钟暴汗燃脂","author":"肉肉芒果干-跟跳员","play":"149.2万","duration":"59:24","pic":"https://i0.hdslb.com/bfs/archive/c89b7cdf07704c58b21be051dbb1f77c7e875984.jpg","link":"https://www.bilibili.com/video/BV1tG4y1u7D4"},{"title":"【十首连跳】30分钟燃脂合集！小基数刷脂必备，跳到流油，突破平台期！让你一次跳个够！","author":"Carina陈自律","play":"300.1万","duration":"30:22","pic":"https://i0.hdslb.com/bfs/archive/2c1c0b354994b9d0463a97b798bfce9ddbb1837c.jpg","link":"https://www.bilibili.com/video/BV1q34y1x7KP"},{"title":"暴汗难以置信！爽到停不下来的15首女团燃脂舞谁跳谁瘦！","author":"手舞足蹈的Angela","play":"277.9万","duration":"46:12","pic":"https://i2.hdslb.com/bfs/archive/4a3d4ce32b32db2f396ea3a5d413ec35df4c4b9e.jpg","link":"https://www.bilibili.com/video/BV1Xf4y157Vn"},{"title":"【季更快码住】KPOP健身有氧舞蹈半小时合集 最新BGM吐血整理 对不起我来晚了","author":"Christina林木","play":"11.5万","duration":"30:26","pic":"https://i0.hdslb.com/bfs/archive/63e9a012a97b14396301239a19f9d624bf7de1e3.jpg","link":"https://www.bilibili.com/video/BV1Um421g7nw"},{"title":"肩膀酸痛，手脚麻木，每天坚持跳操30分钟《健身操》背正面","author":"阳光香果广场舞","play":"90.3万","duration":"6:40","pic":"https://i0.hdslb.com/bfs/archive/60d38ea23eb68852c490ba7662feabf7d88998f2.jpg","link":"https://www.bilibili.com/video/BV1A5411e7iW"}]},{"label":"力量训练","list":[{"title":"无器械全身无氧力量训练｜瘦身塑形提升代谢！","author":"miss朱zhu","play":"103.6万","duration":"13:20","pic":"https://i1.hdslb.com/bfs/archive/4aa7d3af4da7386363f0d8544f007bf61fcf9b6b.jpg","link":"https://www.bilibili.com/video/BV1Ve411j7o8"},{"title":"【安娜growingannanas】30分钟音乐全身力量训练-配合哑铃","author":"安娜growingannanas","play":"35.3万","duration":"35:26","pic":"https://i2.hdslb.com/bfs/archive/ede53d26e4bb12f4e217e806d2385a5536152e65.jpg","link":"https://www.bilibili.com/video/BV1WtQJB4Eve"},{"title":"健身入门：基础力量训练","author":"健身食堂杨师傅","play":"11.7万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/26c51be904e92cc6c69fdbe718fd43b3d9e4d7cd.jpg","link":"https://www.bilibili.com/cheese/play/ss20909?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"30加女生零基础必须控制饮食加力训减肚子最高效#科学减脂#力量训练#减脂塑形#薄肌#少女感","author":"呆萌塑形减脂","play":"149","duration":"2:33","pic":"https://i0.hdslb.com/bfs/archive/50b060837783a5d691234f45bf1ac4840e7d4cdd.jpg","link":"https://www.bilibili.com/video/BV1xY3C6fEcK"},{"title":"【塑形】40分钟力量训练，一月体脂率减10%，需哑铃，动作不重复","author":"范享乐动","play":"136.9万","duration":"39:41","pic":"https://i1.hdslb.com/bfs/archive/84daba0d285efe94cf96792bf68af34ff29bc649.jpg","link":"https://www.bilibili.com/video/BV11t421a7LB"},{"title":"50分钟全身无氧自重力量塑形训练、无工具徒手力量、塑形紧致、循环代谢提升、自重力量紧致肌肉线条","author":"刘元","play":"20.3万","duration":"48:8","pic":"https://i1.hdslb.com/bfs/archive/63d317167154b1c22f72660fb0bb9b0f280d4b4b.jpg","link":"https://www.bilibili.com/video/BV1ZqD3BWEDM"},{"title":"30分钟无氧自重抗阻力量训练、薄肌线条塑造、全身自重训练、提升代谢、增加肌肉弹性","author":"刘元","play":"26.3万","duration":"29:0","pic":"https://i0.hdslb.com/bfs/archive/db83a509f0fa8ccb019a9ef41186455ae49f7073.jpg","link":"https://www.bilibili.com/video/BV11umzBiEJx"},{"title":"【安娜growingannanas】10分钟每日徒手力量训练-无需器械","author":"安娜growingannanas","play":"11.9万","duration":"10:56","pic":"https://i0.hdslb.com/bfs/archive/cf0d1ea694142a309a444280aaf2e8c9105eaa53.jpg","link":"https://www.bilibili.com/video/BV1knKs64Emb"},{"title":"居家减脂塑形力量跟练计划","author":"康老师特别细","play":"4442","duration":"","pic":"https://archive.biliimg.com/bfs/archive/ace96015d0f9ce5871d5a9623443568510ad251f.jpg","link":"https://www.bilibili.com/cheese/play/ss725914551?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"【安娜growingannanas】力量训练四周计划Day2-30分钟上半身训练-配合哑铃","author":"安娜growingannanas","play":"7082","duration":"34:0","pic":"https://i1.hdslb.com/bfs/archive/995ad20d1df4d8fc1e0933420d092dc94e0d845d.jpg","link":"https://www.bilibili.com/video/BV1DJ3C6BExP"},{"title":"30min组合力量训练，快速减掉20斤并全身紧致！","author":"真的费教练健身教学","play":"136.6万","duration":"32:36","pic":"https://i0.hdslb.com/bfs/archive/fb4caaa2b1315c6376b845097f031c5e6b6a1abc.jpg","link":"https://www.bilibili.com/video/BV1D94y1A7EL"},{"title":"22min哑铃全身无氧力量训练｜燃脂塑形，提高代谢","author":"miss朱zhu","play":"270.1万","duration":"22:3","pic":"https://i1.hdslb.com/bfs/archive/6ee62861ba5b23d2dcc0d50ef7bbfabe7cba870b.jpg","link":"https://www.bilibili.com/video/BV1ne4y1i7Dx"}]},{"label":"瑜伽","list":[{"title":"2026.01.12 【Breathe and Flow】试试这个战士2式挑战瑜伽课程","author":"我叫阿搬","play":"3.9万","duration":"27:58","pic":"https://i1.hdslb.com/bfs/archive/f1944b5a26d1e51ca2767d9ad52685a3359694a9.jpg","link":"https://www.bilibili.com/video/BV1kqrvBuEve"},{"title":"10分钟伸展燃烧有氧运动！适合冬季懒人舒展身体和取暖燃脂升温！【周六野】","author":"周六野Zoey","play":"199.3万","duration":"11:55","pic":"https://i2.hdslb.com/bfs/archive/cc93c5c49fa29905d73730b850382c69a66a435e.jpg","link":"https://www.bilibili.com/video/BV1qJ411C7sq"},{"title":"10分钟美腿拉伸运动，变直变长，改善腿型！【周六野Zoey】","author":"周六野Zoey","play":"402.7万","duration":"15:7","pic":"https://i1.hdslb.com/bfs/archive/f0f6b7404d3fb209b944e9266c7f0ec4ced48f32.jpg","link":"https://www.bilibili.com/video/BV1kE411W75u"},{"title":"28天 高效瘦小腿！脂肪型 肌肉型 水肿型 针对训练 漫画腿get","author":"文不叮","play":"167.2万","duration":"7:55","pic":"https://i0.hdslb.com/bfs/archive/b005462e44bad2bfd4926ada1194a3c39d2d5ff8.jpg","link":"https://www.bilibili.com/video/BV1dJ411Q7x8"},{"title":"明星抗衰保养！【秋冬气血瑜伽】懒女孩睡前8min，冻龄婴儿肌+养出瘦体质！","author":"Rosie的瑜伽乐园","play":"17.3万","duration":"9:17","pic":"https://i1.hdslb.com/bfs/archive/7f4e774d40e30c4f2f2eed227a3f382a39c382ca.jpg","link":"https://www.bilibili.com/video/BV1U34y1U78j"},{"title":"【自我康复】5个动作解决肩胛骨内侧疼、肩颈疼痛","author":"郝强Fit","play":"142.1万","duration":"1:34","pic":"https://i1.hdslb.com/bfs/archive/7a50824f3e4366b82455687d3ce39716d903a674.jpg","link":"https://www.bilibili.com/video/BV1Du411S7oQ"},{"title":"【Hisdream】面部瑜伽剪辑版 每天10分钟改善大小脸、面部不对称、歪嘴歪鼻和大小眼高低眉","author":"CupidsArrowHit","play":"101.1万","duration":"9:40","pic":"https://i1.hdslb.com/bfs/archive/84f8a8e984fe775f98dd56255af552dc5d9509b9.jpg","link":"https://www.bilibili.com/video/BV1az4y197Lr"},{"title":"起床空腹6分钟轰炸腹肌/Mooki的瑜伽分享09","author":"Mooki瑜伽","play":"46.6万","duration":"7:13","pic":"https://i1.hdslb.com/bfs/archive/ae3f2a0952cbb084733ecebe202feec21a02590d.jpg","link":"https://www.bilibili.com/video/BV1N54y1y7RW"},{"title":"我必须要给意志力差的姐妹，强烈安利这个韩国一分钟魔性瘦身操！最近在外网上炒鸡火！！｜转自卤水二妹姐","author":"陌与陌寻","play":"360.6万","duration":"7:17","pic":"https://i0.hdslb.com/bfs/archive/2ba5b9012e492f7ae4c3f4dbbede30e4a0c372fc.jpg","link":"https://www.bilibili.com/video/BV1fE411k7NW"},{"title":"【每日瑜伽】脊柱理疗-全方位修复肩颈颈椎，疼痛不再！","author":"每日瑜伽官方账号","play":"43.2万","duration":"179:53","pic":"https://i1.hdslb.com/bfs/archive/53fbbadd0673a55a4fe7d6d6d6d29265c616f2b1.jpg","link":"https://www.bilibili.com/video/BV12W411A7oR"},{"title":"2个晨起瑜伽，每天坚持10分钟，立现性感蝴蝶背","author":"洗衣机推荐2026-","play":"47.0万","duration":"1:10","pic":"https://i2.hdslb.com/bfs/archive/199afaebd6d9ca032025592e89a27986f4e583c2.jpg","link":"https://www.bilibili.com/video/BV1Lt411g7DS"},{"title":"【艾琳】15分钟全身燃脂 | 不用跳不伤膝盖不深蹲 | 适用宿舍学生党上班族","author":"艾琳鱼鱼","play":"47.6万","duration":"19:12","pic":"https://i0.hdslb.com/bfs/archive/5313255cb5dea2ad3be44e5aec4474fac1c220e7.jpg","link":"https://www.bilibili.com/video/BV1Xv411z7NJ"}]},{"label":"普拉提","list":[{"title":"【虐腿】高强度瘦腿|普拉提100次大腿外侧＋100次内侧瘦腿训练","author":"wishisnotfar","play":"1923.6万","duration":"45:44","pic":"https://i0.hdslb.com/bfs/archive/6f72ca203d2b06f451db86e991259fe2cd98818a.jpg","link":"https://www.bilibili.com/video/BV1bp411A7Yp"},{"title":"Eleni Fit - 30分钟站立普拉提训练｜全身燃脂塑形·无重复·含热身拉伸","author":"EleniFit","play":"19.5万","duration":"33:13","pic":"https://i1.hdslb.com/bfs/archive/e59033bbbed66918503dd36b6be7bc7ab792dc95.jpg","link":"https://www.bilibili.com/video/BV1JjTL6AEde"},{"title":"帕梅拉 - 15分钟普拉提训练|慢速全身紧实 膝盖友好低冲击 (Pamela Reif Official)","author":"帕梅拉PamelaReif","play":"458.2万","duration":"16:28","pic":"https://i0.hdslb.com/bfs/archive/38a79651845a239f3395d597ddea68aec2dbc540.jpg","link":"https://www.bilibili.com/video/BV1Wm4y1U72s"},{"title":"35分钟全身塑形普拉提｜紧致线条·提升力量｜居家无器械｜LUNACHEN","author":"LunavChen","play":"5393","duration":"36:40","pic":"https://i1.hdslb.com/bfs/archive/b5bc0c824f094fdd5c30e3632e823b2ec5b9fba3.jpg","link":"https://www.bilibili.com/video/BV19a3M6kExJ"},{"title":"【限时特惠】欧阳春晓：30天维密普拉提居家瘦身","author":"欧阳春晓Aurora","play":"1606.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/2f8600af26c9a566407d0914a75d042ab8328dc5.jpg","link":"https://www.bilibili.com/cheese/play/ss15046?query_from=0&search_id=183304677490764785&search_query=%E6%99%AE%E6%8B%89%E6%8F%90"},{"title":"【2026最新】魏巍普拉提完整课程28天魏巍普拉提完整课程跟练版魏巍普拉提完整课程21天魏巍普拉提完整课程瘦肚子 魏巍普拉提跟练 魏巍普拉提完整课程 魏巍普","author":"62071062","play":"1198","duration":"8352:12","pic":"https://i0.hdslb.com/bfs/archive/0e5f9742f6dde11d53d795e1995ae30b6fb17bd0.jpg","link":"https://www.bilibili.com/video/BV15D3T6rE8a"},{"title":"全身完整版瑶瑶维密普拉提塑形直播回放早课2026/7/29","author":"嘴强王者-练不动","play":"73","duration":"82:8","pic":"https://i1.hdslb.com/bfs/archive/7389e5c5321dacd81ac4f9eef37ded5efbcd5fb5.jpg","link":"https://www.bilibili.com/video/BV1vR316pEdq"},{"title":"【2026最新】魏巍普拉提完整课程 魏巍普拉提跟练版 魏巍普拉提完整课程跟练版 魏魏21天/28天普拉提课程28天骨态塑形营21天普拉提瘦身蜕变营14天快速瘦身","author":"努力1366226","play":"668","duration":"6538:11","pic":"https://i1.hdslb.com/bfs/archive/32d5341677c275e80129b4807cf0b770b2a18d5b.jpg","link":"https://www.bilibili.com/video/BV1nJ3M6QEcr"},{"title":"健身普拉提","author":"仙气缭","play":"74","duration":"0:52","pic":"https://i0.hdslb.com/bfs/archive/e4910c53d475d8db8b9b6f861716216b35b9c2d5.jpg","link":"https://www.bilibili.com/video/BV1aL3r6YEhr"},{"title":"静静晚课普拉提＋私教课腰腹单边右2026.7.28周二晚上录屏上传自用","author":"我叫郑明霞","play":"115","duration":"114:42","pic":"https://i0.hdslb.com/bfs/archive/abb511f6d152e442193d84d74a845de3c5a4bb74.jpg","link":"https://www.bilibili.com/video/BV1jm3r6rEvY"},{"title":"小肚子长不了一点！20分钟普拉提虐腹瘦肚｜私教级口令带练","author":"欧阳春晓Aurora","play":"302.4万","duration":"19:34","pic":"https://i1.hdslb.com/bfs/archive/f18e87b5551416c99b2432124b38e70f506c500e.jpg","link":"https://www.bilibili.com/video/BV1pQ4y1g7C3"},{"title":"MIZI 40分钟练出纤瘦身材｜全身普拉提训练｜无需器材","author":"MIZI","play":"24.5万","duration":"40:31","pic":"https://i1.hdslb.com/bfs/archive/c2dbd5c305cbfe1d2b37451778c27f924f6f6a17.jpg","link":"https://www.bilibili.com/video/BV15P8izHEYE"}]},{"label":"拉伸放松","list":[{"title":"自用，跑步，骑行运动后全身拉伸，全程站立，舒展筋骨，拉伸线条","author":"zngogo","play":"285.3万","duration":"8:3","pic":"https://i0.hdslb.com/bfs/archive/cb5b0516a125bc96153647884df366dffaa4d4e2.jpg","link":"https://www.bilibili.com/video/BV1ae411D7SL"},{"title":"mizi 15分钟全身放松拉伸降低皮质醇舒缓压力放松身心","author":"简宁无跑跳跟练","play":"1037","duration":"15:12","pic":"https://i2.hdslb.com/bfs/archive/084db2863b569bd43bfdd3bf77f95b9c1619d62a.jpg","link":"https://www.bilibili.com/video/BV1wP3w6BEhY"},{"title":"【Mady Morrison】运动后必做10分钟全身拉伸｜冷身放松，修复肌肉缓解酸痛","author":"开合跳撒金币","play":"699","duration":"11:17","pic":"https://i1.hdslb.com/bfs/archive/449e05bbedf63b3599e3c15b08d40e8e09c151a1.jpg","link":"https://www.bilibili.com/video/BV1GnKc6gEGe"},{"title":"拉伸","author":"洗了蒜啦l","play":"7376","duration":"7:7","pic":"https://i1.hdslb.com/bfs/archive/63f7d46623e6fadec61ca3e5073489e5f636707f.jpg","link":"https://www.bilibili.com/video/BV168GX62EPJ"},{"title":"腿部拉伸 | 改善肌肉型腿粗·get细长直美腿！","author":"不织布是Wendy","play":"211.7万","duration":"8:47","pic":"https://i1.hdslb.com/bfs/archive/c0e8bd4f70b213990db51390d88bd9fe6a00fc4a.jpg","link":"https://www.bilibili.com/video/BV1gU4y1d7nV"},{"title":"【MIZI】 14 分钟全身拉伸丨运动后放松，舒展身体，改善僵硬，提升柔韧性","author":"开合跳撒金币","play":"4987","duration":"14:11","pic":"https://i2.hdslb.com/bfs/archive/33adea6d1059932cbabaea2a6c44915ce4fb33d7.jpg","link":"https://www.bilibili.com/video/BV19tMJ6PEWd"},{"title":"【47min 有效改善骨盆前倾】缓解腰痛｜含体态自测 + 原理讲解｜拉伸放松 + 力量巩固全套理疗瑜伽 | 告别小腹突出、久坐腰痛","author":"月川Yue","play":"538","duration":"50:26","pic":"https://i0.hdslb.com/bfs/archive/c8fa520ef5685c9181170bd008631da72661eefa.jpg","link":"https://www.bilibili.com/video/BV1C63e6AEpw"},{"title":"帕梅拉 - 10min 全身拉伸|运动后全身伸展 有效放松肌肉 增强灵活性","author":"帕梅拉PamelaReif","play":"2063.5万","duration":"10:27","pic":"https://i2.hdslb.com/bfs/archive/8d6ee8eb034699b238b42d55aad5ab6c73de4098.jpg","link":"https://www.bilibili.com/video/BV1gf4y1p78A"},{"title":"170 平躺拉伸放松｜深度解锁：再次升级的轻松体验｜碎碎念","author":"军凝伟悦彬江康","play":"0","duration":"0:18","pic":"https://i0.hdslb.com/bfs/archive/08d541da1c1705ff99ebbf95f49ec167dba3c249.jpg","link":"https://www.bilibili.com/video/BV1AG3662EMg"},{"title":"体大硕士带你正确拉伸｜跑前动态拉伸+跑后深度拉伸+入门静态拉伸｜跑步拉伸从入门到精通","author":"跑步的子章老师","play":"380.2万","duration":"24:30","pic":"https://i0.hdslb.com/bfs/archive/97c26f74bb2b0a09c04f9135bef85f2707d21a98.jpg","link":"https://www.bilibili.com/video/BV1fq4y1M7L1"},{"title":"体育课放松拉伸","author":"壹斤米","play":"1.5万","duration":"1:25","pic":"https://i2.hdslb.com/bfs/archive/edfab39ac3b0152729da92852cfe69356ffa368a.jpg","link":"https://www.bilibili.com/video/BV1R6421c7bV"},{"title":"划船机运动之后的拉伸放松","author":"肥渣是只猫","play":"2.4万","duration":"3:36","pic":"https://i0.hdslb.com/bfs/archive/f0eee7b246b1f53e8eb6e7650581a11d49fcd578.jpg","link":"https://www.bilibili.com/video/BV1QK4y1s7Hy"}]}]},"makeup":{"groups":[{"label":"新手化妆","list":[{"title":"【化妆入门课】0基础化妆变美逆袭课！易上手|化妆技巧|化妆教程|系统课|手把手教化妆|毕业变美指南","author":"JSMN-Me","play":"308.0万","duration":"706:28","pic":"https://i1.hdslb.com/bfs/archive/13f3dbf71ada18ba13be81fe20814b6d117f2d7a.png","link":"https://www.bilibili.com/video/BV1iU4y1L7G2"},{"title":"新手跟练版！巨巨巨详细化妆教程，我看谁还学不会。","author":"王艺慈wyc","play":"116.5万","duration":"15:7","pic":"https://i0.hdslb.com/bfs/archive/d4f4d6bda970636024b6c071fc017d756b21aca1.jpg","link":"https://www.bilibili.com/video/BV1Kz421Z7Xc"},{"title":"毛戈平的化妆课","author":"大渔大师课","play":"10.9万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/746ddede613a89824efe59abe51c61460de8c3f2.jpg","link":"https://www.bilibili.com/cheese/play/ss11210?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"10min超详细全妆跟练！新手友好的日杂清透感淡妆~真正能让小白学会化妆的视频！","author":"王小吉日记","play":"536","duration":"10:13","pic":"https://i2.hdslb.com/bfs/archive/67db6a6df0d188da16e21780208521109b45e6ed.jpg","link":"https://www.bilibili.com/video/BV1U53q6mEpH"},{"title":"《看完你就学会化妆》","author":"dao刀刀_","play":"389.4万","duration":"14:33","pic":"https://i1.hdslb.com/bfs/archive/2200201d2187398e69c3aea8db97697f5070a815.jpg","link":"https://www.bilibili.com/video/BV1qa411o7MT"},{"title":"零基础化妆教程","author":"VV美妆小课堂","play":"5.6万","duration":"12:14","pic":"https://i2.hdslb.com/bfs/archive/0c185fa5174c4044ecffba990fcdd9b3c949dc26.jpg","link":"https://www.bilibili.com/video/BV1CHoxBpE5f"},{"title":"巨巨巨巨详细新手化妆教程来啦❗码住跟练~","author":"煤球球coal","play":"41.7万","duration":"13:43","pic":"https://i2.hdslb.com/bfs/archive/48c426b4583a402ed743db9725eeefbb54fcffc0.jpg","link":"https://www.bilibili.com/video/BV1dpGAz7E6f"},{"title":"从洗脸开始拍的新手裸妆教程","author":"四花女士","play":"71.8万","duration":"18:52","pic":"https://i1.hdslb.com/bfs/archive/94a5f8cac15b6683d4a0599fc1e85140a749fab7.jpg","link":"https://www.bilibili.com/video/BV1AnMEzcEKi"},{"title":"化妆课","author":"橘子小课","play":"4.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/a274c7c9cb5d3377def572cdf1c7c08800e066c6.jpg","link":"https://www.bilibili.com/cheese/play/ss24987?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"零基础化妆特训班！底妆轻松学，记得交作业！","author":"勇仔leo","play":"16.9万","duration":"7:32","pic":"https://i1.hdslb.com/bfs/archive/463a4152fd911492c7ddc1ef9031fb7fd41c0509.jpg","link":"https://www.bilibili.com/video/BV1xX4y1H7P2"},{"title":"v太阳花睫毛轻松拿捏～ #三资堂睫毛膏 #睫毛膏 #新手化妆 #防水防汗不晕染 #眼妆","author":"苌大苡d诟W","play":"0","duration":"0:29","pic":"https://i2.hdslb.com/bfs/archive/6e83cc28326fc4aaa608d88cf5dc08cd2c2cb5ad.jpg","link":"https://www.bilibili.com/video/BV1on3B6aEvz"},{"title":"0基础学化妆！新手小白化妆步骤","author":"Lyla豆豆","play":"3.2万","duration":"6:10","pic":"https://i2.hdslb.com/bfs/archive/d3ae150750896719b4138c9c23534e10f86122b3.jpg","link":"https://www.bilibili.com/video/BV1g24y1b7kv"}]},{"label":"日常妆容","list":[{"title":"专属详解版 | 显贵显质感的日常妆容~","author":"程十安an","play":"261.5万","duration":"14:44","pic":"https://i1.hdslb.com/bfs/archive/5a2c264ac447e9adac074198324ee3dd2596e8f1.jpg","link":"https://www.bilibili.com/video/BV1y8411T7VF"},{"title":"这才是普通人应该学的轻透日常妆","author":"美少女老王_","play":"9306","duration":"2:52","pic":"https://i0.hdslb.com/bfs/archive/df7ce28624e9c23db2a80f86e0a8190af6f1c9cf.jpg","link":"https://www.bilibili.com/video/BV11wN96uEct"},{"title":"毛戈平美妆学院：零基础流行妆容应用","author":"毛戈平光影美学","play":"1399","duration":"","pic":"https://archive.biliimg.com/bfs/archive/f6beb7f4ef43d3f0a74d2a44940c85eac3cc5db9.jpg","link":"https://www.bilibili.com/cheese/play/ss3929?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手必看 保姆级眼妆教程 ｜不会画眼影的都来学","author":"是一只小何","play":"127.0万","duration":"2:1","pic":"https://i0.hdslb.com/bfs/archive/c581cfc246accba726020906dd9e37cc1281b60b.jpg","link":"https://www.bilibili.com/video/BV1qi4y1r7an"},{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"男生日常妆容，做好这两步就够了！不会显娘气","author":"崔佳楠sayi","play":"19.3万","duration":"2:38","pic":"https://i2.hdslb.com/bfs/archive/3d97704807197ece76ffbd871336d44799c49508.jpg","link":"https://www.bilibili.com/video/BV1nv411T7GH"},{"title":"清透日常妆容😘内附你们要的眉毛教程！！","author":"enndmee","play":"268.0万","duration":"2:26","pic":"https://i0.hdslb.com/bfs/archive/a2e5922df619d97fb70de9ca30d400397a7ac2a5.jpg","link":"https://www.bilibili.com/video/BV1Lt4y1S7ib"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"化妆美学|零基础化妆教程|毕业变美指南|化妆基础","author":"JSMN-Me","play":"831","duration":"","pic":"https://archive.biliimg.com/bfs/archive/80e35fbb848dd2d1bd0b3cddd99eb50dc6e92f1c.jpg","link":"https://www.bilibili.com/cheese/play/ss27496?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手赶快来学这个日常拍照都好看的淡颜韩妆～","author":"一颗小泡芙芙","play":"2256","duration":"2:5","pic":"https://i1.hdslb.com/bfs/archive/8712dc9ff899f8ff542e961bff30a6cf8fe17b8f.jpg","link":"https://www.bilibili.com/video/BV1z8gS6wENC"},{"title":"妆前是丑女，妆后是女神你还爱我么","author":"小樱桃日常","play":"28.5万","duration":"2:9","pic":"https://i2.hdslb.com/bfs/archive/77a710bd9ed90e4da5eb4cded1f2e94b369bd671.jpg","link":"https://www.bilibili.com/video/BV1ctT96uEEQ"},{"title":"工作日，去上班的一个妆容记录","author":"大脸猫爱吃鱼昂","play":"57.0万","duration":"5:19","pic":"https://i0.hdslb.com/bfs/archive/95e9d5ece483c6644c87ef2305a45640542172f6.jpg","link":"https://www.bilibili.com/video/BV1QL4y1Y7Zf"}]},{"label":"通勤妆","list":[{"title":"十分钟速成美女！通勤/早八/懒人糊弄学换头大法！","author":"九梨Jelly","play":"39.4万","duration":"7:52","pic":"https://i1.hdslb.com/bfs/archive/5c4bfc785784872a0747e0a54d54208463c34b00.jpg","link":"https://www.bilibili.com/video/BV1VT4y1r7kf"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"早九牛马全妆｜花知晓03二画这样更适合通勤","author":"爱臭美的猴儿","play":"594","duration":"6:0","pic":"https://i0.hdslb.com/bfs/archive/26bf268a72aed8119b30c2fb46dbd6db1f7aa1a3.jpg","link":"https://www.bilibili.com/video/BV13Q3q6pEcX"},{"title":"43岁外企理级｜5min搞定通勤妆","author":"jiu酱姨姨","play":"2.8万","duration":"5:53","pic":"https://i0.hdslb.com/bfs/archive/fe49b425d45055954195342b6a897b159a3d34a1.jpg","link":"https://www.bilibili.com/video/BV1nMVU6uEpP"},{"title":"大方脸，早八通勤妆咋画？","author":"弄弄这个妆","play":"21.1万","duration":"2:30","pic":"https://i2.hdslb.com/bfs/archive/515ac543159894a4dc554dc570ab3390ddae9fd0.jpg","link":"https://www.bilibili.com/video/BV1HG4y1t728"},{"title":"新手也一定能学会的早八妆！","author":"nana羊羊羊","play":"9.5万","duration":"6:15","pic":"https://i2.hdslb.com/bfs/archive/159128ba3d1f8bac48afa50c57c3c024ea4718d9.jpg","link":"https://www.bilibili.com/video/BV1igovYGE78"},{"title":"【canmake眼影盘02教程｜10分钟日常通勤妆】","author":"Ulia_Ly","play":"1.5万","duration":"4:5","pic":"https://i0.hdslb.com/bfs/archive/b34bff47b5866470b8c3befbdffecaed343caf12.jpg","link":"https://www.bilibili.com/video/BV1Rz4y1R73v"},{"title":"2分钟搞完通勤伪素颜妆（详细版","author":"一碗粥耶_","play":"5.7万","duration":"6:50","pic":"https://i1.hdslb.com/bfs/archive/7e9a10714dcbd8be8c8b9de48000040181620d22.jpg","link":"https://www.bilibili.com/video/BV1MzrYYDEvJ"},{"title":"【eunHae】 韩国上班族女生10min 快速通勤妆 | my daily 10mins make-up","author":"SunnieMellet","play":"1.3万","duration":"11:28","pic":"https://i2.hdslb.com/bfs/archive/e4e1302a290cce956f67603cba79682c35a8c1e9.jpg","link":"https://www.bilibili.com/video/BV1Ac411d77P"},{"title":"日常通勤底妆 只需要2分钟","author":"Elvis增增-","play":"1.5万","duration":"6:20","pic":"https://i2.hdslb.com/bfs/archive/08f8c683f95c2eacda679269cbf18bafb7ecc369.jpg","link":"https://www.bilibili.com/video/BV17Kcfz7Exv"},{"title":"高效通勤出门淡妆好物！最短的时间最大的改变！","author":"九梨Jelly","play":"21.1万","duration":"6:51","pic":"https://i0.hdslb.com/bfs/archive/105fdfc0f5551c04961927257db143d8fdcf1b12.jpg","link":"https://www.bilibili.com/video/BV1vs4y1u7Tf"},{"title":"爱用合集｜通勤早八面试百搭色！气血高智感！","author":"Carina喵酱","play":"6.3万","duration":"1:37","pic":"https://i0.hdslb.com/bfs/archive/baa6caa59fca5dbec35c2facc3de3d8d879b41d8.jpg","link":"https://www.bilibili.com/video/BV1g1NCzMEkN"}]},{"label":"约会妆","list":[{"title":"新手好学！20分钟又纯又嗲的七夕约会妆容","author":"诺诺和香菜_","play":"2.1万","duration":"3:5","pic":"https://i1.hdslb.com/bfs/archive/e57ec1ad93492d56bd0f2dd33e79b0ae0c683aa5.jpg","link":"https://www.bilibili.com/video/BV1Yd4y1T7BY"},{"title":"【白桃子】约会斩男妆｜只要够精致每天都是情人节","author":"白桃子s","play":"1.7万","duration":"8:25","pic":"https://i1.hdslb.com/bfs/archive/618546872440b3cda88d1e85ed0f86950cc8e3bb.jpg","link":"https://www.bilibili.com/video/BV1bf4y1Q73E"},{"title":"男生夏天的妆容跟练！很自然而且暴汗不脱妆，希望对你有帮助！","author":"乐仔Levi","play":"5426","duration":"4:46","pic":"https://i2.hdslb.com/bfs/archive/f4e3fc529fcbec8195f0c491b9705584d57982e5.jpg","link":"https://www.bilibili.com/video/BV1Miga6NEau"},{"title":"40岁中年老阿姨的无眼线 520心动约会妆 从黄脸婆到面带桃花","author":"白晓袅","play":"3.5万","duration":"10:49","pic":"https://i0.hdslb.com/bfs/archive/c93a0403ec893156e484dc7f21bae0d3755da9b2.jpg","link":"https://www.bilibili.com/video/BV1Nv411L7m8"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"蓝蓝化妆分享","play":"1.1万","duration":"9:37","pic":"https://i2.hdslb.com/bfs/archive/bbd5db0208dc6214827e2fdc6dfe405a70376731.jpg","link":"https://www.bilibili.com/video/BV1PYLw6WEtX"},{"title":"2min跟练｜夏日暴汗不脱妆底妆教程分享～get胶水底妆","author":"露露堡-","play":"2701","duration":"1:53","pic":"https://i2.hdslb.com/bfs/archive/c616543953df9cce3109f4593668573743149d72.jpg","link":"https://www.bilibili.com/video/BV1ya3u6aE9N"},{"title":"新手10分钟氧气甜妹妆！淡颜100%适配！","author":"chilly香菜","play":"39.5万","duration":"1:58","pic":"https://i2.hdslb.com/bfs/archive/63dd33ae8509de6350a700da7d9a4b2a4168f674.jpg","link":"https://www.bilibili.com/video/BV1fZ42127FY"},{"title":"画儿童舞台妆视频教程，学会以后自己小孩舞台表演就不用愁了！","author":"雪児酱","play":"8.8万","duration":"3:45","pic":"https://i0.hdslb.com/bfs/archive/7f857c37b6f03de659abb24cd5cf756d16b29b4d.jpg","link":"https://www.bilibili.com/video/BV1Et411G7ni"},{"title":"【中字 · gojiseung】韩博年末约会妆❄️ | 表面伪素颜 but其实是核级全妆…！！","author":"SunnieMellet","play":"3.8万","duration":"16:9","pic":"https://i0.hdslb.com/bfs/archive/37ceed8ff964d9e067a455c67c5c483d8388c692.jpg","link":"https://www.bilibili.com/video/BV1HRq8BmEaR"},{"title":"GRWM｜温柔桃粉兔兔妆+做蛋糕日常～","author":"Mhoney蒙蒙","play":"30.8万","duration":"4:38","pic":"https://i1.hdslb.com/bfs/archive/6013d1e791338d7302975919144ce1c209722c8f.jpg","link":"https://www.bilibili.com/video/BV166epeCE6k"},{"title":"男友脸红心跳！氛围感纯欲妆！超简单新手必备！通勤约会妆｜圆脸减龄妆教","author":"兔染染Summer","play":"29.5万","duration":"7:5","pic":"https://i2.hdslb.com/bfs/archive/b28e0d950ca182c3dae95917ce95aa0a356163e8.jpg","link":"https://www.bilibili.com/video/BV1M84y1F7vp"},{"title":"让新手看清细节！巨巨详细的心动约会妆！！","author":"爱化妆的陈陈","play":"19.6万","duration":"5:49","pic":"https://i1.hdslb.com/bfs/archive/ace17ca12ee53771e7aac30f0ed0e1fb8b18bc99.jpg","link":"https://www.bilibili.com/video/BV1ju4m1T7WH"}]},{"label":"伪素颜","list":[{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"伪素颜｜参考女明星素颜天花板！普通人如何伪造天然好气色素颜感？【一枝南南】","author":"一枝南南","play":"86.3万","duration":"13:39","pic":"https://i2.hdslb.com/bfs/archive/784b3dc54ebefa2e2fc43c8baa71ae79c33cd033.jpg","link":"https://www.bilibili.com/video/BV1ZA4y1Q7X2"},{"title":"五分钟就能搞定的伪素颜妆","author":"入时十六今六十","play":"78.5万","duration":"1:13","pic":"https://i0.hdslb.com/bfs/archive/9892d1a831157a1a82844a27070edefd859218be.jpg","link":"https://www.bilibili.com/video/BV1oP4y157Xo"},{"title":"“伪妆”高级生活伪素颜","author":"蓝曳-伪妆大师","play":"5.0万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/5efa8a52c8a1569f08ecbf790c6eab32badae4e4.jpg","link":"https://www.bilibili.com/cheese/play/ss16781?query_from=0&search_id=5485147832150080592&search_query=%E4%BC%AA%E7%B4%A0%E9%A2%9C%E5%A6%86"},{"title":"学生党伪素颜四件套，还是很实用的在学校也能美美哒","author":"夏熙呀呀呀","play":"19.3万","duration":"1:55","pic":"https://i0.hdslb.com/bfs/archive/953c6204d285cd57347d55f4c95c32a0a7e66295.jpg","link":"https://www.bilibili.com/video/BV1dP411v73Y"},{"title":"男生素颜妆【一看就会版】","author":"恶霸崔憨憨","play":"117.6万","duration":"2:57","pic":"https://i1.hdslb.com/bfs/archive/bcc30c030421dd3735f7b0f385d83f260963d350.jpg","link":"https://www.bilibili.com/video/BV1tL4y1J7X6"},{"title":"早八5分钟！轻松换头的白开水伪素颜妆","author":"一只超能梦梦","play":"2498","duration":"5:14","pic":"https://i0.hdslb.com/bfs/archive/b07e99f33bc2eccf5348c2d7afd8cee893b42eef.jpg","link":"https://www.bilibili.com/video/BV19R3C6yEB6"},{"title":"无粉底也能画出氛围感伪素颜？10分钟get！","author":"摆烂小O椰","play":"8.2万","duration":"4:2","pic":"https://i2.hdslb.com/bfs/archive/e1ecfb35c784d390f796d24401be67a2ba17beae.jpg","link":"https://www.bilibili.com/video/BV1tDu1zEEb9"},{"title":"新手赶快码住这个1min快素伪素颜淡妆～","author":"一颗小泡芙芙","play":"3341","duration":"1:9","pic":"https://i2.hdslb.com/bfs/archive/2ce2171bfd89da24efa73374b00c64b467e9a4b6.jpg","link":"https://www.bilibili.com/video/BV1GW3w6REf1"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"安琪教化妆","play":"1404","duration":"7:21","pic":"https://i2.hdslb.com/bfs/archive/0fb51b6b478f92790d94259698cf1944128af4db.jpg","link":"https://www.bilibili.com/video/BV1t9gQ6WEH3"},{"title":"【幸運】less is more—极致伪素颜化妆思路～不好意思我素颜就这么美","author":"裴幸運","play":"44.5万","duration":"5:15","pic":"https://i1.hdslb.com/bfs/archive/6952fdaa53743d1775a1d38728c37eef11eb144a.jpg","link":"https://www.bilibili.com/video/BV1Nv411A7jG"},{"title":"绝了！这个新手5min早八伪素颜妆也太嫩太简单了吧！","author":"兰兰同学v","play":"3.2万","duration":"1:24","pic":"https://i2.hdslb.com/bfs/archive/a7a57dc8628ff327d4a9f763a9a9abe80582455a.jpg","link":"https://www.bilibili.com/video/BV1AWsmeFEa7"}]}]}};
+  let feedCat = 0, feedPool = 0;
   function feedEscapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-  function buildVideo(it) {
-    const title = String(it.title || "").replace(/<[^>]+>/g, "");
-    const bvid = it.bvid || "";
-    const link = bvid ? ("https://www.bilibili.com/video/" + bvid) : (it.arcurl || "https://www.bilibili.com");
-    let pic = it.pic || "";
-    if (pic.indexOf("//") === 0) pic = "https:" + pic;
-    return { title: title, author: it.author || it.uname || "", play: feedFmtCount(it.play), duration: it.duration || "", pic: pic, link: link };
+  function feedKwList() {
+    const cat = FEED_CATS[feedCat];
+    const pool = cat.pools[feedPool % cat.pools.length] || cat.pools[0];
+    return pool;
   }
-  async function searchBiliVideos(kw) {
-    const mixin = await getMixinKey();
-    const p = wbiSign({ search_type: "video", keyword: kw, page: 1, page_size: 12 }, mixin);
-    const url = "https://api.bilibili.com/x/web-interface/wbi/search/type?" + Object.keys(p).sort().map((k) => k + "=" + encodeURIComponent(p[k])).join("&");
-    const j = await proxyJSON(url);
-    const res = (j && j.data && j.data.result) || [];
-    if (!res.length) throw new Error("empty");
-    return res.slice(0, 12).map(buildVideo);
-  }
-  function renderFeedFallback(cat, grid) {
+  function renderFeed() {
+    const cat = FEED_CATS[feedCat];
+    const grid = document.getElementById("feed-grid");
+    if (!grid) return;
     grid.innerHTML = "";
-    const head = document.createElement("div"); head.className = "feed-cat-head";
-    head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name + ' <span class="cached">实时获取失败</span>';
+    const head = document.createElement("div");
+    head.className = "feed-cat-head";
+    head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name;
     grid.appendChild(head);
-    const wrap = document.createElement("div"); wrap.className = "feed-grid-cards";
-    cat.kws.forEach(function (kw) {
-      const a = document.createElement("a"); a.className = "vcard fallback";
+    const wrap = document.createElement("div");
+    wrap.className = "feed-grid-cards";
+    feedKwList().forEach(function (kw) {
+      const a = document.createElement("a");
+      a.className = "kcard";
       a.href = "https://search.bilibili.com/all?keyword=" + encodeURIComponent(kw);
       a.target = "_blank"; a.rel = "noopener";
-      a.innerHTML = '<div class="vcard-meta"><div class="vcard-title">🔍 ' + feedEscapeHtml(kw) + '</div><div class="vcard-sub"><span>前往 B站看相关视频 ›</span></div></div>';
+      a.innerHTML =
+        '<div class="kcard-ic">▶</div>' +
+        '<div class="kcard-title">' + feedEscapeHtml(kw) + '</div>' +
+        '<div class="kcard-sub">前往 B 站看相关视频 ›</div>';
       wrap.appendChild(a);
     });
     grid.appendChild(wrap);
-  }
-  function renderFeed(cat, list, kw, isCache) {
-    const grid = document.getElementById("feed-grid"); if (!grid) return;
-    grid.innerHTML = "";
-    const head = document.createElement("div"); head.className = "feed-cat-head";
-    head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name + " · " + feedEscapeHtml(kw) + (isCache ? ' <span class="cached">缓存</span>' : "");
-    grid.appendChild(head);
-    if (list && list.length) {
-      const wrap = document.createElement("div"); wrap.className = "feed-grid-cards";
-      list.forEach(function (v) {
-        const a = document.createElement("a"); a.className = "vcard"; a.href = v.link; a.target = "_blank"; a.rel = "noopener";
-        const thumb = document.createElement("div"); thumb.className = "vcard-thumb";
-        const img = document.createElement("img"); img.loading = "lazy"; img.src = v.pic; img.alt = v.title; img.referrerPolicy = "no-referrer";
-        img.onerror = function () { thumb.classList.add("noimg"); img.style.display = "none"; };
-        const dur = document.createElement("span"); dur.className = "vcard-dur"; dur.textContent = v.duration;
-        thumb.append(img, dur);
-        const meta = document.createElement("div"); meta.className = "vcard-meta";
-        const t = document.createElement("div"); t.className = "vcard-title"; t.textContent = v.title;
-        const sub = document.createElement("div"); sub.className = "vcard-sub";
-        sub.innerHTML = "<span>" + feedEscapeHtml(v.author) + "</span><span>▶ " + v.play + "</span>";
-        meta.append(t, sub);
-        a.append(thumb, meta);
-        wrap.appendChild(a);
-      });
-      grid.appendChild(wrap);
-    } else {
-      renderFeedFallback(cat, grid);
-    }
-  }
-  let feedLoadSeq = 0;
-  async function loadFeed(forceNet) {
-    const cat = FEED_CATS[feedCat];
-    const kw = cat.kws[feedKwIdx % cat.kws.length];
     const tip = document.getElementById("feed-tip");
-    const seq = ++feedLoadSeq;
-    // 第一步：立刻渲染已有内容（本地缓存或内置视频），保证打开就有视频可看
-    const inst = feedInstant(cat.key);
-    if (inst) {
-      renderFeed(cat, inst.list, inst.kw, false);
-      if (tip) tip.textContent = "「" + inst.kw + "」· 正在获取最新…";
-    } else if (tip) {
-      tip.textContent = "正在搜索「" + kw + "」…";
-    }
-    // 第二步：后台拉取最新，拉到后静默替换
-    try {
-      const fresh = feedCache[cat.key];
-      // 5 分钟内的新鲜缓存且非强制刷新/换一批：不再请求网络
-      if (!forceNet && fresh && fresh.kw === kw && Date.now() - (fresh.ts || 0) < 5 * 60 * 1000) {
-        if (tip) tip.textContent = "「" + fresh.kw + "」· 更新于 " + new Date(fresh.ts).toLocaleTimeString();
-        return;
-      }
-      const list = await searchBiliVideos(kw);
-      if (seq !== feedLoadSeq) return; // 期间用户已切换，丢弃过期结果
-      feedCache[cat.key] = { kw: kw, list: list, ts: Date.now() };
-      saveFeedCache();
-      renderFeed(cat, list, kw, false);
-      if (tip) tip.textContent = "「" + kw + "」· 更新于 " + new Date().toLocaleTimeString();
-    } catch (e) {
-      if (seq !== feedLoadSeq) return;
-      if (inst) { if (tip) tip.textContent = "「" + inst.kw + "」· 实时刷新失败，稍后自动重试"; }
-      else { renderFeedFallback(cat, document.getElementById("feed-grid")); if (tip) tip.textContent = "实时获取失败，已提供直达链接"; }
-    }
+    if (tip) tip.textContent = "更新于 " + new Date().toLocaleTimeString();
   }
-  // 页面加载后就静默预热：预取签名密钥 + 后台刷新三个分类的视频缓存
-  setTimeout(function () {
-    getMixinKey().then(function () {
-      FEED_CATS.forEach(function (cat, i) {
-        setTimeout(function () {
-          searchBiliVideos(cat.kws[0]).then(function (list) {
-            feedCache[cat.key] = { kw: cat.kws[0], list: list, ts: Date.now() };
-            saveFeedCache();
-            // 若用户正停在该分类，静默更新画面
-            const view = document.getElementById("view-feed");
-            if (view && view.classList.contains("active") && FEED_CATS[feedCat].key === cat.key && feedKwIdx === 0) {
-              renderFeed(cat, list, cat.kws[0], false);
-              const tip = document.getElementById("feed-tip");
-              if (tip) tip.textContent = "「" + cat.kws[0] + "」· 更新于 " + new Date().toLocaleTimeString();
-            }
-          }).catch(function () {});
-        }, i * 1500);
-      });
-    }).catch(function () {});
-  }, 800);
   function renderFeedTabs() {
     const box = document.getElementById("feed-tabs"); if (!box) return;
     box.innerHTML = "";
@@ -1399,19 +1570,567 @@
       const b = document.createElement("button");
       b.className = "feed-tab" + (i === feedCat ? " active" : "");
       b.innerHTML = "<span>" + cat.ic + "</span> " + cat.name;
-      b.onclick = function () { feedCat = i; feedKwIdx = 0; renderFeedTabs(); loadFeed(); };
+      b.onclick = function () { feedCat = i; feedPool = 0; renderFeedTabs(); renderFeed(); };
       box.appendChild(b);
     });
   }
   renderFeedTabs();
   const feedRefresh = document.getElementById("feed-refresh");
-  if (feedRefresh) feedRefresh.onclick = function () { loadFeed(true); };
+  if (feedRefresh) feedRefresh.onclick = function () { renderFeed(); };
   const feedNext = document.getElementById("feed-next");
-  if (feedNext) feedNext.onclick = function () { feedKwIdx++; loadFeed(true); };
+  if (feedNext) feedNext.onclick = function () { feedPool = (feedPool + 1) % FEED_CATS[feedCat].pools.length; renderFeed(); };
+  // 进入精神食粮视图时即时渲染（无网络依赖，秒开）
+  const feedView = document.getElementById("view-feed");
+  if (feedView && "MutationObserver" in window) {
+    new MutationObserver(function () {
+      if (feedView.classList.contains("active")) renderFeed();
+    }).observe(feedView, { attributes: true, attributeFilter: ["class"] });
+  }
   setInterval(function () {
     const tab = document.querySelector('.tab[data-view="feed"]');
-    if (tab && tab.classList.contains("active")) loadFeed(true);
+    if (tab && tab.classList.contains("active")) renderFeed();
   }, 5 * 60 * 1000);
+
+
+
+
+/* ===================== 教育口播短视频资料库 ===================== */
+(function () {
+  var EDU_CATS = [
+    "类型1｜真人出镜口播（家庭教育、认知成长、亲子、职场干货，最通用）",
+    "类型2｜学科教学口播（学生赛道、网课微课、知识讲解）",
+    "类型3｜通识科普口播（文史、科学、知识科普）",
+    "类型4｜知识付费 / 短视频微课（短平快 45～90s 带货教育口播）"
+  ];
+  var EDU_BLOGGERS = [
+    { id: "cuicui", cat: 0, name: "崔催", platform: "抖音", seg: "家庭教育 / 亲子沟通",
+      highlight: "真人出镜口播，语气温柔有共情；镜头前常用手势与道具演示，慢节奏但信息密度高。",
+      req: "重点拉片亲子冲突场景的破冰话术与字幕节奏；对比其前 3 秒钩子设计。",
+      kw: "家庭教育 亲子沟通 真人出镜 口播" },
+    { id: "zhangqi", cat: 0, name: "张琪", platform: "抖音", seg: "职场认知、商业干货",
+      highlight: "职场 / 商业认知口播，观点犀利、结构清晰，常用「结论先行 + 案例」句式。",
+      req: "拉片其「一个认知 + 一个反例」的叙事结构，记录转场与字幕强调方式。",
+      kw: "职场 商业干货 认知 口播" },
+    { id: "tuokouyue", cat: 0, name: "脱口岳（岳松）", platform: "抖音", seg: "青年成长、热点思辨",
+      highlight: "青年成长 / 热点思辨口播，逻辑递进强，常用设问引出观点，气口停顿明显。",
+      req: "拉片热点选题的切入角度与情绪递进；关注其结尾的价值观升华钩子。",
+      kw: "青年成长 热点思辨 口播" },
+    { id: "yishu", cat: 1, name: "一数", platform: "B站 / 抖音", seg: "高中数学（录屏讲解型口播）",
+      highlight: "录屏 + 讲解型口播标杆；板书清晰、节奏稳定，适合拆解「知识讲解类」剪辑。",
+      req: "拉片其录屏与真人出镜的衔接方式，以及难点处的暂停强调处理。",
+      kw: "高中数学 录屏 知识讲解 口播" },
+    { id: "shiyouyuwen", cat: 1, name: "学过石油的语文老师", platform: "B站", seg: "语文应试干货",
+      highlight: "语文应试干货口播，痛点明确、方法论可复制，字幕重点标注到位。",
+      req: "拉片「题型拆解 + 模板总结」的结构，记录其关键信息的高亮节奏。",
+      kw: "语文 应试 干货 口播" },
+    { id: "yingyutu", cat: 1, name: "英语兔", platform: "B站", seg: "英语学习口播",
+      highlight: "英语学习口播，轻松幽默、类比多，前 3 秒常以反常识提问切入。",
+      req: "拉片其趣味钩子与知识密度的平衡，关注语气停顿与配图配合。",
+      kw: "英语 学习 口播" },
+    { id: "liyongle", cat: 2, name: "李永乐老师", platform: "B站", seg: "通识科普（数理）",
+      highlight: "通识科普口播标杆，由浅入深、板书 + 真人讲解，逻辑极其清晰。",
+      req: "拉片复杂概念的「类比降维」技巧，记录其节奏与字幕层级。",
+      kw: "通识 科普 李永乐 口播" },
+    { id: "xiaoyuehan", cat: 2, name: "小约翰可汗", platform: "B站", seg: "叙事科普（不露脸配音口播）",
+      highlight: "叙事科普配音口播代表，不露脸、靠配音 + 素材叙事，钩子强、信息量大。",
+      req: "拉片其「悬念开场 + 时间线推进」的叙事结构，关注素材切换节奏。",
+      kw: "叙事科普 不露脸 配音 口播" },
+    { id: "xingliu", cat: 3, name: "星流老师", platform: "抖音", seg: "知识付费 / 短视频微课",
+      highlight: "短平快 45～90s 微课口播，单点干货、强引导，适合带货型教育号对标。",
+      req: "拉片其 45s 内的信息密度分配与结尾转化话术。",
+      kw: "知识付费 微课 45s 带货 口播" },
+    { id: "shiyi", cat: 3, name: "十七老师", platform: "抖音", seg: "知识付费 / 短视频微课",
+      highlight: "短视频微课口播，节奏明快、字幕大，常用「你有没有…」式开头。",
+      req: "拉片其开头钩子与知识点分段方式，记录其点击引导设计。",
+      kw: "知识付费 微课 短视频 口播" }
+  ];
+  var EDU_CHANNELS = [
+    { group: "📺 B 站账号", items: [
+      { name: "南门录像厅", platform: "B站", kw: "剪辑 思路 拉片" },
+      { name: "剪辑师小冯", platform: "B站", kw: "剪辑 教程 实战" },
+      { name: "Doyoudo", platform: "B站", kw: "剪辑 入门 Pr AE" },
+      { name: "Oeasy", platform: "B站", kw: "剪辑 免费 全套" }
+    ] },
+    { group: "📺 抖音账号", items: [
+      { name: "剪映研究所", platform: "抖音", kw: "剪映 教程 模板" },
+      { name: "赵小五剪映教学", platform: "抖音", kw: "剪映 实操 口播" }
+    ] },
+    { group: "✂️ 剪映内置课堂", items: [
+      { name: "剪映课堂入口", platform: "剪映", kw: "剪映 内置 课程" }
+    ] }
+  ];
+  var EDU_TRAIN = [
+    { title: "拉片练习（每日 1 条）执行要求", items: [
+      "每日选 1 条对标爆款，完整观看 ≥ 2 遍",
+      "记录前 3 秒钩子类型：提问 / 冲突 / 反常识",
+      "拆解镜头景别、转场与字幕节奏",
+      "写 50 字拉片笔记：今天能复制的 1 个点"
+    ] },
+    { title: "模仿复刻练习方法", items: [
+      "同选题复刻一条，限时 30 分钟出成片",
+      "与原片逐帧对比：节奏 / 字幕 / 语气 / 停顿",
+      "每周精选 1 条做迭代，沉淀自己的模板",
+      "建立「钩子库 / 转场库 / 字幕样式库」三类素材夹"
+    ] },
+    { title: "美妆剪辑 VS 教育口播剪辑核心差异", items: [
+      "美妆：快节奏、卡点、特写多、氛围感优先",
+      "教育口播：信息清晰优先，字幕大、停顿留白、逻辑递进",
+      "共同点：前 3 秒钩子 + 结尾明确引导",
+      "教育口播更忌花哨特效喧宾夺主"
+    ] }
+  ];
+  var EDU_CHECK = [
+    "前 3 秒是否给出明确钩子（痛点 / 反常识 / 利益点）？",
+    "口播是否有停顿留白，避免一气呵成听不清？",
+    "字幕是否够大、对比清晰、无错别字？",
+    "背景音乐是否压过人声？",
+    "画面是否稳定、不过度特效？",
+    "一条是否只讲一个点，信息密度适中？",
+    "结尾是否有明确引导（关注 / 收藏 / 下条预告）？",
+    "是否标注来源、规避争议与侵权内容？"
+  ];
+  var EDU_ASSETS = [
+    { title: "📊 爆款拆解表", html:
+      '<table class="edu-table"><thead><tr><th>维度</th><th>拆解要点</th><th>记录示例</th></tr></thead><tbody>' +
+      '<tr><td>钩子</td><td>类型 + 前 3 秒文案</td><td>反常识提问</td></tr>' +
+      '<tr><td>结构</td><td>开场-展开-收尾</td><td>痛点→方法→引导</td></tr>' +
+      '<tr><td>字幕</td><td>字号 / 强调 / 配色</td><td>大字号+高亮</td></tr>' +
+      '<tr><td>节奏</td><td>镜头 / 停顿 / BGM</td><td>每 5s 一切</td></tr>' +
+      '<tr><td>转化</td><td>结尾引导动作</td><td>关注+下条预告</td></tr>' +
+      '</tbody></table>' },
+    { title: "✍️ 教育口播 30 条钩子文案", html:
+      '<ol class="edu-ol">' +
+      '<li>你有没有发现，90% 的人都做错了这件事？</li>' +
+      '<li>别再瞎努力了，真正有用的是这一招。</li>' +
+      '<li>我家孩子以前也这样，直到我用了这个方法。</li>' +
+      '<li>为什么老师不讲？因为这点太关键了。</li>' +
+      '<li>记住这 3 句话，孩子主动爱上学习。</li>' +
+      '<li>今天这条视频，可能改变你对孩子的态度。</li>' +
+      '<li>很多家长花冤枉钱，其实免费就能搞定。</li>' +
+      '<li>一道题讲透一类题，收藏慢慢看。</li>' +
+      '<li>孩子写作业拖拉？试试这个 5 分钟法。</li>' +
+      '<li>别怪孩子笨，是你没用对方法。</li>' +
+      '<li>这个学习误区，坑了无数小学生。</li>' +
+      '<li>3 个信号说明孩子真的在进步。</li>' +
+      '<li>别再逼孩子了，越逼越叛逆。</li>' +
+      '<li>一句话让孩子愿意听你说话。</li>' +
+      '<li>为什么学霸都在用这个笔记法？</li>' +
+      '<li>中考前必看的 5 个提分细节。</li>' +
+      '<li>数学差不是笨，是这步没打通。</li>' +
+      '<li>孩子沉迷手机？先别收，用这招。</li>' +
+      '<li>作文总扣分？记住这个万能结构。</li>' +
+      '<li>英语从 60 到 110，只靠每天 10 分钟。</li>' +
+      '<li>家长越省心，孩子越独立。</li>' +
+      '<li>这道题 99% 的人第一眼就错。</li>' +
+      '<li>别刷题了，先搞懂这 1 个原理。</li>' +
+      '<li>孩子专注力差，根源可能在你。</li>' +
+      '<li>一个习惯，帮孩子甩开同桌 10 分。</li>' +
+      '<li>老师不会告诉你的提分顺序。</li>' +
+      '<li>孩子不爱读书？换这种方式试试。</li>' +
+      '<li>考前一晚别复习，做这件事更重要。</li>' +
+      '<li>收藏！这 30 条钩子每天用一条。</li>' +
+      '<li>最后一条，也是最重要的一条。</li>' +
+      '</ol>' }
+  ];
+
+  var favSet = {};
+  try { favSet = JSON.parse(localStorage.getItem("wb_edu_fav") || "{}"); } catch (e) {}
+  function saveFav() { try { localStorage.setItem("wb_edu_fav", JSON.stringify(favSet)); } catch (e) {} }
+  var checkSet = {};
+  try { checkSet = JSON.parse(localStorage.getItem("wb_edu_check") || "{}"); } catch (e) {}
+  function saveCheck() { try { localStorage.setItem("wb_edu_check", JSON.stringify(checkSet)); } catch (e) {} }
+
+  function eduUrl(platform, name) {
+    var n = encodeURIComponent(name);
+    if (platform.indexOf("B站") >= 0) return "https://search.bilibili.com/upuser?keyword=" + n;
+    if (platform.indexOf("抖音") >= 0) return "https://www.douyin.com/search/" + n;
+    if (platform.indexOf("剪映") >= 0) return "https://www.capcut.cn/";
+    return "https://www.baidu.com/s?wd=" + n;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]); }); }
+
+  var TABS = ["对标案例库", "剪辑学习渠道", "训练方案", "避坑自查清单", "素材附件"];
+
+  function buildCase() {
+    var wrap = document.createElement("div");
+    EDU_CATS.forEach(function (catTitle, ci) {
+      var acc = document.createElement("div"); acc.className = "acc";
+      var head = document.createElement("div"); head.className = "acc-head";
+      head.innerHTML = '<span>' + esc(catTitle) + '</span><span class="chev">▾</span>';
+      var body = document.createElement("div"); body.className = "acc-body";
+      EDU_BLOGGERS.filter(function (b) { return b.cat === ci; }).forEach(function (b) {
+        var card = document.createElement("div"); card.className = "edu-blog edu-filterable";
+        card.dataset.text = (b.name + " " + b.seg + " " + b.highlight + " " + b.kw + " " + b.platform).toLowerCase();
+        var fav = !!favSet[b.id];
+        card.innerHTML =
+          '<div class="edu-blog-top"><div class="edu-blog-name">' + esc(b.name) + '</div>' +
+          '<button class="edu-star' + (fav ? " on" : "") + '" data-id="' + b.id + '" title="收藏重点博主">' + (fav ? "★" : "☆") + '</button></div>' +
+          '<div class="edu-badge">' + esc(b.platform) + '</div>' +
+          '<div class="edu-row"><span class="edu-k">赛道定位</span><span>' + esc(b.seg) + '</span></div>' +
+          '<div class="edu-row"><span class="edu-k">剪辑亮点</span><span>' + esc(b.highlight) + '</span></div>' +
+          '<div class="edu-row"><span class="edu-k">拉片要求</span><span>' + esc(b.req) + '</span></div>' +
+          '<button class="edu-btn" data-url="' + eduUrl(b.platform, b.name) + '">▶ 前往观看视频</button>';
+        body.appendChild(card);
+      });
+      acc.append(head, body);
+      head.onclick = function () { acc.classList.toggle("open"); };
+      wrap.appendChild(acc);
+    });
+    return wrap;
+  }
+
+  function buildChannel() {
+    var wrap = document.createElement("div");
+    EDU_CHANNELS.forEach(function (g) {
+      var acc = document.createElement("div"); acc.className = "acc";
+      var head = document.createElement("div"); head.className = "acc-head";
+      head.innerHTML = '<span>' + esc(g.group) + '</span><span class="chev">▾</span>';
+      var body = document.createElement("div"); body.className = "acc-body";
+      g.items.forEach(function (it) {
+        var row = document.createElement("div"); row.className = "edu-account edu-filterable";
+        row.dataset.text = (it.name + " " + it.kw + " " + it.platform).toLowerCase();
+        row.innerHTML =
+          '<div class="edu-account-info"><div class="edu-blog-name">' + esc(it.name) + '</div>' +
+          '<div class="edu-badge">' + esc(it.platform) + '</div></div>' +
+          '<button class="edu-btn sm" data-url="' + eduUrl(it.platform, it.name) + '">前往主页 ›</button>';
+        body.appendChild(row);
+      });
+      acc.append(head, body);
+      head.onclick = function () { acc.classList.toggle("open"); };
+      wrap.appendChild(acc);
+    });
+    return wrap;
+  }
+
+  function buildTrain() {
+    var wrap = document.createElement("div");
+    EDU_TRAIN.forEach(function (t) {
+      var acc = document.createElement("div"); acc.className = "acc";
+      var head = document.createElement("div"); head.className = "acc-head";
+      head.innerHTML = '<span>' + esc(t.title) + '</span><span class="chev">▾</span>';
+      var body = document.createElement("div"); body.className = "acc-body";
+      var ul = document.createElement("ul"); ul.className = "edu-ul";
+      t.items.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+      body.appendChild(ul);
+      acc.append(head, body);
+      head.onclick = function () { acc.classList.toggle("open"); };
+      wrap.appendChild(acc);
+    });
+    return wrap;
+  }
+
+  function buildCheck() {
+    var wrap = document.createElement("div");
+    var acc = document.createElement("div"); acc.className = "acc";
+    var head = document.createElement("div"); head.className = "acc-head";
+    head.innerHTML = '<span>教育口播剪辑自查清单</span><span class="chev">▾</span>';
+    var body = document.createElement("div"); body.className = "acc-body";
+    EDU_CHECK.forEach(function (x, i) {
+      var id = "ck" + i;
+      var lab = document.createElement("label"); lab.className = "edu-check";
+      lab.innerHTML = '<input type="checkbox" ' + (checkSet[id] ? "checked" : "") + '><span>' + esc(x) + '</span>';
+      var cb = lab.querySelector("input");
+      cb.onchange = function () {
+        if (cb.checked) checkSet[id] = 1; else delete checkSet[id];
+        saveCheck(); lab.classList.toggle("done", cb.checked);
+      };
+      if (checkSet[id]) lab.classList.add("done");
+      body.appendChild(lab);
+    });
+    acc.append(head, body);
+    head.onclick = function () { acc.classList.toggle("open"); };
+    wrap.appendChild(acc);
+    return wrap;
+  }
+
+  function buildAssets() {
+    var wrap = document.createElement("div");
+    EDU_ASSETS.forEach(function (a) {
+      var acc = document.createElement("div"); acc.className = "acc";
+      var head = document.createElement("div"); head.className = "acc-head";
+      head.innerHTML = '<span>' + esc(a.title) + '</span><span class="chev">▾</span>';
+      var body = document.createElement("div"); body.className = "acc-body";
+      var box = document.createElement("div"); box.className = "edu-asset"; box.innerHTML = a.html;
+      body.appendChild(box);
+      acc.append(head, body);
+      head.onclick = function () { acc.classList.toggle("open"); };
+      wrap.appendChild(acc);
+    });
+    return wrap;
+  }
+
+  function renderEdu() {
+    var content = document.getElementById("edu-content");
+    if (!content) return;
+    content.innerHTML = "";
+    var panels = [buildCase(), buildChannel(), buildTrain(), buildCheck(), buildAssets()];
+    panels.forEach(function (p, i) {
+      var panel = document.createElement("div"); panel.className = "edu-panel"; panel.dataset.tab = String(i);
+      panel.appendChild(p);
+      content.appendChild(panel);
+    });
+    var firstAcc = content.querySelector(".acc");
+    if (firstAcc) firstAcc.classList.add("open");
+    bindEduEvents();
+  }
+
+  var eduTab = 0;
+  function renderEduTabs() {
+    var box = document.getElementById("edu-tabs"); if (!box) return;
+    box.innerHTML = "";
+    TABS.forEach(function (t, i) {
+      var b = document.createElement("button");
+      b.className = "feed-tab" + (i === eduTab ? " active" : "");
+      b.textContent = t;
+      b.onclick = function () { eduTab = i; renderEduTabs(); showEduPanel(); };
+      box.appendChild(b);
+    });
+  }
+  function showEduPanel() {
+    document.querySelectorAll(".edu-panel").forEach(function (p) {
+      p.style.display = (Number(p.dataset.tab) === eduTab) ? "" : "none";
+    });
+  }
+
+  function bindEduEvents() {
+    document.querySelectorAll("#edu-content .edu-btn").forEach(function (btn) {
+      btn.onclick = function (e) { e.stopPropagation(); window.open(btn.dataset.url, "_blank", "noopener"); };
+    });
+    document.querySelectorAll("#edu-content .edu-star").forEach(function (st) {
+      st.onclick = function (e) {
+        e.stopPropagation();
+        var id = st.dataset.id;
+        if (favSet[id]) { delete favSet[id]; st.textContent = "☆"; st.classList.remove("on"); }
+        else { favSet[id] = 1; st.textContent = "★"; st.classList.add("on"); }
+        saveFav();
+      };
+    });
+  }
+
+  function applyEduFilter() {
+    var searchEl = document.getElementById("edu-search");
+    var q = (searchEl && searchEl.value ? searchEl.value : "").trim().toLowerCase();
+    var favBtn = document.getElementById("edu-favonly");
+    var favOnly = favBtn && favBtn.classList.contains("active");
+    var anyVisible = false;
+    document.querySelectorAll("#edu-content .edu-filterable").forEach(function (el) {
+      var matchQ = !q || (el.dataset.text && el.dataset.text.indexOf(q) >= 0);
+      var matchFav = true;
+      if (favOnly) {
+        var star = el.querySelector(".edu-star");
+        matchFav = !!(star && star.classList.contains("on"));
+      }
+      var show = matchQ && matchFav;
+      el.style.display = show ? "" : "none";
+      if (show) anyVisible = true;
+    });
+    if (q || favOnly) {
+      document.querySelectorAll("#edu-content .acc").forEach(function (acc) {
+        var vis = acc.querySelector('.edu-filterable:not([style*="display: none"])');
+        if (vis) acc.classList.add("open");
+      });
+    }
+    var tip = document.getElementById("edu-empty");
+    if (tip) tip.style.display = ((q || favOnly) && !anyVisible) ? "" : "none";
+  }
+
+  function initEdu() {
+    renderEduTabs();
+    renderEdu();
+    showEduPanel();
+    var search = document.getElementById("edu-search");
+    if (search) search.oninput = applyEduFilter;
+    var favBtn = document.getElementById("edu-favonly");
+    if (favBtn) favBtn.onclick = function () { favBtn.classList.toggle("active"); applyEduFilter(); };
+  }
+  initEdu();
+  window.goEduTab = function (i) {
+    try { eduTab = (typeof i === "number") ? i : 0; renderEduTabs(); showEduPanel(); } catch (e) {}
+    var t = document.querySelector('.tab[data-view="edu"]'); if (t) t.click();
+  };
+
+  /* ===== 碎碎念（轻量日记 / 灵感备忘录）===== */
+  var SUI_CATS = ["工作灵感", "日常感悟", "剪辑想法", "运动记录"];
+  var suiItems = store.get("wb_suisui", []);
+  function saveSui() { store.set("wb_suisui", suiItems); }
+  function suiFmt(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    var p = function (n) { return n < 10 ? "0" + n : "" + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function suiNow() { return new Date().toISOString(); }
+
+  var suiCur = { id: null, cat: "", star: false };
+  var suiFilterCat = "all";
+  var suiFavOnly = false;
+  var suiQuery = "";
+  var suiListEl, suiSearchEl, suiCatsEl, suiFavBtn, suiCountEl, suiModal, suiText, suiCatWrap, suiModalStar, suiSaveBtn, suiDelBtn, suiCloseBtn, suiModalTime;
+
+  function renderSuiList() {
+    if (!suiListEl) return;
+    suiListEl.innerHTML = "";
+    var q = suiQuery.trim().toLowerCase();
+    var filtered = suiItems.filter(function (it) {
+      if (suiFilterCat !== "all" && it.cat !== suiFilterCat) return false;
+      if (suiFavOnly && !it.star) return false;
+      if (q && (it.text + " " + (it.cat || "")).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    filtered.sort(function (a, b) { return new Date(b.created) - new Date(a.created); });
+    if (suiCountEl) suiCountEl.textContent = filtered.length ? ("共 " + filtered.length + " 条") : "";
+    if (!filtered.length) {
+      var empty = document.createElement("div");
+      empty.className = "sui-empty";
+      empty.textContent = suiItems.length ? "没有符合条件的碎碎念，换个筛选或关键词试试～" : "还没有碎碎念，点「✏️ 新建碎碎念」记下第一条吧～";
+      suiListEl.appendChild(empty);
+      return;
+    }
+    filtered.forEach(function (it) {
+      var card = document.createElement("div");
+      card.className = "sui-card" + (it.star ? " starred" : "");
+      var badge = it.cat ? '<span class="sui-badge">' + esc(it.cat) + '</span>' : "";
+      card.innerHTML =
+        '<div class="sui-card-top"><span class="sui-time">🕒 ' + esc(suiFmt(it.created)) + '</span>' + badge + '</div>' +
+        '<div class="sui-preview">' + esc(it.text) + '</div>' +
+        '<button class="sui-star" data-id="' + it.id + '" title="收藏"> ' + (it.star ? "★" : "☆") + '</button>';
+      card.onclick = function () { openSui(it.id); };
+      var starBtn = card.querySelector(".sui-star");
+      starBtn.onclick = function (e) { e.stopPropagation(); toggleSuiStar(it.id); };
+      suiListEl.appendChild(card);
+    });
+  }
+
+  function toggleSuiStar(id) {
+    var it = suiItems.find(function (x) { return x.id === id; });
+    if (!it) return;
+    it.star = !it.star;
+    saveSui();
+    renderSuiList();
+  }
+
+  function openSui(id) {
+    var it = suiItems.find(function (x) { return x.id === id; });
+    if (!it) return;
+    suiCur = { id: it.id, cat: it.cat || "", star: !!it.star };
+    suiText.value = it.text;
+    suiText.style.borderColor = "";
+    suiModalTime.textContent = "创建于 " + suiFmt(it.created) + (it.updated && it.updated !== it.created ? "（编辑于 " + suiFmt(it.updated) + "）" : "");
+    renderSuiCatPick();
+    suiModalStar.textContent = it.star ? "★ 已收藏" : "☆ 收藏";
+    suiModalStar.classList.toggle("on", it.star);
+    suiDelBtn.style.display = "";
+    suiModal.classList.add("open");
+    suiText.focus();
+  }
+  function openNewSui() {
+    suiCur = { id: null, cat: "", star: false };
+    suiText.value = "";
+    suiText.style.borderColor = "";
+    suiModalTime.textContent = "";
+    renderSuiCatPick();
+    suiModalStar.textContent = "☆ 收藏";
+    suiModalStar.classList.remove("on");
+    suiDelBtn.style.display = "none";
+    suiModal.classList.add("open");
+    suiText.focus();
+  }
+  function renderSuiCatPick() {
+    suiCatWrap.innerHTML = "";
+    SUI_CATS.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = c;
+      b.className = suiCur.cat === c ? "on" : "";
+      b.onclick = function () { suiCur.cat = c; renderSuiCatPick(); };
+      suiCatWrap.appendChild(b);
+    });
+  }
+  function closeSui() { suiModal.classList.remove("open"); }
+
+  function saveSuiModal() {
+    var text = suiText.value.trim();
+    if (!text) { suiText.focus(); suiText.style.borderColor = "var(--warn)"; return; }
+    suiText.style.borderColor = "";
+    if (suiCur.id) {
+      var it = suiItems.find(function (x) { return x.id === suiCur.id; });
+      if (it) { it.text = text; it.cat = suiCur.cat; it.star = suiCur.star; it.updated = suiNow(); }
+    } else {
+      suiItems.push({ id: uid(), text: text, cat: suiCur.cat, star: suiCur.star, created: suiNow(), updated: suiNow() });
+    }
+    saveSui();
+    closeSui();
+    renderSuiList();
+  }
+  function deleteSui() {
+    if (!suiCur.id) return;
+    if (!confirm("确定删除这条碎碎念吗？此操作不可恢复。")) return;
+    suiItems = suiItems.filter(function (x) { return x.id !== suiCur.id; });
+    saveSui();
+    closeSui();
+    renderSuiList();
+  }
+  function toggleModalStar() {
+    suiCur.star = !suiCur.star;
+    suiModalStar.textContent = suiCur.star ? "★ 已收藏" : "☆ 收藏";
+    suiModalStar.classList.toggle("on", suiCur.star);
+  }
+
+  function renderSuiCats() {
+    if (!suiCatsEl) return;
+    suiCatsEl.innerHTML = "";
+    var opts = [{ k: "all", t: "全部" }].concat(SUI_CATS.map(function (c) { return { k: c, t: c }; }));
+    opts.forEach(function (o) {
+      var b = document.createElement("button");
+      b.className = "sui-cat" + (suiFilterCat === o.k ? " active" : "");
+      b.textContent = o.t;
+      b.onclick = function () { suiFilterCat = o.k; renderSuiCats(); renderSuiList(); };
+      suiCatsEl.appendChild(b);
+    });
+  }
+
+  function initSui() {
+    suiListEl = document.getElementById("suisui-list");
+    suiSearchEl = document.getElementById("suisui-search");
+    suiCatsEl = document.getElementById("suisui-cats");
+    suiFavBtn = document.getElementById("suisui-favonly");
+    suiCountEl = document.getElementById("suisui-count");
+    suiModal = document.getElementById("suisui-modal");
+    suiText = document.getElementById("suisui-text");
+    suiCatWrap = document.getElementById("suisui-catpick");
+    suiModalStar = document.getElementById("suisui-modal-star");
+    suiSaveBtn = document.getElementById("suisui-save");
+    suiDelBtn = document.getElementById("suisui-delete");
+    suiCloseBtn = document.getElementById("suisui-close");
+    suiModalTime = document.getElementById("suisui-modal-time");
+
+    var newBtn = document.getElementById("suisui-new");
+    if (newBtn) newBtn.onclick = openNewSui;
+    if (suiSearchEl) suiSearchEl.oninput = function () { suiQuery = suiSearchEl.value; renderSuiList(); };
+    if (suiFavBtn) suiFavBtn.onclick = function () { suiFavOnly = !suiFavOnly; suiFavBtn.classList.toggle("active", suiFavOnly); renderSuiList(); };
+    suiCloseBtn.onclick = closeSui;
+    suiSaveBtn.onclick = saveSuiModal;
+    suiDelBtn.onclick = deleteSui;
+    suiModalStar.onclick = toggleModalStar;
+    suiModal.onclick = function (e) { if (e.target === suiModal) closeSui(); };
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && suiModal.classList.contains("open")) closeSui(); });
+
+    renderSuiCats();
+    renderSuiList();
+  }
+  initSui();
+  window.addSuisuiNote = function (text, cat) {
+    text = (text || "").trim();
+    if (!text) return false;
+    suiItems.push({ id: uid(), text: text, cat: cat || "", star: false, created: suiNow(), updated: suiNow() });
+    saveSui();
+    renderSuiList();
+    return true;
+  };
+  window.openSuisuiNew = openNewSui;
+
+  /* ===== 自律督促工作站（不纵容摆烂 · 聚焦行动）===== */
+})();
 
 </script>
 </body>
