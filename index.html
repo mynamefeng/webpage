@@ -81,22 +81,19 @@
     color: #fff;
     box-shadow: 0 6px 16px rgba(94,198,184,.35);
   }
-  .nav-group {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .02em;
-    color: var(--mint-deep);
-    opacity: .5;
-    padding: 0 4px 0 2px;
-    align-self: center;
-    white-space: nowrap;
+  .nav-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 26px;
+    background: rgba(94,198,184,.10);
+    border: 1.5px solid rgba(94,198,184,.32);
   }
-  .nav-sep {
-    width: 1px;
-    height: 22px;
-    background: var(--line);
-    margin: 0 8px;
-    align-self: center;
+  .nav-box-b {
+    background: rgba(124,142,255,.10);
+    border-color: rgba(124,142,255,.34);
+    margin-left: 4px;
   }
 
   main { max-width: 1080px; margin: 26px auto 0; padding: 0 22px; }
@@ -440,10 +437,10 @@
     .feed-grid-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .kcard { min-height: 92px; padding: 14px; }
 
-    /* 导航：手机端隐藏分组标签、收紧间距，四个工具项仍连续 */
-    .nav { padding: 12px 14px; gap: 6px; }
-    .nav-group { display: none; }
-    .nav-sep { margin: 0 4px; height: 20px; }
+    /* 导航：手机端两框竖排、各框内居中换行，两组仍明显区分 */
+    .nav { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
+    .nav-box { flex-wrap: wrap; justify-content: center; gap: 6px; }
+    .nav-box-b { margin-left: 0; }
     .tab { padding: 8px 13px; font-size: 14px; }
     .kcard-title { font-size: 14px; }
   }
@@ -552,18 +549,20 @@
 <header>
   <nav class="nav">
     <div class="brand"><span class="dot"></span>清新工作台</div>
-    <span class="nav-group">🧰 我的工具</span>
-    <button class="tab active" data-view="plan">每日计划</button>
-    <button class="tab" data-view="todo">待做事项</button>
-    <button class="tab" data-view="app">APP分享</button>
-    <button class="tab" data-view="habit">习惯打卡</button>
-    <span class="nav-sep"></span>
-    <span class="nav-group">✨ 内容灵感</span>
-    <button class="tab" data-view="idea">灵感</button>
-    <button class="tab" data-view="hot">热点</button>
-    <button class="tab" data-view="feed">精神食粮</button>
-    <button class="tab" data-view="edu">🎓 教育口播</button>
-    <button class="tab" data-view="suisui">💬 碎碎念</button>  </nav>
+    <div class="nav-box nav-box-a">
+      <button class="tab active" data-view="plan">每日计划</button>
+      <button class="tab" data-view="todo">待做事项</button>
+      <button class="tab" data-view="idea">灵感</button>
+      <button class="tab" data-view="habit">习惯打卡</button>
+      <button class="tab" data-view="suisui">💬 碎碎念</button>
+    </div>
+    <div class="nav-box nav-box-b">
+      <button class="tab" data-view="app">APP分享</button>
+      <button class="tab" data-view="hot">热点</button>
+      <button class="tab" data-view="feed">精神食粮</button>
+      <button class="tab" data-view="edu">🎓 教育口播</button>
+    </div>
+  </nav>
   <div class="syncbar">
     <span class="sync-status" id="sync-status">连接中…</span>
     <span class="sync-code">同步码 <b id="sync-code">—</b></span>
