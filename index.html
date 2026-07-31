@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="referrer" content="no-referrer" />
 <title>清新工作台</title>
 <style>
@@ -22,7 +22,15 @@
     --shadow: 0 8px 24px rgba(93, 178, 184, 0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { overflow-x: hidden; }
+  html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body { -webkit-text-size-adjust: 100%; }
+  input, textarea, select, button { font-size: 16px; touch-action: manipulation; -webkit-appearance: none; appearance: none; }
+  button { background: transparent; border: 0; color: inherit; font: inherit; }
+  /* 锁定移动端：禁止双指缩放/平移 */
+  .no-zoom, .view, .panel, .workbench { touch-action: manipulation; }
+  @media (max-width: 720px) {
+    input, textarea, select { font-size: 16px; }
+  }
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
     background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
@@ -466,31 +474,92 @@
     .kcard-title { font-size: 14px; }
   }
   /* ===== 教育口播短视频资料库 ===== */
-  .edu-search { display: flex; gap: 10px; margin: 8px 0 14px; flex-wrap: wrap; }
-  .edu-search input { flex: 1 1 220px; min-width: 0; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 15px; outline: none; background: #fbfdfc; }
-  .edu-search input:focus { border-color: var(--mint); }
-  #edu-favonly.active { border-color: var(--mint); color: var(--mint-deep); background: #eef6f3; }
   .edu-tabs { display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; margin-bottom: 14px; }
   .edu-tabs::-webkit-scrollbar { height: 0; }
-  .edu-panel { display: block; }
+  .edu-panel { display: block; background: #fff; border: 1.5px solid var(--line); border-radius: 18px; box-shadow: 0 12px 34px rgba(93,178,184,.10); padding: 4px; }
   .acc { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; margin-bottom: 14px; overflow: hidden; }
   .acc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 15px 16px; cursor: pointer; font-weight: 700; font-size: 15.5px; color: var(--ink); user-select: none; }
-  .acc-head .chev { color: var(--mint-deep); transition: transform .2s; font-size: 13px; }
+  .acc-head span:first-child { word-break: break-word; }
+  .acc-head .chev { color: var(--mint-deep); transition: transform .2s; font-size: 13px; flex: 0 0 auto; }
   .acc.open .acc-head .chev { transform: rotate(180deg); }
   .acc-body { display: none; padding: 4px 16px 16px; border-top: 1px solid var(--line); }
   .acc.open .acc-body { display: block; }
-  .edu-blog { border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; margin: 12px 0; background: #fbfdfc; }
-  .edu-blog-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .edu-blog-name { font-size: 17px; font-weight: 800; color: var(--ink); }
-  .edu-star { border: none; background: transparent; font-size: 20px; cursor: pointer; color: #d8a900; line-height: 1; padding: 2px 6px; }
-  .edu-star.on { color: #f5b400; }
+  .edu-blog-name { font-size: 17px; font-weight: 800; color: var(--ink); word-break: break-word; }
+  /* 教育博主 APP 唤起（抖音 / B站） */
+  .edu-blogger-group-head {
+  .edu-blogger-group-head { font-size: 15px; font-weight: 800; color: var(--mint-deep); margin: 16px 0 10px; border-left: 3px solid var(--mint); padding-left: 10px; }
+  .edu-blogger-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 16px 18px; background: #fff; border: 1.5px solid var(--line); border-radius: 18px; margin-bottom: 14px; box-shadow: 0 8px 22px rgba(93,178,184,.12); }
+  .edu-blogger-name { font-size: 18px; font-weight: 800; letter-spacing: .3px; color: var(--ink); word-break: break-word; }
+  .edu-blogger-study { flex: 1; font-size: 13px; line-height: 1.9; color: var(--ink-soft); opacity: .92; }
+  .edu-chk { font-size: 15px; line-height: 1; margin-right: 5px; filter: saturate(1.3); vertical-align: -1px; }
+  #edu-tabs .feed-tab {
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #fff;
+    background-color: #fff;
+    color: var(--ink-soft);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  #edu-tabs .feed-tab.active { background: var(--mint-deep); background-color: var(--mint-deep); color: #fff; box-shadow: 0 4px 10px rgba(62,178,172,.24); }
+  #edu-tabs .feed-tab:hover:not(.active) { background: #f1faf8; }
+  #edu-tabs .feed-tab:active { transform: scale(0.97); }
+  .edu-blogger-actions { margin-left: auto; }
+  .edu-blogger-jump {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    height: 32px !important;
+    padding: 0 16px !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: #888 !important;
+    background-color: #888 !important;
+    background-image: none !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .edu-blogger-jump:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.16) !important; filter: brightness(1.05); }
+  .edu-blogger-jump:active { transform: translateY(0) scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important; }
+  .edu-blogger-group[data-key="douyin"] .edu-blogger-jump { background: #ff5e62 !important; background-color: #ff5e62 !important; }
+  .edu-blogger-group[data-key="bili"] .edu-blogger-jump { background: #2f88ff !important; background-color: #2f88ff !important; }
+  @media (max-width: 720px) {
+    .edu-blogger-name { font-size: 15px; }
+    .edu-blogger-row { flex-direction: column; align-items: stretch; }
+    .edu-blogger-actions { margin-left: 0; }
+    .edu-blogger-jump { width: 100%; justify-content: center; }
+  }
   .edu-badge { display: inline-block; margin: 8px 0; font-size: 12px; color: var(--mint-deep); background: #eef6f3; border-radius: 999px; padding: 3px 10px; font-weight: 600; }
-  .edu-row { display: flex; gap: 10px; margin: 7px 0; font-size: 14.5px; line-height: 1.6; }
-  .edu-k { flex: 0 0 64px; color: var(--ink-soft); font-weight: 600; }
-  .edu-row > span:last-child { flex: 1; color: var(--ink); }
-  .edu-btn { margin-top: 10px; border: none; background: var(--mint); color: #fff; font-weight: 700; font-size: 14.5px; padding: 10px 16px; border-radius: 12px; cursor: pointer; }
-  .edu-btn.sm { padding: 8px 14px; font-size: 13.5px; }
-  .edu-btn:hover { background: var(--mint-deep); }
+  .edu-btn { margin-top: 10px; border: 0; background-color: var(--mint); color: #fff; font-weight: 700; font-size: 14.5px; padding: 10px 16px; border-radius: 12px; cursor: pointer; -webkit-appearance: none; appearance: none; }
+  .edu-btn.sm { height: 32px; padding: 0 16px; border-radius: 8px; font-size: 13.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); transition: transform .12s ease, box-shadow .12s ease, filter .12s ease; }
+  .edu-btn:hover:not(.sm) { background-color: var(--mint-deep); }
+  .edu-btn.sm:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.16); filter: brightness(1.05); }
+  .edu-btn.sm:active { transform: translateY(0) scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .edu-btn.sm.plat-douyin { background-color: #ff5e62; }
+  .edu-btn.sm.plat-bili { background-color: #2f88ff; }
+  .edu-btn.sm.plat-jianying { background-color: var(--mint-deep); }
   .edu-account { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 12px 0; background: #fbfdfc; }
   .edu-account-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .edu-ul { margin: 6px 0; padding-left: 20px; }
@@ -505,13 +574,12 @@
   .edu-ol li { font-size: 14px; line-height: 1.8; margin: 4px 0; }
   .edu-empty { text-align: center; color: var(--ink-soft); padding: 24px; font-size: 14px; }
   @media (max-width: 720px) {
-    .edu-search input { font-size: 16px; }
     .edu-blog-name { font-size: 16px; }
-    .edu-row { font-size: 14px; }
     .acc-head { font-size: 15px; padding: 14px; }
-    .edu-blog { padding: 12px; }
     .edu-account { flex-direction: column; align-items: stretch; }
+    .edu-account-info { width: 100%; }
     .edu-account .edu-btn { width: 100%; }
+    .feed-tab { white-space: normal; text-align: center; }
   }
 
   </style>
@@ -706,22 +774,26 @@
   <!-- 教育口播短视频资料库 -->
   <section class="view" id="view-edu">
     <h2>🎓 教育口播短视频资料库</h2>
-    <div class="sub">对标案例、剪辑学习渠道、训练方案、避坑清单、素材附件，一站收藏。点卡片展开详情，点「前往观看视频」直达学习。</div>
-    <div class="edu-search">
-      <input type="search" id="edu-search" placeholder="搜索博主名称 / 剪辑关键词…" />
-      <button class="btn ghost" id="edu-favonly">★ 只看收藏</button>
-    </div>
+    <div class="sub">剪辑学习渠道、训练方案、避坑清单、素材附件，一站收藏。点卡片展开详情。</div>
+
+    <!-- 教育博主抖音 / B站 APP 唤起 -->
+    <div id="edu-bloggers" class="edu-bloggers"></div>
+
     <div class="edu-tabs" id="edu-tabs"></div>
     <div id="edu-content"></div>
-    <div id="edu-empty" class="edu-empty" style="display:none">未找到匹配的博主 / 渠道，换个关键词试试～</div>
   </section>
 
 </main>
 
 <script>
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]); }); }
 (function () {
   "use strict";
   const $ = (s) => document.querySelector(s);
+  /* 移动端锁定：阻止双指缩放/平移 */
+  document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
+  document.addEventListener("gesturechange", function (e) { e.preventDefault(); });
+  document.addEventListener("gestureend", function (e) { e.preventDefault(); });
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
     set(k, v, silent) { localStorage.setItem(k, JSON.stringify(v)); if (!silent && Sync.ready) Sync.schedulePush(); }
@@ -963,6 +1035,7 @@
   }
 
   let ideas = store.get("wb_ideas", []);
+  if (!Array.isArray(ideas)) ideas = [];
   $("#idea-date").value = curDate;
   let ideaMulti = false;
   const ideaSel = new Set();
@@ -973,6 +1046,7 @@
   const ideaSelAllBtn = $("#idea-selall");
 
   function renderIdeas() {
+    if (!Array.isArray(ideas)) ideas = [];
     ideaListEl.innerHTML = "";
     ideas.forEach(function (it) { it.key = !!it.key; });
     const dates = {};
@@ -1064,7 +1138,7 @@
       if (k === "wb_board") return;
       if (k === "wb_plans") plans = payload.plans;
       else if (k === "wb_todos") todos = payload.todos;
-      else if (k === "wb_ideas") ideas = payload.ideas;
+      else if (k === "wb_ideas") { if (payload.ideas != null && Array.isArray(payload.ideas)) ideas = payload.ideas; }
       store.set(k, payload[k], true);
     });
     if (typeof renderPlan === "function") renderPlan();
@@ -1141,9 +1215,7 @@
     { name: "小红书", ic: "📕", scheme: "xhsdiscover://", web: "https://www.xiaohongshu.com", cat: "影音娱乐" },
     { name: "美团", ic: "🍜", scheme: "imeituan://", web: "https://www.meituan.com", cat: "购物消费" },
     { name: "闲鱼", ic: "🐟", scheme: "fleamarket://", web: "https://www.goofish.com", cat: "购物消费" },
-    { name: "山姆会员商店", ic: "🏬", scheme: "samsclub://", web: "https://www.samsclub.cn", cat: "购物消费" },
     { name: "支付宝", ic: "💙", scheme: "alipay://", web: "https://www.alipay.com", cat: "购物消费" },
-    { name: "京东金融", ic: "🏦", scheme: "jrjd://", web: "https://jr.jd.com", cat: "购物消费" },
     { name: "京东", ic: "🛒", scheme: "openapp.jdmobile://", web: "https://www.jd.com", cat: "购物消费" },
     { name: "淘宝", ic: "🛍️", scheme: "taobao://", web: "https://www.taobao.com", cat: "购物消费" },
     { name: "美颜相机", ic: "📸", scheme: "myxj://", web: "https://www.meiyan.com", cat: "工具素材" },
@@ -1186,10 +1258,18 @@
 
   /* 灵感模块平台快捷跳转：手机端优先唤起 APP（避开网页广告/非 APP 内页），未安装再回落网页 */
   document.addEventListener("click", function (e) {
-    var j = e.target && e.target.closest ? e.target.closest("a.jump") : null;
+    var j = e.target && e.target.closest ? e.target.closest("a.jump, .edu-blogger-jump") : null;
     if (!j || !j.dataset || !j.dataset.scheme) return;
     e.preventDefault();
     openApp({ scheme: j.dataset.scheme, web: j.dataset.web, name: j.dataset.name });
+  });
+
+  /* 教育口播-剪辑学习渠道：「前往主页」按钮打开对应网页 */
+  document.addEventListener("click", function (e) {
+    var b = e.target && e.target.closest ? e.target.closest(".edu-btn.sm[data-url]") : null;
+    if (!b || !b.dataset || !b.dataset.url) return;
+    e.preventDefault();
+    window.location.href = b.dataset.url;
   });
 
   /* ---------- 习惯打卡 ---------- */
@@ -1634,54 +1714,6 @@
 
 /* ===================== 教育口播短视频资料库 ===================== */
 (function () {
-  var EDU_CATS = [
-    "类型1｜真人出镜口播（家庭教育、认知成长、亲子、职场干货，最通用）",
-    "类型2｜学科教学口播（学生赛道、网课微课、知识讲解）",
-    "类型3｜通识科普口播（文史、科学、知识科普）",
-    "类型4｜知识付费 / 短视频微课（短平快 45～90s 带货教育口播）"
-  ];
-  var EDU_BLOGGERS = [
-    { id: "cuicui", cat: 0, name: "崔催", platform: "抖音", seg: "家庭教育 / 亲子沟通",
-      highlight: "真人出镜口播，语气温柔有共情；镜头前常用手势与道具演示，慢节奏但信息密度高。",
-      req: "重点拉片亲子冲突场景的破冰话术与字幕节奏；对比其前 3 秒钩子设计。",
-      kw: "家庭教育 亲子沟通 真人出镜 口播" },
-    { id: "zhangqi", cat: 0, name: "张琪", platform: "抖音", seg: "职场认知、商业干货",
-      highlight: "职场 / 商业认知口播，观点犀利、结构清晰，常用「结论先行 + 案例」句式。",
-      req: "拉片其「一个认知 + 一个反例」的叙事结构，记录转场与字幕强调方式。",
-      kw: "职场 商业干货 认知 口播" },
-    { id: "tuokouyue", cat: 0, name: "脱口岳（岳松）", platform: "抖音", seg: "青年成长、热点思辨",
-      highlight: "青年成长 / 热点思辨口播，逻辑递进强，常用设问引出观点，气口停顿明显。",
-      req: "拉片热点选题的切入角度与情绪递进；关注其结尾的价值观升华钩子。",
-      kw: "青年成长 热点思辨 口播" },
-    { id: "yishu", cat: 1, name: "一数", platform: "B站 / 抖音", seg: "高中数学（录屏讲解型口播）",
-      highlight: "录屏 + 讲解型口播标杆；板书清晰、节奏稳定，适合拆解「知识讲解类」剪辑。",
-      req: "拉片其录屏与真人出镜的衔接方式，以及难点处的暂停强调处理。",
-      kw: "高中数学 录屏 知识讲解 口播" },
-    { id: "shiyouyuwen", cat: 1, name: "学过石油的语文老师", platform: "B站", seg: "语文应试干货",
-      highlight: "语文应试干货口播，痛点明确、方法论可复制，字幕重点标注到位。",
-      req: "拉片「题型拆解 + 模板总结」的结构，记录其关键信息的高亮节奏。",
-      kw: "语文 应试 干货 口播" },
-    { id: "yingyutu", cat: 1, name: "英语兔", platform: "B站", seg: "英语学习口播",
-      highlight: "英语学习口播，轻松幽默、类比多，前 3 秒常以反常识提问切入。",
-      req: "拉片其趣味钩子与知识密度的平衡，关注语气停顿与配图配合。",
-      kw: "英语 学习 口播" },
-    { id: "liyongle", cat: 2, name: "李永乐老师", platform: "B站", seg: "通识科普（数理）",
-      highlight: "通识科普口播标杆，由浅入深、板书 + 真人讲解，逻辑极其清晰。",
-      req: "拉片复杂概念的「类比降维」技巧，记录其节奏与字幕层级。",
-      kw: "通识 科普 李永乐 口播" },
-    { id: "xiaoyuehan", cat: 2, name: "小约翰可汗", platform: "B站", seg: "叙事科普（不露脸配音口播）",
-      highlight: "叙事科普配音口播代表，不露脸、靠配音 + 素材叙事，钩子强、信息量大。",
-      req: "拉片其「悬念开场 + 时间线推进」的叙事结构，关注素材切换节奏。",
-      kw: "叙事科普 不露脸 配音 口播" },
-    { id: "xingliu", cat: 3, name: "星流老师", platform: "抖音", seg: "知识付费 / 短视频微课",
-      highlight: "短平快 45～90s 微课口播，单点干货、强引导，适合带货型教育号对标。",
-      req: "拉片其 45s 内的信息密度分配与结尾转化话术。",
-      kw: "知识付费 微课 45s 带货 口播" },
-    { id: "shiyi", cat: 3, name: "十七老师", platform: "抖音", seg: "知识付费 / 短视频微课",
-      highlight: "短视频微课口播，节奏明快、字幕大，常用「你有没有…」式开头。",
-      req: "拉片其开头钩子与知识点分段方式，记录其点击引导设计。",
-      kw: "知识付费 微课 短视频 口播" }
-  ];
   var EDU_CHANNELS = [
     { group: "📺 B 站账号", items: [
       { name: "南门录像厅", platform: "B站", kw: "剪辑 思路 拉片" },
@@ -1771,9 +1803,6 @@
       '</ol>' }
   ];
 
-  var favSet = {};
-  try { favSet = JSON.parse(localStorage.getItem("wb_edu_fav") || "{}"); } catch (e) {}
-  function saveFav() { try { localStorage.setItem("wb_edu_fav", JSON.stringify(favSet)); } catch (e) {} }
   var checkSet = {};
   try { checkSet = JSON.parse(localStorage.getItem("wb_edu_check") || "{}"); } catch (e) {}
   function saveCheck() { try { localStorage.setItem("wb_edu_check", JSON.stringify(checkSet)); } catch (e) {} }
@@ -1785,37 +1814,7 @@
     if (platform.indexOf("剪映") >= 0) return "https://www.capcut.cn/";
     return "https://www.baidu.com/s?wd=" + n;
   }
-  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]); }); }
-
-  var TABS = ["对标案例库", "剪辑学习渠道", "训练方案", "避坑自查清单", "素材附件"];
-
-  function buildCase() {
-    var wrap = document.createElement("div");
-    EDU_CATS.forEach(function (catTitle, ci) {
-      var acc = document.createElement("div"); acc.className = "acc";
-      var head = document.createElement("div"); head.className = "acc-head";
-      head.innerHTML = '<span>' + esc(catTitle) + '</span><span class="chev">▾</span>';
-      var body = document.createElement("div"); body.className = "acc-body";
-      EDU_BLOGGERS.filter(function (b) { return b.cat === ci; }).forEach(function (b) {
-        var card = document.createElement("div"); card.className = "edu-blog edu-filterable";
-        card.dataset.text = (b.name + " " + b.seg + " " + b.highlight + " " + b.kw + " " + b.platform).toLowerCase();
-        var fav = !!favSet[b.id];
-        card.innerHTML =
-          '<div class="edu-blog-top"><div class="edu-blog-name">' + esc(b.name) + '</div>' +
-          '<button class="edu-star' + (fav ? " on" : "") + '" data-id="' + b.id + '" title="收藏重点博主">' + (fav ? "★" : "☆") + '</button></div>' +
-          '<div class="edu-badge">' + esc(b.platform) + '</div>' +
-          '<div class="edu-row"><span class="edu-k">赛道定位</span><span>' + esc(b.seg) + '</span></div>' +
-          '<div class="edu-row"><span class="edu-k">剪辑亮点</span><span>' + esc(b.highlight) + '</span></div>' +
-          '<div class="edu-row"><span class="edu-k">拉片要求</span><span>' + esc(b.req) + '</span></div>' +
-          '<button class="edu-btn" data-url="' + eduUrl(b.platform, b.name) + '">▶ 前往观看视频</button>';
-        body.appendChild(card);
-      });
-      acc.append(head, body);
-      head.onclick = function () { acc.classList.toggle("open"); };
-      wrap.appendChild(acc);
-    });
-    return wrap;
-  }
+  var TABS = ["剪辑学习渠道", "训练方案", "避坑自查清单", "素材附件"];
 
   function buildChannel() {
     var wrap = document.createElement("div");
@@ -1825,12 +1824,11 @@
       head.innerHTML = '<span>' + esc(g.group) + '</span><span class="chev">▾</span>';
       var body = document.createElement("div"); body.className = "acc-body";
       g.items.forEach(function (it) {
-        var row = document.createElement("div"); row.className = "edu-account edu-filterable";
-        row.dataset.text = (it.name + " " + it.kw + " " + it.platform).toLowerCase();
+        var row = document.createElement("div"); row.className = "edu-account";
         row.innerHTML =
           '<div class="edu-account-info"><div class="edu-blog-name">' + esc(it.name) + '</div>' +
           '<div class="edu-badge">' + esc(it.platform) + '</div></div>' +
-          '<button class="edu-btn sm" data-url="' + eduUrl(it.platform, it.name) + '">前往主页 ›</button>';
+          '<button class="edu-btn sm plat-' + (it.platform === 'B站' ? 'bili' : it.platform === '抖音' ? 'douyin' : 'jianying') + '" data-url="' + eduUrl(it.platform, it.name) + '">前往主页 ›</button>';
         body.appendChild(row);
       });
       acc.append(head, body);
@@ -1901,7 +1899,7 @@
     var content = document.getElementById("edu-content");
     if (!content) return;
     content.innerHTML = "";
-    var panels = [buildCase(), buildChannel(), buildTrain(), buildCheck(), buildAssets()];
+    var panels = [buildChannel(), buildTrain(), buildCheck(), buildAssets()];
     panels.forEach(function (p, i) {
       var panel = document.createElement("div"); panel.className = "edu-panel"; panel.dataset.tab = String(i);
       panel.appendChild(p);
@@ -1909,7 +1907,6 @@
     });
     var firstAcc = content.querySelector(".acc");
     if (firstAcc) firstAcc.classList.add("open");
-    bindEduEvents();
   }
 
   var eduTab = 0;
@@ -1930,56 +1927,50 @@
     });
   }
 
-  function bindEduEvents() {
-    document.querySelectorAll("#edu-content .edu-btn").forEach(function (btn) {
-      btn.onclick = function (e) { e.stopPropagation(); window.open(btn.dataset.url, "_blank", "noopener"); };
-    });
-    document.querySelectorAll("#edu-content .edu-star").forEach(function (st) {
-      st.onclick = function (e) {
-        e.stopPropagation();
-        var id = st.dataset.id;
-        if (favSet[id]) { delete favSet[id]; st.textContent = "☆"; st.classList.remove("on"); }
-        else { favSet[id] = 1; st.textContent = "★"; st.classList.add("on"); }
-        saveFav();
-      };
-    });
+  /* ===== 教育博主 APP 唤起（抖音 / B站，手机端直接跳 APP，不跳网页） ===== */
+  const BLOGGERS = {
+    douyin: [
+      { name: "崔催", search: "崔催", study: "学习重点：温和叙事口播范本、长镜头稳定运用、关键帧缓慢推镜、关键词字幕动画、极低音量 BGM。适合亲子、心理、成长类口播。", scheme: "snssdk1128://" },
+      { name: "脱口岳（岳松）", search: "脱口岳", study: "学习重点：轻松思辨风格、剪辑大量留白、极少花哨音效，依靠台词内容抓人，适合青年成长、热点观点类。", scheme: "snssdk1128://" },
+      { name: "张琪｜商业认知", search: "张琪｜商业认知", study: "学习重点：干练节奏、论点节点切换素材画中画、重点文字弹窗、干货密集型口播剪辑参考。", scheme: "snssdk1128://" }
+    ],
+    bili: [
+      { name: "一数", study: "学习重点：录屏教学标杆、红圈标注、箭头蒙版、难点画面停留，无多余转场。做学科教学必拆解。", scheme: "bilibili://" },
+      { name: "学过石油的语文老师", study: "学习重点：真人黑板出镜，知识点适时插入图文 PPT，快慢节奏结合。", scheme: "bilibili://" },
+      { name: "英语兔", study: "学习重点：真人形象 + 动态图文结合、字幕分层拆分、概念搭配文本动画，外语教学参考。", scheme: "bilibili://" },
+      { name: "李永乐老师官方", study: "学习重点：板书口播、逻辑清晰，复杂概念搭配示意图，剪辑干净克制。", scheme: "bilibili://" },
+      { name: "小约翰可汗", study: "学习重点：不露脸配音口播范本，跟随叙事节奏切换大量图文素材，音频情绪匹配画面。适合文史科普。", scheme: "bilibili://" },
+      { name: "南门录像厅（剪辑思维教学）", study: "学习重点：口播节奏、拉片分析、剪辑底层思维，不只教工具。", scheme: "bilibili://" },
+      { name: "剪辑师小冯（剪映实操）", study: "学习重点：剪映实操、教育口播完整成片跟练。", scheme: "bilibili://" }
+    ]
+  };
+  function renderBloggers() {
+    const box = document.getElementById("edu-bloggers");
+    if (!box) return;
+    const groups = [
+      { key: "douyin", label: "抖音博主（手机端点击直接唤起抖音 APP）" },
+      { key: "bili", label: "B 站博主（手机端点击直接唤起 B 站 APP）" }
+    ];
+    box.innerHTML = groups.map(function (g) {
+      const list = BLOGGERS[g.key];
+      const rows = list.map(function (b) {
+        const scheme = g.key === "bili" ? "bilibili://" : "snssdk1128://";
+        const web = (g.key === "bili"
+          ? "https://www.bilibili.com/search?keyword="
+          : "https://www.douyin.com/search?keyword=") + encodeURIComponent(b.search);
+        const jump = '<button class="edu-blogger-jump" data-scheme="' + scheme + '" data-web="' + web + '" data-name="' + b.name + '"><span>🚀</span><span>打开' + (g.key === "bili" ? "B站" : "抖音") + ' · ' + b.name + '</span></button>';
+        return '<div class="edu-blogger-row"><div class="edu-blogger-name">' + b.name + '</div><div class="edu-blogger-study"><span class="edu-chk" aria-hidden="true">✅</span> ' + b.study + '</div><div class="edu-blogger-actions">' + jump + '</div></div>';
+      }).join("");
+      return '<div class="edu-blogger-group" data-key="' + g.key + '"><div class="edu-blogger-group-head">' + g.label + '</div>' + rows + '</div>';
+    }).join("");
   }
 
-  function applyEduFilter() {
-    var searchEl = document.getElementById("edu-search");
-    var q = (searchEl && searchEl.value ? searchEl.value : "").trim().toLowerCase();
-    var favBtn = document.getElementById("edu-favonly");
-    var favOnly = favBtn && favBtn.classList.contains("active");
-    var anyVisible = false;
-    document.querySelectorAll("#edu-content .edu-filterable").forEach(function (el) {
-      var matchQ = !q || (el.dataset.text && el.dataset.text.indexOf(q) >= 0);
-      var matchFav = true;
-      if (favOnly) {
-        var star = el.querySelector(".edu-star");
-        matchFav = !!(star && star.classList.contains("on"));
-      }
-      var show = matchQ && matchFav;
-      el.style.display = show ? "" : "none";
-      if (show) anyVisible = true;
-    });
-    if (q || favOnly) {
-      document.querySelectorAll("#edu-content .acc").forEach(function (acc) {
-        var vis = acc.querySelector('.edu-filterable:not([style*="display: none"])');
-        if (vis) acc.classList.add("open");
-      });
-    }
-    var tip = document.getElementById("edu-empty");
-    if (tip) tip.style.display = ((q || favOnly) && !anyVisible) ? "" : "none";
-  }
 
   function initEdu() {
     renderEduTabs();
     renderEdu();
     showEduPanel();
-    var search = document.getElementById("edu-search");
-    if (search) search.oninput = applyEduFilter;
-    var favBtn = document.getElementById("edu-favonly");
-    if (favBtn) favBtn.onclick = function () { favBtn.classList.toggle("active"); applyEduFilter(); };
+    renderBloggers();
   }
   initEdu();
   window.goEduTab = function (i) {
