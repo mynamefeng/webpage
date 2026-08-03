@@ -2,8 +2,11 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content" />
 <meta name="referrer" content="no-referrer" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>清新工作台</title>
 <style>
   :root {
@@ -20,6 +23,10 @@
     --warn: #ff9a76;
     --done: #b7c9c4;
     --shadow: 0 8px 24px rgba(93, 178, 184, 0.12);
+    --prio-normal: #c2d2cd;
+    --prio-important: #f4b740;
+    --prio-urgent: #ff6b6b;
+    --dot: #2bbf7a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
@@ -36,6 +43,7 @@
     background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
     color: var(--ink);
     min-height: 100vh;
+    min-height: 100dvh;
     padding: 0 0 60px;
     overflow-x: hidden;
   }
@@ -78,16 +86,20 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--ink-soft);
+    opacity: .72;
     padding: 9px 18px;
     border-radius: 22px;
     cursor: pointer;
     transition: all .25s ease;
+    -webkit-tap-highlight-color: transparent;
   }
-  .tab:hover { background: var(--line); color: var(--mint-deep); }
+  .tab:hover { background: var(--line); color: var(--mint-deep); opacity: 1; }
+  .tab:active { transform: scale(0.96); }
   .tab.active {
-    background: linear-gradient(135deg, var(--mint), var(--sky));
+    background: linear-gradient(135deg, var(--mint-deep), var(--mint));
     color: #fff;
-    box-shadow: 0 6px 16px rgba(94,198,184,.35);
+    opacity: 1;
+    box-shadow: 0 6px 16px rgba(58,169,151,.38);
   }
   .nav-box {
     display: flex;
@@ -150,24 +162,40 @@
   }
 
   /* 输入区 */
-  .add-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-  input[type="text"], textarea, input[type="date"] {
+  .add-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: stretch; }
+  input[type="text"], textarea, input[type="date"], input[type="time"] {
     border: 1.5px solid var(--line);
     border-radius: 12px;
     padding: 11px 14px;
     font-size: 14px;
+    line-height: 1.5;
+    min-height: 44px;
     color: var(--ink);
     background: #fbfdfc;
     outline: none;
-    transition: border .2s;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     font-family: inherit;
+    -webkit-user-select: auto;
+    user-select: auto;
+    -webkit-appearance: none;
+    appearance: none;
   }
-  input[type="text"]:focus, textarea:focus, input[type="date"]:focus {
+  input[type="text"]::placeholder, textarea::placeholder, input[type="date"]::placeholder, input[type="time"]::placeholder {
+    color: var(--ink-soft);
+    opacity: .45;
+  }
+  input[type="text"]:focus, textarea:focus, input[type="date"]:focus, input[type="time"]:focus {
     border-color: var(--mint);
     background: #fff;
+    box-shadow: 0 0 0 3px rgba(94,198,184,.16);
   }
   textarea { resize: vertical; min-height: 56px; width: 100%; }
-  .grow { flex: 1; min-width: 180px; }
+  .grow { flex: 1; min-width: 140px; }
+  @media (max-width: 480px) {
+    .add-row { gap: 8px; }
+    .add-row .grow { width: 100%; min-width: 0; flex: 1 1 100%; }
+    .add-row .btn { flex: 1; }
+  }
 
   .btn {
     border: none;
@@ -178,10 +206,12 @@
     padding: 11px 20px;
     border-radius: 12px;
     cursor: pointer;
-    transition: transform .15s, box-shadow .2s;
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
     box-shadow: 0 5px 14px rgba(94,198,184,.3);
+    -webkit-tap-highlight-color: transparent;
   }
   .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(94,198,184,.4); }
+  .btn:active { transform: translateY(0) scale(0.96); box-shadow: 0 3px 8px rgba(94,198,184,.28); filter: brightness(0.97); }
   .btn.ghost {
     background: #fff;
     color: var(--mint-deep);
@@ -189,6 +219,7 @@
     box-shadow: none;
   }
   .btn.ghost:hover { background: var(--line); }
+  .btn.ghost:active { background: var(--mint); color: #fff; }
 
   /* 列表项 */
   .item {
@@ -221,6 +252,19 @@
     color: var(--ink-soft); font-size: 18px; padding: 4px 6px; border-radius: 8px;
   }
   .del:hover { background: #ffe9e3; color: var(--warn); }
+  /* 优先级标记 + 长按拖拽 */
+  .item { position: relative; }
+  .item[data-prio="important"] { border-left: 4px solid var(--prio-important); }
+  .item[data-prio="urgent"] { border-left: 4px solid var(--prio-urgent); }
+  .prio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.08); cursor: pointer; flex-shrink: 0; padding: 0; align-self: center; transition: transform .12s; -webkit-appearance: none; appearance: none; }
+  .prio.normal { background: var(--prio-normal); }
+  .prio.important { background: var(--prio-important); }
+  .prio.urgent { background: var(--prio-urgent); }
+  .prio:active { transform: scale(0.9); }
+  .drag-handle { color: var(--ink-soft); font-size: 16px; line-height: 1; cursor: grab; flex-shrink: 0; padding: 2px 5px; border-radius: 8px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .drag-handle:active { background: var(--line); }
+  .item.dragging { opacity: .55; box-shadow: var(--shadow); transform: scale(1.02); z-index: 5; }
+  .item.drag-over { border-top: 2px dashed var(--mint); }
 
   .sec-title { font-size: 15px; font-weight: 700; color: var(--ink); margin: 8px 0 12px; display:flex; align-items:center; gap:8px;}
   .sec-title .bar { width: 5px; height: 16px; border-radius: 3px; background: var(--mint); display:inline-block;}
@@ -238,6 +282,14 @@
     border: 1.5px solid var(--line);
     border-radius: 14px;
     padding: 12px 14px;
+  }
+  @media (max-width: 720px) {
+    .todo-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .todo-grid input[type="text"] { grid-column: 1 / -1; }
+    .todo-grid .btn { min-width: 0; }
+    .todo-head { display: none !important; }
+    .todo-row { grid-template-columns: 1fr 1fr auto auto; gap: 8px; }
+    .todo-row .todo-text { grid-column: 1 / -1; }
   }
   .todo-row.overdue { border-color: var(--warn); background: #fff6f1; }
   .todo-row.done .todo-text { text-decoration: line-through; color: var(--done); }
@@ -291,9 +343,9 @@
   .app-wrap { margin-top: 6px; }
   .app-cat-label { font-size: 13px; font-weight: 600; color: var(--mint); margin: 16px 0 8px; padding-left: 10px; border-left: 3px solid var(--mint); }
   .app-cat-label:first-child { margin-top: 2px; }
-  .app-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(84px,1fr)); gap:10px; margin-top:0; align-content: start; }
+  .app-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; margin:0 8px; align-content: start; }
   .app-card {
-    display:flex; flex-direction:column; align-items:center; gap:8px;
+    display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0; width:100%;
     background: linear-gradient(135deg, #fff, #f3fbf9);
     border:1.5px solid var(--line); border-radius:16px; padding:16px 10px;
     cursor:pointer; transition: all .2s; text-align:center; user-select:none;
@@ -342,7 +394,7 @@
   .hot-fallback { font-size: 13px; color: var(--ink-soft); padding: 6px 2px; }
   .hot-fallback a { color: var(--mint-deep); font-weight: 700; text-decoration: none; }
   .app-ic { font-size:26px; line-height:1; }
-  .app-name { font-size:14px; font-weight:600; color: var(--ink); }
+  .app-name { font-size:14px; font-weight:600; color: var(--ink); word-break: break-word; max-width:100%; }
   .app-hint { color: var(--ink-soft); font-size:13px; margin-bottom:14px; }
 
   .empty { color: var(--ink-soft); font-size: 14px; text-align:center; padding: 24px; }
@@ -395,25 +447,72 @@
   .rec-perhabit-item .nm { font-size: 14px; color: var(--ink); word-break: break-word; }
   .rec-perhabit-item .vl { font-size: 14px; font-weight: 700; color: var(--mint-deep); white-space: nowrap; margin-left: 12px; }
 
+  /* 习惯：连续打卡 / 断签 */
+  .habit-stats { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--ink-soft); }
+  .habit-stats b { color: var(--mint-deep); font-size: 15px; }
+  .habit-stats .fire { color: #ff8a4c; }
+  .cal-cell.missed { background: #ffe9e3; color: var(--warn); }
+  .cal-cell.missed::after { content: "✕"; font-size: 10px; line-height: 1; }
+  .habit-mini { margin-top: 12px; }
+  .habit-mini-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .habit-mini-label { font-size: 13px; font-weight: 700; color: var(--mint-deep); }
+  .habit-mini-tip { font-size: 12px; color: var(--ink-soft); margin-left: 4px; }
+
+  /* 通用：搜索框 + 筛选 chips + 星标/置顶按钮 */
+  .search-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .search-row input[type="text"] { flex: 1; min-width: 160px; }
+  .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter-chip { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-size: 13px; padding: 7px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; transition: all .15s; }
+  .filter-chip.active { border-color: var(--mint); background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; }
+  .tag-star { font-size: 11px; background: #fff3d6; color: #a8791a; border-radius: 999px; padding: 2px 8px; font-weight: 700; }
+  .tag-top { font-size: 11px; background: #e6f6f2; color: var(--mint-deep); border-radius: 999px; padding: 2px 8px; font-weight: 700; }
+  .star-btn, .pin-btn {
+    border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft);
+    width: 30px; height: 30px; border-radius: 9px; cursor: pointer; font-size: 14px;
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    -webkit-appearance: none; appearance: none; transition: all .15s;
+  }
+  .star-btn.on { border-color: #f0c869; background: #fff3d6; color: #a8791a; }
+  .pin-btn.on { border-color: var(--mint); background: var(--line); color: var(--mint-deep); }
+  .star-btn:active, .pin-btn:active { transform: scale(0.92); }
+  .item-row-acts { display: flex; gap: 6px; align-items: center; justify-content: center; }
+
+  /* 待做事项：每日待办 / 长期常驻 切换 */
+  .todo-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .todo-tab { border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); font-weight: 700; font-size: 14px; padding: 9px 18px; border-radius: 12px; cursor: pointer; transition: all .15s; }
+  .todo-tab.active { border-color: var(--mint); background: linear-gradient(135deg, var(--mint), var(--sky)); color: #fff; box-shadow: 0 4px 12px rgba(58,169,151,.28); }
+  .todo-hide { display: none !important; }
+
+  /* 同步栏自动备份提示 */
+  .autobk b { color: var(--mint-deep); }
+
   /* 同步栏 */
   .syncbar {
     max-width: 1080px; margin: 0 auto; padding: 6px 22px 12px;
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     font-size: 13px; color: var(--ink-soft);
   }
-  .sync-status { color: var(--mint-deep); font-weight: 600; }
+  .sync-status { color: var(--mint-deep); font-weight: 600; transition: color .3s ease; }
+  .sync-status.connecting { color: #e0a23a; }
+  .sync-status.synced { color: #1f9d57; }
+  .sync-status.offline { color: #9aa6a2; }
   .sync-code b { color: var(--ink); font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .5px; }
   .sbtn {
     border: 1.5px solid var(--mint); background: #fff; color: var(--mint-deep);
-    font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: 10px; cursor: pointer;
-    transition: all .2s;
+    font-weight: 600; font-size: 13px; padding: 7px 14px; border-radius: 12px; cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .2s ease, border-color .2s ease;
+    -webkit-appearance: none; appearance: none;
   }
   .sbtn:hover { background: var(--line); }
+  .sbtn:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(94,198,184,.28); }
   .syncbar select {
-    border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft);
-    font-size: 13px; padding: 6px 10px; border-radius: 10px; cursor: pointer; outline: none;
+    border: 1.5px solid var(--mint); background: #fff; color: var(--mint-deep);
+    font-size: 13px; padding: 7px 12px; border-radius: 12px; cursor: pointer; outline: none;
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%233aa997'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
   }
-  .syncbar select:focus { border-color: var(--mint); }
+  .syncbar select:focus { border-color: var(--mint-deep); box-shadow: 0 0 0 3px rgba(94,198,184,.18); }
   .autobk { color: var(--ink-soft); font-size: 12px; }
   .autobk b { color: var(--mint-deep); }
 
@@ -432,8 +531,10 @@
   .cal-day.muted:hover { border-color:transparent; }
   .cal-day.today { border-color: var(--mint); background:#eafaf6; font-weight:700; }
   .cal-day.sel { background: linear-gradient(135deg,var(--mint),var(--sky)); color:#fff; border-color:transparent; font-weight:700; }
-  .cal-day.has::after { content:""; position:absolute; bottom:7px; width:6px; height:6px; border-radius:50%; background: var(--warn); }
+  .cal-day.has::after { content:""; position:absolute; bottom:6px; width:7px; height:7px; border-radius:50%; background: var(--dot); }
   .cal-day.sel.has::after { background:#fff; }
+  .cal-stats { margin-top: 12px; text-align: center; font-size: 13.5px; color: var(--ink-soft); background: #eafaf6; border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; }
+  .cal-stats b { color: var(--mint-deep); font-size: 15px; }
 
   @media (max-width: 720px) {
     .clock-time { font-size: 28px; }
@@ -458,8 +559,7 @@
     .date-pill + .date-pill { order: 4; }
     .badge { order: 5; flex: 0 0 auto; }
 
-    /* APP分享：手机端每行固定列数铺满 */
-    .app-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    /* APP分享：手机端固定 3 列（由基础规则兜底，避免被挤压截断） */
     .app-name { font-size: 13px; }
 
     /* 精神食粮：手机端每行 2 张卡片铺满 */
@@ -473,6 +573,11 @@
     .tab { padding: 8px 13px; font-size: 14px; }
     .kcard-title { font-size: 14px; }
   }
+  /* APP分享：电脑宽屏自动适配更多列（手机竖屏保持 3 列） */
+  @media (min-width: 600px)  { .app-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 820px)  { .app-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  @media (min-width: 1080px) { .app-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+  @media (min-width: 1320px) { .app-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
   /* ===== 教育口播短视频资料库 ===== */
   .edu-tabs { display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; margin-bottom: 14px; }
   .edu-tabs::-webkit-scrollbar { height: 0; }
@@ -523,7 +628,7 @@
     gap: 4px !important;
     height: 32px !important;
     padding: 0 16px !important;
-    border: 0 !important;
+    border: 1.5px solid rgba(0,0,0,0.18) !important;
     border-radius: 8px !important;
     background: #888 !important;
     background-color: #888 !important;
@@ -582,51 +687,275 @@
     .feed-tab { white-space: normal; text-align: center; }
   }
 
-  </style>
+    /* ============ 本轮：主题切换 / 番茄钟 / 触摸优化 ============ */
+  /* 浅色主题：淡蓝 / 奶白（薄荷绿为默认 :root） */
+  [data-color="blue"] {
+    --mint: #5aa9e6;
+    --mint-deep: #2f7fc4;
+    --sky: #8fc6f0;
+    --leaf: #8fd9c0;
+    --bg-1: #e6f1fb;
+    --bg-2: #eef5fc;
+    --line: #d6e6f5;
+  }
+  [data-color="cream"] {
+    --mint: #b7a07e;
+    --mint-deep: #9c8460;
+    --sky: #cdbb97;
+    --leaf: #c2cba0;
+    --bg-1: #faf6ee;
+    --bg-2: #fdfbf6;
+    --line: #ece2d2;
+  }
+
+  /* 滚动回弹 + 触摸优化 */
+  html, body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: auto; }
+  button, .tab, .sbtn, .btn, .filter-chip, .todo-tab, .feed-tab, .gear, .theme-dot {
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-height: 44px;
+  }
+  .btn, .sbtn, .tab, .filter-chip, .todo-tab, .feed-tab, .gear {
+    padding-top: 11px; padding-bottom: 11px;
+  }
+  .item .check { width: 26px; height: 26px; font-size: 14px; }
+  .item .del { min-width: 36px; min-height: 36px; display: grid; place-items: center; }
+  .item .prio { width: 26px; height: 26px; }
+
+  /* 设置面板 + 自定义名称 + 主题色 */
+  .settings { padding: 0 22px 6px; }
+  .settings[hidden] { display: none; }
+  .ws-name-display { outline: none; }
+  .gear {
+    width: 40px; height: 40px; border-radius: 50%; margin-left: 4px;
+    background: rgba(94,198,184,.14); color: var(--mint-deep);
+    font-size: 18px; cursor: pointer; display: grid; place-items: center;
+    border: 1.5px solid transparent; flex: 0 0 auto;
+  }
+  .gear:active { transform: scale(.94); }
+  .set-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 14px 4px; border-bottom: 1px solid var(--line);
+  }
+  .set-row:last-child { border-bottom: none; }
+  .set-row > label, .set-row > span { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .set-row input#ws-name {
+    flex: 1; max-width: 200px; padding: 10px 12px; border-radius: 10px;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink);
+  }
+  .theme-colors { display: flex; gap: 14px; }
+  .theme-dot {
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; position: relative; padding: 0;
+  }
+  .theme-dot.mint { background: linear-gradient(135deg, #5ec6b8, #7fc8e8); }
+  .theme-dot.blue { background: linear-gradient(135deg, #5aa9e6, #8fc6f0); }
+  .theme-dot.cream { background: linear-gradient(135deg, #f3e9d6, #cdbb97); }
+  .theme-dot.active { border-color: var(--ink); transform: scale(1.08); }
+  .theme-dot.active::after {
+    content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+
+  /* ====== 番茄专注计时（严格按参考图：居中、分层、大留白）====== */
+  /* ====== 番茄钟（严格按参考图还原）====== */
+  .pomo { text-align: left; padding: 32px 20px 16px; }
+  .pomo-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 36px; }
+  .pomo-mode { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: 2px; }
+  .pomo-time {
+    font-size: 52px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums;
+    line-height: 1.1; letter-spacing: 1px;
+  }
+  .pomo-ctrl { display: flex; gap: 14px; margin-bottom: 32px; }
+  .pomo-ctrl .btn {
+    font-size: 17px; font-weight: 700;
+    padding: 14px 40px; border-radius: 28px;
+    box-shadow: 0 6px 18px rgba(94,198,184,.35);
+  }
+  .pomo-ctrl .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(94,198,184,.45); }
+  .pomo-ctrl .btn:active { transform: scale(0.97); }
+  .pomo-ctrl .btn.ghost {
+    background: #fff; color: var(--mint-deep);
+    border: 2px solid var(--mint); box-shadow: none;
+    padding: 12px 38px;
+  }
+  .pomo-ctrl .btn.ghost:hover { background: #f0faf8; }
+  .pomo-ctrl .btn.ghost:active { background: var(--mint); color: #fff; }
+  .pomo-set {
+    display: inline-flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: 15px; color: var(--ink-soft);
+    background: #f6f9f8; border-radius: 14px; padding: 16px 24px; margin-bottom: 28px;
+  }
+  .pomo-set label { display: inline-flex; align-items: center; gap: 6px; }
+  .pomo-set input {
+    width: 54px; text-align: center; padding: 6px; border-radius: 10px;
+    border: 1.5px solid var(--line); background: #fff; color: var(--ink); font-size: 15px;
+    font-weight: 600;
+  }
+  .pomo-set input:disabled { opacity: .45; background: #eef2f1; cursor: not-allowed; }
+  .pomo-set select {
+    padding: 5px 8px; border-radius: 10px; border: 1.5px solid var(--line);
+    background: #fff; color: var(--ink); font-size: 14px; cursor: pointer; font-weight: 600;
+  }
+  .pomo-count-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+  .pomo-count { font-size: 15px; color: var(--ink-soft); font-weight: 600; }
+
+  /* ====== 自动循环开关（真实 DOM 元素 toggle，不依赖伪元素）====== */
+  .cycle {
+    display: inline-flex !important; align-items: center; gap: 8px;
+    font-size: 14px; color: var(--ink); font-weight: 500; cursor: pointer;
+    user-select: none; -webkit-tap-highlight-color: transparent;
+    position: relative; padding: 2px 0;
+  }
+  .cycle input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+  .cycle .track {
+    display: block !important; position: relative;
+    width: 50px !important; height: 28px !important; min-width: 50px !important; min-height: 28px !important;
+    border-radius: 14px !important; box-sizing: border-box !important;
+    background: #e8ecec !important; border: 2px solid #bfc8c4 !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.12) !important;
+    flex-shrink: 0; vertical-align: middle; overflow: hidden;
+  }
+  .cycle .track .knob {
+    display: block !important; position: absolute;
+    top: 2px !important; left: 2px !important;
+    width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25) !important;
+    transition: transform .25s cubic-bezier(.4,0,.2,1);
+  }
+  /* 开启态：薄荷绿底 + 白色滑块右滑 */
+  .cycle input:checked + .track { background: #5ecfa8 !important; border-color: #3dbd89 !important; box-shadow: none !important; }
+  .cycle input:checked + .track .knob { transform: translateX(22px) !important; }
+  .cycle input:focus-visible + .track { outline: 2px solid var(--mint-deep) !important; outline-offset: 2px !important; }
+
+  /* 提醒时长选项行（紧凑排列，不抢视觉焦点） */
+  .pomo-alert-row { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 13px; color: var(--ink-soft); }
+  .pomo-alert-row select {
+    padding: 4px 8px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: #fff; color: var(--ink); font-size: 13px; cursor: pointer;
+  }
+  /* 分隔线 + 提示文字 */
+  .pomo-divider { border: none; border-top: 1px solid var(--line); margin: 0 0 18px; }
+  .pomo-tip { font-size: 12.5px; color: var(--ink-soft); opacity: .7; line-height: 1.6; }
+
+</style>
 </head>
 <body>
 <header>
   <nav class="nav">
-    <div class="brand"><span class="dot"></span>清新工作台</div>
+    <div class="brand"><span class="dot"></span><span class="ws-name-display" id="ws-name-display">清新工作台</span><button type="button" class="gear" id="settings-toggle" title="工作台设置" aria-label="设置">⚙️</button></div>
     <div class="nav-box nav-box-a">
-      <button class="tab active" data-view="plan">每日计划</button>
-      <button class="tab" data-view="todo">待做事项</button>
-      <button class="tab" data-view="idea">灵感</button>
-      <button class="tab" data-view="habit">习惯打卡</button>
+      <button type="button" class="tab active" data-view="plan">每日计划</button>
+      <button type="button" class="tab" data-view="todo">待做事项</button>
+      <button type="button" class="tab" data-view="idea">灵感</button>
+      <button type="button" class="tab" data-view="habit">习惯打卡</button>
     </div>
     <div class="nav-box nav-box-b">
-      <button class="tab" data-view="app">APP分享</button>
-      <button class="tab" data-view="hot">热点</button>
-      <button class="tab" data-view="feed">精神食粮</button>
-      <button class="tab" data-view="edu">🎓 教育口播</button>
+      <button type="button" class="tab" data-view="app">APP分享</button>
+      <button type="button" class="tab" data-view="hot">热点</button>
+      <button type="button" class="tab" data-view="feed">精神食粮</button>
+      <button type="button" class="tab" data-view="edu">🎓 教育口播</button>
     </div>
   </nav>
   <div class="syncbar">
-    <span class="sync-status" id="sync-status">连接中…</span>
-    <span class="sync-code">同步码 <b id="sync-code">—</b></span>
-    <button class="sbtn" id="sync-copy">复制</button>
-    <button class="sbtn" id="sync-join">加入其他设备</button>
-    <button class="sbtn" id="sync-now">立即同步</button>
-    <button class="sbtn" id="sync-export">导出</button>
-    <button class="sbtn" id="sync-import">导入</button>
+    <span class="sync-status connecting" id="sync-status">连接中…</span>
+    <span class="sync-code">同步码 <b id="sync-code">生成中…</b></span>
+    <span class="autobk" id="autobk"></span>
+    <button type="button" class="sbtn" id="sync-copy">复制</button>
+    <button type="button" class="sbtn" id="sync-join">加入其他设备</button>
+    <button type="button" class="sbtn" id="sync-now">立即同步</button>
+    <button type="button" class="sbtn" id="sync-export">导出</button>
+    <button type="button" class="sbtn" id="sync-import">导入</button>
     <input type="file" id="sync-file" accept="application/json,.json" style="display:none" />
   </div>
-</header>
+  </header>
+
+<section class="settings" id="settings-panel" hidden>
+  <div class="panel">
+    <h2>⚙️ 工作台设置</h2>
+    <div class="sub">个性化你的工作台外观，设置自动保存</div>
+    <div class="set-row">
+      <label for="ws-name">工作台名称</label>
+      <input type="text" id="ws-name" maxlength="12" placeholder="清新工作台" />
+    </div>
+    <div class="set-row">
+      <span>浅色主题</span>
+      <div class="theme-colors" id="theme-colors">
+        <button type="button" class="theme-dot mint" data-color="mint" title="薄荷绿"></button>
+        <button type="button" class="theme-dot blue" data-color="blue" title="淡蓝"></button>
+        <button type="button" class="theme-dot cream" data-color="cream" title="奶白"></button>
+      </div>
+    </div>
+  </div>
+</section>
 
 <main>
   <!-- 每日计划 -->
   <section class="view active" id="view-plan">
     <div class="clock-card">
       <div>
-        <div class="clock-date" id="plan-date">--</div>
-        <div class="clock-week" id="plan-week">--</div>
+        <div class="clock-date" id="plan-date">加载中…</div>
+        <div class="clock-week" id="plan-week">加载中…</div>
       </div>
-      <div class="clock-time" id="plan-time">--:--:--</div>
+      <div class="clock-time" id="plan-time">加载中…</div>
       <div class="clock-tag" id="plan-tag">今日</div>
     </div>
 
+    <div class="panel">
+      <h2>🍅 专注计时</h2>
+      <div class="sub">番茄工作法：专注一段时间，再休息片刻，提升效率</div>
+      <div class="pomo">
+        <div class="pomo-head">
+          <span class="pomo-mode" id="pomo-mode">专注</span>
+          <span class="pomo-time" id="pomo-time">25:00</span>
+        </div>
+        <div class="pomo-ctrl">
+          <button type="button" class="btn" id="pomo-start">开始</button>
+          <button type="button" class="btn ghost" id="pomo-reset">重置</button>
+        </div>
+        <div class="pomo-set">
+          <label>专注 <input type="number" id="pomo-work" min="1" max="90" value="25" /> <span class="pomo-ul">分</span></label>
+          <label>休息 <input type="number" id="pomo-break" min="1" max="30" value="5" /> <span class="pomo-ul">分</span></label>
+          <label>单位
+            <select id="pomo-unit">
+              <option value="min" selected>分钟</option>
+              <option value="sec">秒</option>
+            </select>
+          </label>
+        </div>
+        <div class="pomo-count-row">
+          <span class="pomo-count" id="pomo-count">今日已完成 0 个番茄</span>
+          <label class="cycle" title="开启后自动循环，关闭则单次运行停止"
+                 style="display:inline-flex!important;align-items:center;gap:8px;font-size:14px;color:var(--ink);cursor:pointer;user-select:none;padding:2px 0">
+            <input type="checkbox" id="pomo-cycle"
+                   style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" />
+            <div class="track" id="pomo-track"
+                 style="display:block;position:relative;width:50px;height:28px;min-width:50px;min-height:28px;border-radius:14px;box-sizing:border-box;background:#e8ecec;border:2px solid #bfc8c4;box-shadow:inset 0 1px 3px rgba(0,0,0,.12);flex-shrink:0;overflow:hidden;transition:background .25s,border-color .25s">
+              <div class="knob" id="pomo-knob"
+                   style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .25s cubic-bezier(.4,0,.2,1)"></div>
+            </div>
+            <span style="font-weight:500">自动循环</span>
+          </label>
+        </div>
+        <div class="pomo-alert-row">
+          <label>⏱ 提醒弹窗时长
+            <select id="pomo-toast-dur">
+              <option value="5">5 秒</option>
+              <option value="7" selected>7 秒</option>
+              <option value="10">10 秒</option>
+              <option value="15">15 秒</option>
+              <option value="0">常驻（手动关闭）</option>
+            </select>
+          </label>
+        </div>
+        <hr class="pomo-divider" />
+        <div class="pomo-tip">每个阶段结束会响铃并弹出提醒（首次点「开始」授权音效）</div>
+      </div>
+    </div>
+
     <div class="viewbar">
-      <span>正在查看：<b id="plan-viewdate">--</b></span>
+      <span>正在查看：<b id="plan-viewdate">加载中…</b></span>
+      <button class="btn ghost" id="plan-reset">🔄 重置当日计划</button>
       <button class="btn ghost" id="plan-backtoday">回到今天</button>
     </div>
 
@@ -635,10 +964,11 @@
       <div class="sub">点选日期查看当天计划，有记录的日期会标亮点</div>
       <div class="cal-head">
         <button class="btn ghost" id="cal-prev">‹ 上月</button>
-        <div class="cal-title" id="cal-title">--</div>
+        <div class="cal-title" id="cal-title">加载中…</div>
         <button class="btn ghost" id="cal-next">下月 ›</button>
       </div>
       <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-stats" id="cal-stats"></div>
     </div>
 
     <div class="panel">
@@ -646,7 +976,7 @@
       <div class="sub">勾选左侧圆圈标记完成情况，数据自动保存</div>
       <div class="add-row">
         <input type="text" id="plan-input" class="grow" placeholder="今天要完成的一件事…" />
-        <button class="btn" id="plan-add">添加</button>
+        <button type="button" class="btn" id="plan-add">添加</button>
         <button class="btn ghost" id="plan-clear">清空</button>
       </div>
       <div id="plan-list"></div>
@@ -657,7 +987,7 @@
       <div class="sub">查看当天为之后做的规划</div>
       <div class="add-row">
         <input type="text" id="tomorrow-input" class="grow" placeholder="明天计划安排…" />
-        <button class="btn" id="tomorrow-add">添加</button>
+        <button type="button" class="btn" id="tomorrow-add">添加</button>
         <button class="btn ghost" id="tomorrow-clear">清空</button>
       </div>
       <div id="tomorrow-list"></div>
@@ -668,17 +998,37 @@
   <section class="view" id="view-todo">
     <div class="panel">
       <h2>✅ 待做事项</h2>
-      <div class="sub">设置起日期与截止日期，逾期会自动高亮提醒</div>
-      <div class="todo-grid" style="margin-bottom:14px;">
-        <input type="date" id="todo-start" />
-        <input type="date" id="todo-deadline" />
-        <input type="text" id="todo-text" class="grow" placeholder="要做什么？" />
-        <button class="btn" id="todo-add">添加</button>
-        <button class="btn ghost" id="todo-clear">清空</button>
+      <div class="sub">分为「每日待办」（带起止日期、逾期提醒）与「长期常驻清单」（无期限、长期挂起）</div>
+      <div class="todo-tabs">
+        <button type="button" class="todo-tab active" id="todo-tab-daily" data-type="daily">📆 每日待办</button>
+        <button type="button" class="todo-tab" id="todo-tab-resident" data-type="resident">📌 长期常驻清单</button>
       </div>
-      <div class="todo-head" style="display:grid; grid-template-columns:130px 130px 1fr auto auto; gap:10px;">
-        <span>起日期</span><span>截止日期</span><span>内容</span><span>状态</span><span></span>
+
+      <!-- 每日待办 添加区 -->
+      <div class="todo-add-wrap" id="todo-add-daily">
+        <div class="todo-grid" style="margin-bottom:14px;">
+          <input type="date" id="todo-start" />
+          <input type="date" id="todo-deadline" />
+          <input type="text" id="todo-text" class="grow" placeholder="今天/近期要做什么？" />
+          <button type="button" class="btn" id="todo-add">添加</button>
+        </div>
       </div>
+
+      <!-- 长期常驻 添加区 -->
+      <div class="todo-add-wrap todo-hide" id="todo-add-resident">
+        <div class="add-row" style="margin-bottom:14px;">
+          <input type="text" id="todo-resident-text" class="grow" placeholder="长期挂起的一件事，如：坚持阅读 / 月度复盘…" />
+          <button type="button" class="btn" id="todo-resident-add">添加</button>
+        </div>
+      </div>
+
+      <div class="filter-chips">
+        <button class="filter-chip active" id="todo-filter-all" data-f="all">全部</button>
+        <button class="filter-chip" id="todo-filter-done" data-f="done">已完成</button>
+        <button class="filter-chip" id="todo-filter-undone" data-f="undone">未完成</button>
+        <button class="btn ghost" id="todo-clear" style="margin-left:auto;">清空当前清单</button>
+      </div>
+
       <div id="todo-list"></div>
     </div>
   </section>
@@ -691,13 +1041,21 @@
       <div class="add-row">
         <input type="date" id="idea-date" />
         <input type="text" id="idea-text" class="grow" placeholder="一个灵感、一句文案、一个点子…" />
-        <button class="btn" id="idea-add">添加</button>
+        <button type="button" class="btn" id="idea-add">添加</button>
         <button class="btn ghost" id="idea-clear">清空</button>
+      </div>
+      <div class="search-row">
+        <input type="text" id="idea-search" placeholder="🔍 搜索灵感内容…" />
+      </div>
+      <div class="filter-chips">
+        <button class="filter-chip active" id="idea-filter-all" data-f="all">全部</button>
+        <button class="filter-chip" id="idea-filter-star" data-f="star">★ 收藏</button>
+        <button class="filter-chip" id="idea-filter-top" data-f="top">📌 置顶</button>
       </div>
       <div class="idea-toolbar">
         <button class="btn ghost" id="idea-multi">☑ 多选</button>
         <button class="btn ghost" id="idea-selall" style="display:none">全选 / 取消</button>
-        <button class="btn" id="idea-mark-key" style="display:none">★ 标记重点</button>
+        <button type="button" class="btn" id="idea-mark-key" style="display:none">★ 标记重点</button>
         <button class="btn ghost" id="idea-unmark-key" style="display:none">☆ 取消重点</button>
         <span class="idea-selcount" id="idea-selcount"></span>
         <span class="idea-summary" id="idea-summary"></span>
@@ -718,7 +1076,10 @@
   <section class="view" id="view-app">
     <div class="panel">
       <h2>🔗 APP分享</h2>
-      <div class="app-hint">手机端点击可直接唤起对应 APP；电脑端将打开该 APP 的网页版。</div>
+      <div class="app-hint">手机端点击可直接唤起对应 APP；电脑端将打开该 APP 的网页版。点亮 ★ 可收藏常用，📌 置顶的 APP 排在最前。</div>
+      <div class="search-row">
+        <input type="text" id="app-search" placeholder="🔍 搜索 APP 名称…" />
+      </div>
       <div class="app-wrap" id="app-list"></div>
     </div>
   </section>
@@ -735,7 +1096,7 @@
           <option value="multi">每天多次</option>
         </select>
         <input type="time" id="habit-time" class="habit-time-input" title="提醒时间（可选）" />
-        <button class="btn" id="habit-add">添加</button>
+        <button type="button" class="btn" id="habit-add">添加</button>
       </div>
       <div class="rec-bar">
         <button class="btn ghost" id="habit-record">📊 累计记录</button>
@@ -751,7 +1112,7 @@
     <h2>🔥 热点聚合</h2>
     <div class="sub">自动提取各平台实时热搜，点击标题看原帖；每 5 分钟自动刷新一次，也可点「全部刷新」手动更新。</div>
     <div class="hot-bar">
-      <button class="btn" id="hot-refresh">🔄 全部刷新</button>
+      <button type="button" class="btn" id="hot-refresh">🔄 全部刷新</button>
       <span class="hot-tip" id="hot-tip"></span>
     </div>
     <div id="hot-list"></div>
@@ -762,8 +1123,11 @@
     <h2>🍱 精神食粮</h2>
     <div class="sub">全网热门的运动 / 化妆视频，按种类分组实时更新（泡沫轴放松、跳操、力量训练、瑜伽等）；点卡片直接跳 B站观看。每 5 分钟自动刷新，也可点「刷新 / 换一批」。</div>
     <div class="feed-tabs" id="feed-tabs"></div>
+    <div class="search-row">
+      <input type="text" id="feed-search" placeholder="🔍 搜索关键词，如：泡沫轴 / 妆容 / 拉伸…" />
+    </div>
     <div class="hot-bar">
-      <button class="btn" id="feed-refresh">🔄 刷新</button>
+      <button type="button" class="btn" id="feed-refresh">🔄 刷新</button>
       <button class="btn ghost" id="feed-next">🔁 换一批</button>
       <a class="btn ghost" href="https://space.bilibili.com/431264165/favlist" target="_blank" rel="noopener" style="text-decoration:none">📺 我的B站收藏</a>
       <span class="hot-tip" id="feed-tip"></span>
@@ -774,7 +1138,11 @@
   <!-- 教育口播短视频资料库 -->
   <section class="view" id="view-edu">
     <h2>🎓 教育口播短视频资料库</h2>
-    <div class="sub">剪辑学习渠道、训练方案、避坑清单、素材附件，一站收藏。点卡片展开详情。</div>
+    <div class="sub">剪辑学习渠道、训练方案、避坑清单、素材附件，一站收藏。点卡片展开详情。可用搜索过滤，博主支持 ★收藏 / 📌置顶。</div>
+
+    <div class="search-row">
+      <input type="text" id="edu-search" placeholder="🔍 搜索博主 / 渠道 / 关键词…" />
+    </div>
 
     <!-- 教育博主抖音 / B站 APP 唤起 -->
     <div id="edu-bloggers" class="edu-bloggers"></div>
@@ -794,12 +1162,27 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
   document.addEventListener("gesturechange", function (e) { e.preventDefault(); });
   document.addEventListener("gestureend", function (e) { e.preventDefault(); });
+  /* 全局错误可见化：任何脚本错误都弹提示，避免“点了没反应”却不知道原因 */
+  window.addEventListener("error", function (e) {
+    try { var m = (e && e.message) ? e.message : "未知脚本错误"; if (typeof showToast === "function") showToast("⚠️ " + m); } catch (_) {}
+  });
+  const BUILD = "20260803t";
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
     set(k, v, silent) { localStorage.setItem(k, JSON.stringify(v)); if (!silent && Sync.ready) Sync.schedulePush(); }
   };
   const todayStr = () => new Date().toISOString().slice(0, 10);
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  /* 按钮防抖：立即执行一次，随后 ms 内忽略重复点击，防止误触重复触发 */
+  function guardClick(fn, ms) {
+    let locked = false;
+    return function (e) {
+      if (locked) { if (e && e.preventDefault) e.preventDefault(); return; }
+      locked = true;
+      setTimeout(() => { locked = false; }, ms || 500);
+      return fn.apply(this, arguments);
+    };
+  }
 
   /* ---------- 云端同步 (Supabase) ---------- */
   const SB = {
@@ -813,12 +1196,15 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     onRemote: null,
     headers() { return { "apikey": SB.key, "Authorization": "Bearer " + SB.key, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }; },
     async fetchRow() {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 5000);
       try {
-        const r = await fetch(SB.url + "/rest/v1/wb_data?id=eq." + encodeURIComponent(this.boardId) + "&select=*", { headers: this.headers() });
+        const r = await fetch(SB.url + "/rest/v1/wb_data?id=eq." + encodeURIComponent(this.boardId) + "&select=*", { headers: this.headers(), signal: ctrl.signal });
+        clearTimeout(to);
         if (!r.ok) return null;
         const arr = await r.json();
         return arr && arr[0] ? arr[0] : null;
-      } catch (e) { return null; }
+      } catch (e) { clearTimeout(to); return null; }
     },
     async push() {
       if (!this.ready) return;
@@ -830,14 +1216,14 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
         }
       }
       try {
-        setStatus("同步中…");
+        setStatus("同步中…", "connecting");
         const r = await fetch(SB.url + "/rest/v1/wb_data", {
           method: "POST", headers: this.headers(),
           body: JSON.stringify({ id: this.boardId, payload: payload, updated_at: new Date().toISOString() })
         });
-        if (r.ok) { this.lastPush = Date.now(); setStatus("已同步 " + timeNow()); }
-        else setStatus("同步失败");
-      } catch (e) { setStatus("离线，稍后重试"); }
+        if (r.ok) { this.lastPush = Date.now(); setStatus("✅ 已同步 " + timeNow(), "synced"); }
+        else setStatus("同步离线", "offline");
+      } catch (e) { setStatus("同步离线", "offline"); }
     },
     _t: null,
     schedulePush() { clearTimeout(this._t); this._t = setTimeout(() => this.push(), 700); },
@@ -850,23 +1236,29 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       this.lastPush = remote;
     },
     async init() {
-      const row = await this.fetchRow();
-      if (row && row.payload) {
-        Object.keys(row.payload).forEach((k) => { if (k !== "wb_board") store.set(k, row.payload[k], true); });
-      } else {
-        await this.push();
+      let row = null;
+      try { row = await this.fetchRow(); } catch (e) { row = null; }
+      try {
+        if (row && row.payload) {
+          if (typeof applyRemote === "function") applyRemote(row.payload);
+          this.lastPush = new Date(row.updated_at).getTime() || Date.now();
+          setStatus("✅ 已同步 " + timeNow(), "synced");
+        } else {
+          await this.push();
+          this.lastPush = Date.now();
+          setStatus("✅ 已同步 " + timeNow(), "synced");
+        }
+      } catch (e) {
+        setStatus("同步离线", "offline");
       }
       this.ready = true;
-      this.lastPush = Date.now();
-      setStatus("已同步 " + timeNow());
       setInterval(() => this.pull(), 15000);
     }
   };
-  function setStatus(t) { const el = document.getElementById("sync-status"); if (el) el.textContent = t; }
+  function setStatus(t, cls) { const el = document.getElementById("sync-status"); if (!el) return; el.textContent = t; el.className = "sync-status" + (cls ? " " + cls : ""); }
   function timeNow() { const d = new Date(); const p = (n) => String(n).padStart(2, "0"); return p(d.getHours()) + ":" + p(d.getMinutes()); }
   function showBoard() { const el = document.getElementById("sync-code"); if (el) el.textContent = Sync.boardId; }
 
-  Sync.init().finally(function () {
   /* ---------- 导航切换 ---------- */
   document.querySelectorAll(".tab").forEach((t) => {
     t.addEventListener("click", () => {
@@ -892,53 +1284,149 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
 
   /* ---------- 每日计划 ---------- */
   let plans = store.get("wb_plans", {});
+  if (!plans || typeof plans !== "object") plans = {};
   const curDate = todayStr();
   let viewDate = curDate;
-  const ensurePlan = () => { if (!plans[viewDate]) plans[viewDate] = { today: [], tomorrow: [] }; };
+  const ensurePlan = () => { if (!plans || typeof plans !== "object") plans = {}; if (!plans[viewDate]) plans[viewDate] = { today: [], tomorrow: [] }; };
   ensurePlan();
 
   function renderPlan() {
+    ensurePlan();
     const data = plans[viewDate];
     $("#plan-viewdate").textContent = viewDate;
+    const sortDoneLast = (arr) => [...arr].sort((a, b) => (a.done === b.done ? 0 : (a.done ? 1 : -1)));
     const pl = $("#plan-list"); pl.innerHTML = "";
-    if (!data.today.length) pl.innerHTML = '<div class="empty">这一天还没安排～</div>';
-    data.today.forEach((it) => pl.appendChild(makeItem(it, "today")));
+    const tList = sortDoneLast(data.today);
+    if (!tList.length) pl.innerHTML = '<div class="empty">这一天还没安排～</div>';
+    tList.forEach((it) => pl.appendChild(makeItem(it, "today")));
     const tl = $("#tomorrow-list"); tl.innerHTML = "";
-    if (!data.tomorrow.length) tl.innerHTML = '<div class="empty">这一天没有明日安排</div>';
-    data.tomorrow.forEach((it) => tl.appendChild(makeItem(it, "tomorrow")));
+    const tmList = sortDoneLast(data.tomorrow);
+    if (!tmList.length) tl.innerHTML = '<div class="empty">这一天没有明日安排</div>';
+    tmList.forEach((it) => tl.appendChild(makeItem(it, "tomorrow")));
   }
+  const PRIO = ["normal", "important", "urgent"];
+  const PRIO_LABEL = { normal: "普通", important: "重要", urgent: "紧急" };
+  function cyclePrio(it) { const i = PRIO.indexOf(it.prio || "normal"); it.prio = PRIO[(i + 1) % 3]; }
+
+  let drag = null;
+  function beginDrag(handle, row, key) {
+    ensurePlan();
+    drag = { handle, row, key, arr: (plans[viewDate][key] || []) };
+    row.classList.add("dragging");
+    handle.textContent = "✋";
+  }
+  function onDragMove(ev) {
+    if (!drag) return;
+    const under = document.elementFromPoint(ev.clientX, ev.clientY);
+    const target = under && under.closest(".item");
+    if (target && target !== drag.row && target.parentElement === drag.row.parentElement) {
+      const rect = target.getBoundingClientRect();
+      if ((ev.clientY - rect.top) > rect.height / 2) target.after(drag.row); else target.before(drag.row);
+    }
+  }
+  function endDrag() {
+    if (!drag) return;
+    ensurePlan();
+    const parent = drag.row.parentElement;
+    const ids = [...parent.querySelectorAll(".item")].map((el) => el.dataset.id);
+    const newArr = ids.map((id) => drag.arr.find((x) => x.id === id)).filter(Boolean);
+    plans[viewDate][drag.key] = newArr;
+    savePlan();
+    drag.row.classList.remove("dragging");
+    drag.handle.textContent = "⋮⋮";
+    drag = null;
+    renderPlan(); renderCalendar();
+  }
+
   function makeItem(it, key) {
     const row = document.createElement("div");
     row.className = "item" + (it.done ? " done" : "");
+    row.dataset.id = it.id;
+    row.dataset.prio = it.prio || "normal";
+
+    const handle = document.createElement("span");
+    handle.className = "drag-handle"; handle.textContent = "⋮⋮"; handle.title = "长按拖拽排序";
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+      const timer = setTimeout(() => beginDrag(handle, row, key), 450);
+      const move = (ev) => onDragMove(ev);
+      const up = () => {
+        clearTimeout(timer);
+        try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+        if (drag) endDrag();
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", up);
+        handle.removeEventListener("pointercancel", up);
+      };
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", up);
+      handle.addEventListener("pointercancel", up);
+    });
+
+    const prio = document.createElement("button");
+    prio.type = "button";
+    prio.className = "prio " + (it.prio || "normal");
+    prio.title = "优先级：" + PRIO_LABEL[it.prio || "normal"] + "（点击切换）";
+    prio.onclick = (e) => { e.stopPropagation(); cyclePrio(it); savePlan(); renderPlan(); };
+
     const chk = document.createElement("div");
     chk.className = "check"; chk.textContent = it.done ? "✓" : "";
     chk.onclick = () => { it.done = !it.done; savePlan(); renderPlan(); };
+
     const txt = document.createElement("div"); txt.className = "text"; txt.textContent = it.text;
-    const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
-    del.onclick = () => { plans[viewDate][key] = plans[viewDate][key].filter((x) => x.id !== it.id); savePlan(); renderPlan(); renderCalendar(); };
-    row.append(chk, txt, del); return row;
+
+    const del = document.createElement("button"); del.className = "del"; del.textContent = "✕"; del.title = "删除";
+    del.onclick = () => wbConfirm("确定删除这项计划吗？删除后不可恢复。", () => {
+      ensurePlan();
+      if (!plans[viewDate][key]) return;
+      plans[viewDate][key] = plans[viewDate][key].filter((x) => x.id !== it.id);
+      savePlan(); renderPlan(); renderCalendar();
+    });
+
+    row.append(handle, prio, chk, txt, del);
+    return row;
   }
   function savePlan() { store.set("wb_plans", plans); }
-  $("#plan-add").onclick = () => {
-    const v = $("#plan-input").value.trim(); if (!v) return;
-    ensurePlan(); plans[viewDate].today.push({ id: uid(), text: v, done: false });
-    $("#plan-input").value = ""; savePlan(); renderPlan(); renderCalendar();
-  };
-  $("#plan-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#plan-add").click(); });
-  $("#tomorrow-add").onclick = () => {
-    const v = $("#tomorrow-input").value.trim(); if (!v) return;
-    ensurePlan(); plans[viewDate].tomorrow.push({ id: uid(), text: v, done: false });
-    $("#tomorrow-input").value = ""; savePlan(); renderPlan(); renderCalendar();
-  };
-  $("#tomorrow-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#tomorrow-add").click(); });
+  function bindAdd(inputId, btnId, addFn) {
+    const input = $("#" + inputId), btn = $("#" + btnId);
+    if (!input || !btn) { console.warn("bindAdd: 缺少元素", inputId, btnId); return; }
+    let composing = false;
+    input.addEventListener("compositionstart", () => { composing = true; });
+    input.addEventListener("compositionend", () => { composing = false; });
+    const doAdd = () => {
+      const v = input.value.trim();
+      if (!v) { showToast("请先输入内容"); return; }
+      addFn(v);
+      input.value = "";
+    };
+    btn.addEventListener("click", guardClick((e) => { e.preventDefault(); doAdd(); }, 500));
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !composing) { e.preventDefault(); doAdd(); } });
+  }
+  bindAdd("plan-input", "plan-add", (v) => {
+    ensurePlan(); plans[viewDate].today.push({ id: uid(), text: v, done: false, prio: "normal" }); savePlan(); renderPlan(); renderCalendar(); showToast("已添加到当日计划");
+  });
+  bindAdd("tomorrow-input", "tomorrow-add", (v) => {
+    ensurePlan(); plans[viewDate].tomorrow.push({ id: uid(), text: v, done: false, prio: "normal" }); savePlan(); renderPlan(); renderCalendar(); showToast("已添加到次日安排");
+  });
   $("#plan-clear").onclick = () => {
-    if (!plans[viewDate].today.length) return;
-    if (confirm("确定清空这一天的计划？")) { plans[viewDate].today = []; savePlan(); renderPlan(); renderCalendar(); }
+    ensurePlan(); if (!plans[viewDate].today.length) return;
+    wbConfirm("确定清空这一天的计划？此操作不可恢复。", () => { plans[viewDate].today = []; savePlan(); renderPlan(); renderCalendar(); });
   };
   $("#tomorrow-clear").onclick = () => {
-    if (!plans[viewDate].tomorrow.length) return;
-    if (confirm("确定清空这一天的明日安排？")) { plans[viewDate].tomorrow = []; savePlan(); renderPlan(); renderCalendar(); }
+    ensurePlan(); if (!plans[viewDate].tomorrow.length) return;
+    wbConfirm("确定清空这一天的明日安排？此操作不可恢复。", () => { plans[viewDate].tomorrow = []; savePlan(); renderPlan(); renderCalendar(); });
   };
+  /* 一键重置「当日计划」：清空所查看这一天的 当日+次日 全部计划（区别于各分区的「清空」按钮） */
+  $("#plan-reset").onclick = guardClick(() => {
+    ensurePlan();
+    const has = plans[viewDate].today.length || plans[viewDate].tomorrow.length;
+    if (!has) { showToast("「" + viewDate + "」当天还没有计划可重置"); return; }
+    wbConfirm("确定重置「" + viewDate + "」当天的全部计划（当日+次日）？此操作不可恢复。", () => {
+      plans[viewDate] = { today: [], tomorrow: [] };
+      savePlan(); renderPlan(); renderCalendar(); showToast("已重置当日计划");
+    });
+  }, 600);
 
   /* ---------- 日历 ---------- */
   let calY = new Date().getFullYear();
@@ -967,54 +1455,422 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     for (let i = 1; i <= trail; i++) {
       const c = document.createElement("div"); c.className = "cal-day muted"; c.textContent = i; grid.appendChild(c);
     }
+    /* 本月简易统计：总任务数量 + 完成率 */
+    let total = 0, done = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = `${calY}-${String(calM + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const rec = plans[ds];
+      if (rec) {
+        rec.today.forEach((t) => { total++; if (t.done) done++; });
+        rec.tomorrow.forEach((t) => { total++; if (t.done) done++; });
+      }
+    }
+    const rate = total ? Math.round((done / total) * 100) : 0;
+    const statsEl = $("#cal-stats");
+    if (statsEl) statsEl.innerHTML = `本月共 <b>${total}</b> 项任务 · 完成率 <b>${rate}%</b>`;
   }
-  $("#cal-prev").onclick = () => { calM--; if (calM < 0) { calM = 11; calY--; } renderCalendar(); };
-  $("#cal-next").onclick = () => { calM++; if (calM > 11) { calM = 0; calY++; } renderCalendar(); };
-  $("#plan-backtoday").onclick = () => {
+  $("#cal-prev").onclick = guardClick(() => { calM--; if (calM < 0) { calM = 11; calY--; } renderCalendar(); }, 400);
+  $("#cal-next").onclick = guardClick(() => { calM++; if (calM > 11) { calM = 0; calY++; } renderCalendar(); }, 400);
+  $("#plan-backtoday").onclick = guardClick(() => {
     viewDate = curDate; calY = new Date().getFullYear(); calM = new Date().getMonth();
     ensurePlan(); renderPlan(); renderCalendar();
-  };
+  }, 400);
 
   renderPlan();
   renderCalendar();
 
-  /* ---------- 待做事项 ---------- */
+  /* ---------- 待做事项（每日待办 / 长期常驻清单） ---------- */
   let todos = store.get("wb_todos", []);
+  if (!Array.isArray(todos)) todos = [];
+  /* 旧数据兼容：未带 type 的默认归入「每日待办」 */
+  let todoType = "daily";
+  let todoFilter = "all";
+  function migrateTodos() { todos.forEach((it) => { if (!it || !it.type) it.type = "daily"; }); }
   function renderTodos() {
+    migrateTodos();
     const list = $("#todo-list"); list.innerHTML = "";
-    if (!todos.length) { list.innerHTML = '<div class="empty">暂无待做事项</div>'; return; }
+    const items = todos.filter((it) => it.type === todoType);
+    if (!items.length) {
+      list.innerHTML = '<div class="empty">' + (todoType === "daily" ? "今日暂无待办，添加一条吧～" : "长期常驻清单还是空的，添加一条长期挂起的事。") + '</div>';
+      return;
+    }
     const today = todayStr();
-    [...todos].sort((a, b) => (a.deadline > b.deadline ? 1 : -1)).forEach((it) => {
-      const overdue = !it.done && it.deadline && it.deadline < today;
+    const filtered = items.filter((it) => {
+      if (todoFilter === "done") return it.done;
+      if (todoFilter === "undone") return !it.done;
+      return true;
+    });
+    if (!filtered.length) { list.innerHTML = '<div class="empty">没有符合筛选条件的条目</div>'; return; }
+    const sorted = todoType === "daily"
+      ? [...filtered].sort((a, b) => (String(a.deadline || "") > String(b.deadline || "") ? 1 : -1))
+      : filtered;
+    sorted.forEach((it) => {
+      const overdue = todoType === "daily" && !it.done && it.deadline && it.deadline < today;
       const row = document.createElement("div");
       row.className = "todo-row" + (it.done ? " done" : "") + (overdue ? " overdue" : "");
-      const s = document.createElement("div"); s.className = "date-pill"; s.textContent = it.start || "—";
-      const d = document.createElement("div"); d.className = "date-pill"; d.textContent = it.deadline || "—";
-      const t = document.createElement("div"); t.className = "todo-text"; t.textContent = it.text;
-      const badge = document.createElement("div");
-      badge.className = "badge " + (it.done ? "ok" : overdue ? "late" : "prog");
-      badge.textContent = it.done ? "已完成" : overdue ? "已逾期" : "进行中";
-      badge.style.cursor = "pointer";
-      badge.onclick = () => { it.done = !it.done; store.set("wb_todos", todos); renderTodos(); };
-      const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
-      del.onclick = () => { todos = todos.filter((x) => x.id !== it.id); store.set("wb_todos", todos); renderTodos(); };
-      row.append(s, d, t, badge, del); list.appendChild(row);
+      if (todoType === "daily") {
+        const s = document.createElement("div"); s.className = "date-pill"; s.textContent = it.start || "—";
+        const d = document.createElement("div"); d.className = "date-pill"; d.textContent = it.deadline || "—";
+        const t = document.createElement("div"); t.className = "todo-text"; t.textContent = it.text;
+        const badge = document.createElement("div");
+        badge.className = "badge " + (it.done ? "ok" : overdue ? "late" : "prog");
+        badge.textContent = it.done ? "已完成" : overdue ? "已逾期" : "进行中";
+        badge.style.cursor = "pointer";
+        badge.onclick = () => { it.done = !it.done; store.set("wb_todos", todos); renderTodos(); };
+        const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+        del.onclick = () => { todos = todos.filter((x) => x.id !== it.id); store.set("wb_todos", todos); renderTodos(); };
+        row.append(s, d, t, badge, del);
+      } else {
+        const t = document.createElement("div"); t.className = "todo-text"; t.textContent = it.text;
+        const badge = document.createElement("div"); badge.className = "badge ok"; badge.textContent = "长期"; badge.style.cursor = "pointer";
+        badge.onclick = () => { it.done = !it.done; store.set("wb_todos", todos); renderTodos(); };
+        const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
+        del.onclick = () => { todos = todos.filter((x) => x.id !== it.id); store.set("wb_todos", todos); renderTodos(); };
+        row.append(t, badge, del);
+      }
+      list.appendChild(row);
     });
   }
-  $("#todo-add").onclick = () => {
-    const text = $("#todo-text").value.trim();
-    if (!text) return;
-    todos.push({ id: uid(), start: $("#todo-start").value, deadline: $("#todo-deadline").value, text, done: false });
-    $("#todo-text").value = ""; store.set("wb_todos", todos); renderTodos();
-  };
-  $("#todo-text").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#todo-add").click(); });
-  $("#todo-clear").onclick = () => {
-    if (!todos.length) return;
-    if (confirm("确定清空全部待做事项？")) { todos = []; store.set("wb_todos", todos); renderTodos(); }
-  };
+  function setTodoType(type) {
+    todoType = type;
+    $("#todo-tab-daily").classList.toggle("active", type === "daily");
+    $("#todo-tab-resident").classList.toggle("active", type === "resident");
+    $("#todo-add-daily").classList.toggle("todo-hide", type !== "daily");
+    $("#todo-add-resident").classList.toggle("todo-hide", type !== "resident");
+    renderTodos();
+  }
+  function setTodoFilter(f) {
+    todoFilter = f;
+    ["all", "done", "undone"].forEach((x) => $("#todo-filter-" + x).classList.toggle("active", x === f));
+    renderTodos();
+  }
+  $("#todo-tab-daily").onclick = () => setTodoType("daily");
+  $("#todo-tab-resident").onclick = () => setTodoType("resident");
+  $("#todo-filter-all").onclick = () => setTodoFilter("all");
+  $("#todo-filter-done").onclick = () => setTodoFilter("done");
+  $("#todo-filter-undone").onclick = () => setTodoFilter("undone");
+  bindAdd("todo-text", "todo-add", (text) => {
+    todos.push({ id: uid(), type: "daily", start: $("#todo-start").value, deadline: $("#todo-deadline").value, text, done: false });
+    store.set("wb_todos", todos); renderTodos(); showToast("已添加到每日待办");
+  });
+  bindAdd("todo-resident-text", "todo-resident-add", (text) => {
+    todos.push({ id: uid(), type: "resident", text, done: false });
+    store.set("wb_todos", todos); renderTodos(); showToast("已加入长期常驻清单");
+  });
+  $("#todo-clear").onclick = guardClick(() => {
+    const list = todos.filter((it) => it.type === todoType);
+    if (!list.length) { showToast("当前清单已是空的"); return; }
+    wbConfirm("确定清空当前「" + (todoType === "daily" ? "每日待办" : "长期常驻清单") + "」的所有条目？", () => {
+      todos = todos.filter((it) => it.type !== todoType); store.set("wb_todos", todos); renderTodos();
+    });
+  }, 600);
+  try { $("#todo-start").value = curDate; } catch (e) {}
+  setTodoType("daily");
   renderTodos();
 
   /* ---------- 灵感 ---------- */
+  /* ---------- 外观设置：自定义名称 / 浅色主题 ---------- */
+  function applyTheme() {
+    const color = localStorage.getItem("wb_theme_color") || "mint";
+    const root = document.documentElement;
+    root.setAttribute("data-color", color);
+    document.querySelectorAll("#theme-colors .theme-dot").forEach(function (d) {
+      d.classList.toggle("active", d.getAttribute("data-color") === color);
+    });
+  }
+  function applyName() {
+    const raw = localStorage.getItem("wb_ws_name") || "";
+    const name = raw || "清新工作台";
+    const disp = $("#ws-name-display"); if (disp) disp.textContent = name;
+    const inp = $("#ws-name"); if (inp && !inp.value) inp.value = raw;
+    document.title = name;
+  }
+  function bindSettings() {
+    const tog = $("#settings-toggle");
+    if (tog) tog.addEventListener("click", guardClick(function () {
+      const p = $("#settings-panel");
+      if (p) { p.hidden = !p.hidden; applyName(); }
+    }, 300));
+    const nameInp = $("#ws-name");
+    if (nameInp) nameInp.addEventListener("input", function () {
+      const v = nameInp.value.trim();
+      localStorage.setItem("wb_ws_name", v);
+      const disp = $("#ws-name-display"); if (disp) disp.textContent = v || "清新工作台";
+      document.title = v || "清新工作台";
+    });
+    document.querySelectorAll("#theme-colors .theme-dot").forEach(function (d) {
+      d.addEventListener("click", guardClick(function () {
+        localStorage.setItem("wb_theme_color", d.getAttribute("data-color"));
+        applyTheme();
+      }, 300));
+    });
+  }
+
+  /* ---------- 番茄专注计时（时间戳驱动，后台保活） ---------- */
+  const pomo = { work: 25, break: 5, unit: "min", mode: "work", remain: 25 * 60, running: false, cycle: false, timer: null, startTs: 0, remain0: 25 * 60, wakeLock: null };
+  let pomoCount = 0;
+  try {
+    const pd = JSON.parse(localStorage.getItem("wb_pomo") || "{}");
+    if (pd && pd.date === todayStr()) pomoCount = pd.count || 0;
+  } catch (e) {}
+  try { const cy = localStorage.getItem("wb_pomo_cycle"); if (cy !== null) pomo.cycle = cy === "1"; } catch (e) {}
+  /* 基于真实时间戳计算当前剩余秒数（后台被节流也能保持准确） */
+  function pomoRemainNow() {
+    if (!pomo.running || !pomo.startTs) return Math.max(0, pomo.remain0);
+    const sec = pomo.remain0 - Math.floor((Date.now() - pomo.startTs) / 1000);
+    return Math.max(0, sec);
+  }
+  /* 按当前单位（分钟/秒）把输入值换算成真实秒数 */
+  function pomoWorkSec() { return pomo.unit === "sec" ? pomo.work : pomo.work * 60; }
+  function pomoBreakSec() { return pomo.unit === "sec" ? pomo.break : pomo.break * 60; }
+  function pomoRender() {
+    const remain = pomoRemainNow();
+    pomo.remain = remain;
+    const m = Math.floor(remain / 60), s = remain % 60;
+    const t = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    const el = $("#pomo-time"); if (el) el.textContent = t;
+    const modeEl = $("#pomo-mode"); if (modeEl) modeEl.textContent = pomo.mode === "work" ? "专注" : "休息";
+    const cnt = $("#pomo-count"); if (cnt) cnt.textContent = "今日已完成 " + pomoCount + " 个番茄";
+    const st = $("#pomo-start"); if (st) st.textContent = pomo.running ? "⏸ 暂停" : "▶ 开始";
+    const w = $("#pomo-work"), b = $("#pomo-break"), cy = $("#pomo-cycle");
+    if (w) w.disabled = pomo.running;
+    if (b) b.disabled = pomo.running;
+    if (cy) cy.checked = pomo.cycle;
+    if (typeof pomoCycleStyle === "function") pomoCycleStyle();
+  }
+  /* 阶段结束统一处理：提醒 + 切换阶段 + 自动循环/停止 */
+  function pomoOnPhaseEnd() {
+    const finished = pomo.mode;
+    pomoRing(finished);   // 阶段结束提醒：提示音 + 页面/系统通知（无论是否自动循环都触发）
+    if (finished === "work") {
+      pomoCount++;
+      try { localStorage.setItem("wb_pomo", JSON.stringify({ date: todayStr(), count: pomoCount })); } catch (e) {}
+      pomo.mode = "break"; pomo.remain0 = pomoBreakSec();
+    } else {
+      pomo.mode = "work"; pomo.remain0 = pomoWorkSec();
+    }
+    if (pomo.cycle) { pomo.startTs = Date.now(); pomoRender(); return; }   // 自动循环：持续运行，进入下一阶段
+    clearInterval(pomo.timer); pomo.running = false; pomo.startTs = 0;  // 关闭自动循环：计时结束即停止
+    pomoRender();
+  }
+  function pomoTick() {
+    const remain = pomoRemainNow();
+    pomo.remain = remain;
+    pomoRender();
+    if (remain > 0) return;
+    pomoOnPhaseEnd();
+  }
+  /* 番茄阶段结束提醒：提示音（Web Audio 三连音合成）+ 页面/系统通知 */
+  let pomoAudioCtx = null;
+  let pomoToastDur = 7000; // 默认 7 秒
+  try { pomoToastDur = parseInt(localStorage.getItem("wb_pomo_toast"), 10) || 7000; } catch (e) {}
+  function pomoGetToastDur() {
+    var sel = document.getElementById("pomo-toast-dur");
+    if (!sel) return pomoToastDur;
+    var v = parseInt(sel.value, 10);
+    return v === 0 ? 60000 : (v * 1000); // 0 → 常驻 60 秒（实际由用户手动关闭）
+  }
+  function pomoInitAudio() {
+    try {
+      if (!pomoAudioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) pomoAudioCtx = new AC();
+      }
+      if (pomoAudioCtx && pomoAudioCtx.state === "suspended") pomoAudioCtx.resume();
+    } catch (e) {}
+  }
+  function pomoBeep(kind) {
+    // 响亮、悠长的三连提示音：主音(三角波饱满) + 八度泛音(正弦增亮) + 低八度基音(更厚实)，整体更响更长
+    try {
+      if (!pomoAudioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        pomoAudioCtx = new AC();
+      }
+      if (pomoAudioCtx.state === "suspended") pomoAudioCtx.resume();
+      var ctx = pomoAudioCtx, now = ctx.currentTime;
+      // 专注结束：明亮上行 B5→E6→G6（"完成啦"的明亮感）；休息结束：温和 G4→B4→D5（"开工"的提示感）
+      var notes = kind === "work" ? [988, 1319, 1568] : [392, 494, 587];
+      var step = 0.60;   // 每个音符间隔 0.6s
+      var dur = 1.30;    // 每个音符持续（含长淡出），总时长约 3.0s
+      notes.forEach(function (f, i) {
+        var t0 = now + i * step;
+        // 三层叠加：低八度基音(厚实) + 主音(饱满) + 八度泛音(增亮)，整体峰值约 0.92，听感更响更扎实
+        [ [f / 2, "sine", 0.32], [f, "triangle", 0.85], [f * 2, "sine", 0.30] ].forEach(function (spec) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.type = spec[1]; o.frequency.value = spec[0];
+          var peak = spec[2];
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(peak, t0 + 0.05);        // 较快起音
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);       // 长淡出，不短促
+          o.connect(g); g.connect(ctx.destination);
+          o.start(t0); o.stop(t0 + dur + 0.05);
+        });
+      });
+    } catch (e) {}
+  }
+  function pomoRing(kind) {
+    pomoBeep(kind);
+    var msg = kind === "work"
+      ? "🍅 完成一个番茄！休息一下~"
+      : "☕ 休息结束，继续专注 💪";
+    var dur = pomoGetToastDur();   // 根据【提醒弹窗时长】控件控制弹窗自动消失秒数
+    showToast(msg, dur);
+
+    if ("Notification" in window && Notification.permission === "granted") {
+      try {
+        new Notification(
+          kind === "work" ? "🍅 专注完成" : "☕ 休息结束",
+          { body: kind === "work" ? "一个番茄已完成，去休息一下吧~" : "休息结束，继续专注加油 💪", silent: true }
+        );
+      } catch (e) {}
+    }
+  }
+  /* 申请屏幕唤醒锁（安卓 Chrome 支持，iOS Safari / 微信不支持则静默失败） */
+  function pomoRequestWakeLock() {
+    try {
+      if ("wakeLock" in navigator && navigator.wakeLock && navigator.wakeLock.request) {
+        navigator.wakeLock.request("screen").then(function (lock) {
+          pomo.wakeLock = lock;
+          lock.addEventListener && lock.addEventListener("release", function () { pomo.wakeLock = null; });
+        }).catch(function () {});
+      }
+    } catch (e) {}
+  }
+  /* 页面回前台：恢复音频 + 后台期间到点则立即补播铃声与弹窗 */
+  function pomoVisibilityCheck() {
+    if (document.visibilityState !== "visible") return;
+    pomoInitAudio();   // 回到前台先解锁音频上下文
+    if (pomo.running) {
+      const remain = pomoRemainNow();
+      pomo.remain = remain; pomoRender();
+      if (remain <= 0) pomoOnPhaseEnd();   // 后台期间已到点 → 立即补播提醒
+    }
+    if (pomo.wakeLock === null) pomoRequestWakeLock();   // 唤醒锁被释放则重新申请
+  }
+  function pomoStart() {
+    if (pomo.running) {
+      // 暂停：冻结当前剩余秒数，停止计时
+      pomo.remain0 = pomoRemainNow();
+      clearInterval(pomo.timer); pomo.running = false; pomo.startTs = 0;
+      if (pomo.wakeLock) { try { pomo.wakeLock.release(); } catch (e) {} pomo.wakeLock = null; }
+      pomoRender(); return;
+    }
+    pomoInitAudio();  // 用户手势内解锁音频（浏览器自动播放策略要求）
+    if ("Notification" in window && Notification.permission === "default") {
+      try { Notification.requestPermission().catch(function () {}); } catch (e) {}
+    }
+    pomo.running = true;
+    pomo.startTs = Date.now();   // 从当前剩余秒数开始，基于真实时间倒计时
+    pomo.timer = setInterval(pomoTick, 250);   // 高频刷新（后台被节流但计算仍准）
+    pomoRender();
+    pomoRequestWakeLock();
+  }
+  function pomoReset() {
+    clearInterval(pomo.timer); pomo.running = false; pomo.startTs = 0;
+    pomo.mode = "work"; pomo.remain0 = pomoWorkSec(); pomo.remain = pomo.remain0;
+    pomoRender();
+  }
+  function bindPomo() {
+    const st = $("#pomo-start"), rs = $("#pomo-reset");
+    if (st) st.addEventListener("click", guardClick(function () { pomoStart(); }, 300));
+    if (rs) rs.addEventListener("click", guardClick(function () { pomoReset(); }, 300));
+    const w = $("#pomo-work"), b = $("#pomo-break");
+    /* 根据单位设置输入框取值范围，并更新"分/秒"标签文字 */
+    function pomoSetRange() {
+      if (!w || !b) return;
+      if (pomo.unit === "min") { w.min = 1; w.max = 90; b.min = 1; b.max = 30; }
+      else { w.min = 1; w.max = 5400; b.min = 1; b.max = 1800; }
+    }
+    function pomoApplyUnitLabels() {
+      document.querySelectorAll(".pomo-ul").forEach(function (el) { el.textContent = pomo.unit === "sec" ? "秒" : "分"; });
+    }
+    /* 切换单位时自动换算当前数值（分钟↔秒），保证时长不变 */
+    function pomoSwitchUnit(u) {
+      if (u === pomo.unit) return;
+      if (pomo.unit === "min" && u === "sec") { pomo.work *= 60; pomo.break *= 60; }
+      else if (pomo.unit === "sec" && u === "min") { pomo.work = Math.max(1, Math.round(pomo.work / 60)); pomo.break = Math.max(1, Math.round(pomo.break / 60)); }
+      pomo.unit = u;
+      pomoSetRange(); pomoApplyUnitLabels();
+      if (w) w.value = pomo.work;
+      if (b) b.value = pomo.break;
+      try { localStorage.setItem("wb_pomo_cfg", JSON.stringify({ work: pomo.work, break: pomo.break, unit: pomo.unit })); } catch (e) {}
+      if (!pomo.running) { pomo.remain0 = pomo.mode === "work" ? pomoWorkSec() : pomoBreakSec(); pomo.remain = pomo.remain0; }
+      pomoRender();
+    }
+    if (w) w.addEventListener("change", function () {
+      var mx = pomo.unit === "min" ? 90 : 5400;
+      pomo.work = Math.max(1, Math.min(mx, parseInt(w.value, 10) || (pomo.unit === "min" ? 25 : 1500)));
+      w.value = pomo.work;
+      try { localStorage.setItem("wb_pomo_cfg", JSON.stringify({ work: pomo.work, break: pomo.break, unit: pomo.unit })); } catch (e) {}
+      if (!pomo.running && pomo.mode === "work") { pomo.remain0 = pomoWorkSec(); pomo.remain = pomo.remain0; pomoRender(); }
+    });
+    if (b) b.addEventListener("change", function () {
+      var mx = pomo.unit === "min" ? 30 : 1800;
+      pomo.break = Math.max(1, Math.min(mx, parseInt(b.value, 10) || (pomo.unit === "min" ? 5 : 300)));
+      b.value = pomo.break;
+      try { localStorage.setItem("wb_pomo_cfg", JSON.stringify({ work: pomo.work, break: pomo.break, unit: pomo.unit })); } catch (e) {}
+      if (!pomo.running && pomo.mode === "break") { pomo.remain0 = pomoBreakSec(); pomo.remain = pomo.remain0; pomoRender(); }
+    });
+    const unitSel = $("#pomo-unit");
+    if (unitSel) {
+      unitSel.value = pomo.unit;
+      unitSel.addEventListener("change", function () { pomoSwitchUnit(unitSel.value); });
+    }
+    const cy = $("#pomo-cycle");
+    /* 切换开关视觉状态（inline style 方式，不依赖 CSS :checked） */
+    function pomoCycleStyle() {
+      var t = $("#pomo-track"), k = $("#pomo-knob"), c = $("#pomo-cycle");
+      if (!t || !k || !c) return;
+      if (c.checked) {
+        t.style.background = "#5ecfa8"; t.style.borderColor = "#3dbd89"; t.style.boxShadow = "none";
+        k.style.transform = "translateX(22px)";
+      } else {
+        t.style.background = "#e8ecec"; t.style.borderColor = "#bfc8c4";
+        t.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,.12)";
+        k.style.transform = "translateX(0)";
+      }
+    }
+    if (cy) cy.addEventListener("change", function () {
+      pomo.cycle = cy.checked;
+      try { localStorage.setItem("wb_pomo_cycle", pomo.cycle ? "1" : "0"); } catch (e) {}
+      pomoCycleStyle();
+      pomoRender();
+    });
+    // 提醒弹窗时长选择
+    const tdSel = $("#pomo-toast-dur");
+    if (tdSel) {
+      try {
+        var savedDur = localStorage.getItem("wb_pomo_toast");
+        if (savedDur !== null && savedDur !== "") {
+          var sv = parseInt(savedDur, 10);
+          // 匹配选项：5/7/10/15/0
+          if ([5, 7, 10, 15, 0].indexOf(sv) > -1) tdSel.value = String(sv);
+        }
+      } catch (e) {}
+      tdSel.addEventListener("change", function () {
+        try { localStorage.setItem("wb_pomo_toast", tdSel.value); } catch (e) {}
+        pomoToastDur = parseInt(tdSel.value, 10) * 1000 || 7000;
+      });
+    }
+    try {
+      const cfg = JSON.parse(localStorage.getItem("wb_pomo_cfg") || "{}");
+      if (cfg.unit) pomo.unit = cfg.unit;
+      if (cfg.work) pomo.work = cfg.work;
+      if (cfg.break) pomo.break = cfg.break;
+    } catch (e) {}
+    pomoSetRange();
+    pomoApplyUnitLabels();
+    if (w) w.value = pomo.work;
+    if (b) b.value = pomo.break;
+    pomo.remain0 = pomo.mode === "work" ? pomoWorkSec() : pomoBreakSec();
+    pomo.remain = pomo.remain0;
+    pomoRender();
+    // 后台保活：监听页面可见性变化，回到前台立即补播后台期间错过的提醒
+    document.removeEventListener("visibilitychange", pomoVisibilityCheck);
+    document.addEventListener("visibilitychange", pomoVisibilityCheck);
+  }
+
   /* 通用确认弹窗：避免沙箱/iframe 拦截原生 confirm */
   function wbConfirm(msg, onYes) {
     let mask = document.getElementById("wb-confirm-mask");
@@ -1022,7 +1878,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       mask = document.createElement("div");
       mask.id = "wb-confirm-mask";
       mask.className = "wb-confirm-mask";
-      mask.innerHTML = '<div class="wb-confirm-box"><div class="wb-confirm-msg"></div><div class="wb-confirm-btns"><button class="btn ghost" data-no>取消</button><button class="btn" data-yes>确定</button></div></div>';
+      mask.innerHTML = '<div class="wb-confirm-box"><div class="wb-confirm-msg"></div><div class="wb-confirm-btns"><button class="btn ghost" data-no>取消</button><button type="button" class="btn" data-yes>确定</button></div></div>';
       document.body.appendChild(mask);
     }
     mask.querySelector(".wb-confirm-msg").textContent = msg;
@@ -1045,19 +1901,29 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   const ideaMultiBtn = $("#idea-multi");
   const ideaSelAllBtn = $("#idea-selall");
 
+  let ideaSearch = "";
+  let ideaFilter = "all"; // all | star | top
   function renderIdeas() {
     if (!Array.isArray(ideas)) ideas = [];
     ideaListEl.innerHTML = "";
-    ideas.forEach(function (it) { it.key = !!it.key; });
-    const dates = {};
-    let keyCount = 0;
-    ideas.forEach(function (it) { dates[it.date] = (dates[it.date] || 0) + 1; if (it.key) keyCount++; });
-    if (ideaSummaryEl) ideaSummaryEl.textContent = "共 " + ideas.length + " 条 · 覆盖 " + Object.keys(dates).length + " 个日期 · 重点 " + keyCount + " 条";
+    ideas.forEach(function (it) { it.key = !!it.key; it.top = !!it.top; });
+    let view = ideas;
+    if (ideaSearch) {
+      const q = ideaSearch.toLowerCase();
+      view = view.filter(function (it) { return (it.text || "").toLowerCase().indexOf(q) >= 0 || (it.date || "").indexOf(q) >= 0; });
+    }
+    if (ideaFilter === "star") view = view.filter(function (it) { return it.key; });
+    else if (ideaFilter === "top") view = view.filter(function (it) { return it.top; });
+    const keyCount = ideas.filter(function (it) { return it.key; }).length;
+    const topCount = ideas.filter(function (it) { return it.top; }).length;
+    if (ideaSummaryEl) ideaSummaryEl.textContent = "共 " + ideas.length + " 条 · ★收藏 " + keyCount + " · 📌置顶 " + topCount + (ideaSearch || ideaFilter !== "all" ? " · 筛选 " + view.length + " 条" : "");
     if (ideaSelCountEl) ideaSelCountEl.textContent = ideaMulti ? ("已选 " + ideaSel.size + " 项") : "";
 
     if (!ideas.length) { ideaListEl.innerHTML = '<div class="empty">灵感还在路上，记录第一条吧</div>'; return; }
+    if (!view.length) { ideaListEl.innerHTML = '<div class="empty">没有匹配的灵感，换个关键词或筛选试试</div>'; return; }
 
-    // 按日期分组汇总（满足「汇总全部日期下的内容」）
+    const dates = {};
+    view.forEach(function (it) { dates[it.date] = (dates[it.date] || 0) + 1; });
     const sortedDates = Object.keys(dates).sort(function (a, b) { return a < b ? 1 : -1; });
     sortedDates.forEach(function (d) {
       const group = document.createElement("div");
@@ -1067,24 +1933,30 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       head.innerHTML = '<span class="idea-group-date">📅 ' + esc(d) + '</span><span class="idea-group-count">' + dates[d] + ' 条</span>';
       group.appendChild(head);
 
-      ideas.filter(function (it) { return it.date === d; }).sort(function (a, b) { return (a.id < b.id ? 1 : -1); }).forEach(function (it) {
+      view.filter(function (it) { return it.date === d; }).sort(function (a, b) {
+        if (a.top !== b.top) return a.top ? -1 : 1;
+        return (a.id < b.id ? 1 : -1);
+      }).forEach(function (it) {
         const row = document.createElement("div");
-        row.className = "idea-row" + (it.key ? " idea-key" : "") + (ideaSel.has(it.id) ? " idea-sel" : "");
+        row.className = "idea-row" + (it.key ? " idea-key" : "") + (it.top ? " idea-pin" : "") + (ideaSel.has(it.id) ? " idea-sel" : "");
         if (ideaMulti) {
           const chk = document.createElement("input");
           chk.type = "checkbox"; chk.className = "idea-check"; chk.checked = ideaSel.has(it.id);
           chk.onclick = function (e) { e.stopPropagation(); toggleIdeaSel(it.id); };
           row.appendChild(chk);
         }
-        if (it.key) {
-          const badge = document.createElement("span");
-          badge.className = "idea-key-badge"; badge.textContent = "★ 重点";
-          row.appendChild(badge);
-        }
+        if (it.top) { const tg = document.createElement("span"); tg.className = "tag-top"; tg.textContent = "📌 置顶"; row.appendChild(tg); }
+        if (it.key) { const badge = document.createElement("span"); badge.className = "idea-key-badge"; badge.textContent = "★ 收藏"; row.appendChild(badge); }
         const tx = document.createElement("div"); tx.className = "idea-text"; tx.textContent = it.text;
+        row.appendChild(tx);
+        const acts = document.createElement("div"); acts.className = "item-row-acts";
+        const starBtn = document.createElement("button"); starBtn.type = "button"; starBtn.className = "star-btn" + (it.key ? " on" : ""); starBtn.textContent = "★"; starBtn.title = it.key ? "取消收藏" : "收藏";
+        starBtn.onclick = function (e) { e.stopPropagation(); it.key = !it.key; store.set("wb_ideas", ideas); renderIdeas(); };
+        const pinBtn = document.createElement("button"); pinBtn.type = "button"; pinBtn.className = "pin-btn" + (it.top ? " on" : ""); pinBtn.textContent = "📌"; pinBtn.title = it.top ? "取消置顶" : "置顶";
+        pinBtn.onclick = function (e) { e.stopPropagation(); it.top = !it.top; store.set("wb_ideas", ideas); renderIdeas(); };
         const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
         del.onclick = function (e) { e.stopPropagation(); ideas = ideas.filter(function (x) { return x.id !== it.id; }); ideaSel.delete(it.id); store.set("wb_ideas", ideas); renderIdeas(); };
-        row.appendChild(tx); row.appendChild(del);
+        acts.append(starBtn, pinBtn, del); row.appendChild(acts);
         if (ideaMulti) row.onclick = function () { toggleIdeaSel(it.id); };
         group.appendChild(row);
       });
@@ -1116,12 +1988,10 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     renderIdeas();
   }
 
-  $("#idea-add").onclick = function () {
-    const text = $("#idea-text").value.trim(); if (!text) return;
+  bindAdd("idea-text", "idea-add", (text) => {
     ideas.push({ id: uid(), date: $("#idea-date").value || curDate, text: text, key: false });
-    $("#idea-text").value = ""; store.set("wb_ideas", ideas); renderIdeas();
-  };
-  $("#idea-text").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#idea-add").click(); });
+    store.set("wb_ideas", ideas); renderIdeas(); showToast("灵感已收集");
+  });
   $("#idea-clear").onclick = function () {
     if (!ideas.length) return;
     wbConfirm("确定清空全部灵感？此操作不可恢复。", function () { ideas = []; ideaSel.clear(); store.set("wb_ideas", ideas); renderIdeas(); });
@@ -1131,16 +2001,32 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   $("#idea-mark-key").onclick = function () { setIdeaKey(true); };
   $("#idea-unmark-key").onclick = function () { setIdeaKey(false); };
 
+  /* 灵感：搜索 + 筛选（★收藏 / 📌置顶） */
+  const ideaSearchEl = $("#idea-search");
+  if (ideaSearchEl) ideaSearchEl.addEventListener("input", function () { ideaSearch = ideaSearchEl.value.trim(); renderIdeas(); });
+  function setIdeaFilter(f) {
+    ideaFilter = f;
+    ["all", "star", "top"].forEach(function (x) { const b = $("#idea-filter-" + x); if (b) b.classList.toggle("active", x === f); });
+    renderIdeas();
+  }
+  $("#idea-filter-all").onclick = function () { setIdeaFilter("all"); };
+  $("#idea-filter-star").onclick = function () { setIdeaFilter("star"); };
+  $("#idea-filter-top").onclick = function () { setIdeaFilter("top"); };
+
   renderIdeas();
 
   function applyRemote(payload) {
     Object.keys(payload).forEach((k) => {
       if (k === "wb_board") return;
-      if (k === "wb_plans") plans = payload.plans;
-      else if (k === "wb_todos") todos = payload.todos;
-      else if (k === "wb_ideas") { if (payload.ideas != null && Array.isArray(payload.ideas)) ideas = payload.ideas; }
+      if (k === "wb_plans") { if (payload.wb_plans != null && typeof payload.wb_plans === "object") plans = payload.wb_plans; }
+      else if (k === "wb_todos") { if (Array.isArray(payload.wb_todos)) todos = payload.wb_todos; }
+      else if (k === "wb_ideas") { if (Array.isArray(payload.wb_ideas)) ideas = payload.wb_ideas; }
       store.set(k, payload[k], true);
     });
+    /* 防御：云端数据异常时重置为安全默认值 */
+    if (!plans || typeof plans !== "object") plans = {};
+    if (!Array.isArray(todos)) todos = [];
+    if (!Array.isArray(ideas)) ideas = [];
     if (typeof renderPlan === "function") renderPlan();
     if (typeof renderCalendar === "function") renderCalendar();
     if (typeof renderTodos === "function") renderTodos();
@@ -1148,17 +2034,20 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     if (typeof renderHabits === "function") renderHabits();
   }
   showBoard();
-  $("#sync-copy").onclick = function () {
+  $("#sync-copy").onclick = guardClick(function () {
+    var done = function () { if (typeof showToast === "function") showToast("复制完毕"); else setStatus("复制完毕"); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(Sync.boardId).then(function(){ setStatus("已复制同步码"); })
-        .catch(function(){ prompt("复制此同步码到其它设备：", Sync.boardId); });
-    } else { prompt("复制此同步码到其它设备：", Sync.boardId); }
-  };
-  $("#sync-join").onclick = function () {
+      navigator.clipboard.writeText(Sync.boardId).then(done)
+        .catch(function(){ try { window.clipboardData.setData("Text", Sync.boardId); done(); } catch (e) { prompt("复制此同步码到其它设备：", Sync.boardId); } });
+    } else {
+      try { window.clipboardData.setData("Text", Sync.boardId); done(); } catch (e) { prompt("复制此同步码到其它设备：", Sync.boardId); }
+    }
+  }, 800);
+  $("#sync-join").onclick = guardClick(function () {
     const code = prompt("粘贴其它设备的同步码，加入同一份数据：");
     if (code && code.trim()) { localStorage.setItem("wb_board", code.trim()); location.reload(); }
-  };
-  $("#sync-now").onclick = function () { Sync.push().then(function(){ return Sync.pull(); }); };
+  }, 800);
+  $("#sync-now").onclick = guardClick(function () { Sync.push().then(function(){ return Sync.pull(); }); }, 1000);
 
   /* 导出 / 导入备份 */
   function exportData() {
@@ -1180,27 +2069,52 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   function importData(file) {
     const reader = new FileReader();
     reader.onload = function () {
-      try {
-        const data = JSON.parse(reader.result);
-        if (!confirm("导入会用备份覆盖当前数据并同步到云端，确定继续？")) return;
+      let data;
+      try { data = JSON.parse(reader.result); }
+      catch (e) { showToast("导入失败：文件不是有效的 JSON 备份"); return; }
+      if (!data || typeof data !== "object") { showToast("导入失败：文件内容无效"); return; }
+      wbConfirm("导入会用备份覆盖当前数据并同步到云端，确定继续？", function () {
         Object.keys(data).forEach((k) => {
           if (k.indexOf("wb_") === 0 && k !== "wb_board") store.set(k, data[k], true);
         });
-        plans = store.get("wb_plans", {});
-        todos = store.get("wb_todos", []);
-        ideas = store.get("wb_ideas", []);
-        renderPlan(); renderCalendar(); renderTodos(); renderIdeas();
+        plans = store.get("wb_plans", {}); if (!plans || typeof plans !== "object") plans = {};
+        todos = store.get("wb_todos", []); if (!Array.isArray(todos)) todos = [];
+        ideas = store.get("wb_ideas", []); if (!Array.isArray(ideas)) ideas = [];
+        habits = store.get("wb_habits", []); if (!Array.isArray(habits)) habits = [];
+        renderPlan(); renderCalendar(); renderTodos(); renderIdeas(); renderHabits();
         Sync.push();
         setStatus("已导入并同步");
-      } catch (e) { alert("文件格式有误，导入失败"); }
+      });
     };
     reader.readAsText(file);
   }
-  $("#sync-export").onclick = exportData;
-  $("#sync-import").onclick = function () { $("#sync-file").click(); };
+  /* 每天首次打开自动本地备份（写入 wb_backup_YYYY-MM-DD，仅本地，不影响云端） */
+  function setAutobk(day, ok) {
+    const el = document.getElementById("autobk");
+    if (el) el.innerHTML = ok ? ("今日已自动备份 ✅ <b>" + day + "</b>") : "自动备份失败";
+  }
+  function autoBackup() {
+    const day = todayStr();
+    const key = "wb_backup_" + day;
+    if (localStorage.getItem(key)) { setAutobk(day, true); return; }
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf("wb_") === 0 && k !== "wb_board") {
+        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch (e) { data[k] = localStorage.getItem(k); }
+      }
+    }
+    try { localStorage.setItem(key, JSON.stringify(data)); setAutobk(day, true); } catch (e) { setAutobk(day, false); }
+  }
+  $("#sync-export").onclick = guardClick(exportData, 800);
+  $("#sync-import").onclick = guardClick(function () { $("#sync-file").click(); }, 800);
   $("#sync-file").addEventListener("change", function (e) {
     const f = e.target.files && e.target.files[0];
-    if (f) importData(f);
+    if (f) {
+      const okType = (f.type && f.type.indexOf("json") >= 0) || /\.json$/i.test(f.name || "");
+      if (!okType) { showToast("仅支持 JSON 格式的备份文件"); e.target.value = ""; return; }
+      importData(f);
+    }
     e.target.value = "";
   });
 
@@ -1233,28 +2147,58 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       if (!left) window.location.href = app.web;
     }, 1500);
   }
-  (function renderApps() {
+  /* APP分享：分类展示 + 搜索 + ★收藏 / 📌置顶 */
+  let appState = {};
+  try { appState = JSON.parse(localStorage.getItem("wb_app_state") || "{}"); } catch (e) { appState = {}; }
+  function saveAppState() { try { localStorage.setItem("wb_app_state", JSON.stringify(appState)); } catch (e) {} }
+  let appSearch = "";
+  function makeAppCat(cat, items) {
+    const wrap = document.createElement("div");
+    const label = document.createElement("div"); label.className = "app-cat-label"; label.textContent = cat;
+    wrap.appendChild(label);
+    const grid = document.createElement("div"); grid.className = "app-grid";
+    items.forEach((a) => {
+      const st = appState[a.name] || {};
+      const card = document.createElement("div"); card.className = "app-card";
+      const ic = document.createElement("div"); ic.className = "app-ic"; ic.textContent = a.ic;
+      const name = document.createElement("div"); name.className = "app-name"; name.textContent = (st.top ? "📌 " : "") + a.name;
+      const acts = document.createElement("div"); acts.className = "item-row-acts"; acts.style.marginTop = "8px";
+      const starBtn = document.createElement("button"); starBtn.type = "button"; starBtn.className = "star-btn" + (st.star ? " on" : ""); starBtn.textContent = "★"; starBtn.title = st.star ? "取消收藏" : "收藏";
+      starBtn.onclick = function (e) { e.stopPropagation(); appState[a.name] = appState[a.name] || {}; appState[a.name].star = !appState[a.name].star; saveAppState(); renderApps(); };
+      const pinBtn = document.createElement("button"); pinBtn.type = "button"; pinBtn.className = "pin-btn" + (st.top ? " on" : ""); pinBtn.textContent = "📌"; pinBtn.title = st.top ? "取消置顶" : "置顶";
+      pinBtn.onclick = function (e) { e.stopPropagation(); appState[a.name] = appState[a.name] || {}; appState[a.name].top = !appState[a.name].top; saveAppState(); renderApps(); };
+      acts.append(starBtn, pinBtn);
+      card.append(ic, name, acts);
+      card.onclick = function () { openApp(a); };
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+  function renderApps() {
     const box = document.getElementById("app-list");
     if (!box) return;
-    APP_CATS.forEach((cat) => {
-      const items = APPS.filter((a) => a.cat === cat);
-      if (!items.length) return;
-      const label = document.createElement("div");
-      label.className = "app-cat-label";
-      label.textContent = cat;
-      box.appendChild(label);
-      const grid = document.createElement("div");
-      grid.className = "app-grid";
-      items.forEach((a) => {
-        const card = document.createElement("div");
-        card.className = "app-card";
-        card.innerHTML = '<div class="app-ic">' + a.ic + '</div><div class="app-name">' + a.name + "</div>";
-        card.onclick = () => openApp(a);
-        grid.appendChild(card);
-      });
-      box.appendChild(grid);
+    box.innerHTML = "";
+    const q = appSearch.trim().toLowerCase();
+    const appItems = APPS.slice().sort((a, b) => {
+      const ta = (appState[a.name] && appState[a.name].top) ? 1 : 0;
+      const tb = (appState[b.name] && appState[b.name].top) ? 1 : 0;
+      return tb - ta;
     });
-  })();
+    if (!q) {
+      APP_CATS.forEach((cat) => {
+        const items = appItems.filter((a) => a.cat === cat);
+        if (items.length) box.appendChild(makeAppCat(cat, items));
+      });
+    } else {
+      const items = appItems.filter((a) => a.name.toLowerCase().indexOf(q) >= 0);
+      if (!items.length) { box.innerHTML = '<div class="empty">没有匹配的 APP</div>'; return; }
+      box.appendChild(makeAppCat("搜索结果", items));
+    }
+  }
+  renderApps();
+  const appSearchEl = $("#app-search");
+  if (appSearchEl) appSearchEl.addEventListener("input", function () { appSearch = appSearchEl.value; renderApps(); });
 
   /* 灵感模块平台快捷跳转：手机端优先唤起 APP（避开网页广告/非 APP 内页），未安装再回落网页 */
   document.addEventListener("click", function (e) {
@@ -1274,6 +2218,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
 
   /* ---------- 习惯打卡 ---------- */
   let habits = store.get("wb_habits", []);
+  if (!Array.isArray(habits)) habits = [];
   const habitCal = { id: null, mode: "month", y: new Date().getFullYear(), m: new Date().getMonth() };
   function saveHabits() { store.set("wb_habits", habits); }
   let habitRecordOpen = false;
@@ -1362,6 +2307,63 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     }
     panel.appendChild(wrap);
   }
+  const habitOpen = {};
+  const habitMiniNav = {};
+  function ymdStr(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function nextDayStr(ds) { const d = new Date(ds + "T00:00:00"); d.setDate(d.getDate() + 1); return ymdStr(d); }
+  function calcStreak(checks) {
+    const today = todayStr();
+    const d = new Date();
+    if (!(today in checks) || cntOf(checks, today) <= 0) d.setDate(d.getDate() - 1); // 今天未打卡也从昨天起算，避免“今天还没打”误判断签
+    let streak = 0;
+    while (true) {
+      const ds = ymdStr(d);
+      if (cntOf(checks, ds) > 0) { streak++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    return streak;
+  }
+  function calcBest(checks) {
+    const dsList = Object.keys(checks).filter((ds) => cntOf(checks, ds) > 0).sort();
+    let best = 0, run = 0, prev = null;
+    dsList.forEach((ds) => {
+      run = (prev && nextDayStr(prev) === ds) ? run + 1 : 1;
+      if (run > best) best = run;
+      prev = ds;
+    });
+    return best;
+  }
+  function renderHabitMini(h) {
+    const wrap = document.createElement("div"); wrap.className = "habit-mini";
+    const nav = habitMiniNav[h.id] || { y: new Date().getFullYear(), m: new Date().getMonth() };
+    habitMiniNav[h.id] = nav;
+    const bar = document.createElement("div"); bar.className = "cal-bar";
+    const prev = document.createElement("button"); prev.className = "cal-nav"; prev.textContent = "‹";
+    const next = document.createElement("button"); next.className = "cal-nav"; next.textContent = "›";
+    const label = document.createElement("div"); label.className = "cal-label"; label.textContent = nav.y + "年" + (nav.m + 1) + "月";
+    const tip = document.createElement("span"); tip.className = "habit-mini-tip"; tip.textContent = "✓已打卡 · ✕断签";
+    bar.append(prev, label, next, tip);
+    wrap.appendChild(bar);
+    const perDay = h.perDay || "once";
+    const grid = document.createElement("div"); grid.className = "cal-grid mini";
+    ["日", "一", "二", "三", "四", "五", "六"].forEach((w) => { const c = document.createElement("div"); c.className = "cal-wk"; c.textContent = w; grid.appendChild(c); });
+    const first = new Date(nav.y, nav.m, 1).getDay();
+    const days = new Date(nav.y, nav.m + 1, 0).getDate();
+    for (let i = 0; i < first; i++) { const e = document.createElement("div"); e.className = "cal-cell empty"; grid.appendChild(e); }
+    const today = todayStr();
+    for (let d = 1; d <= days; d++) {
+      const ds = nav.y + "-" + String(nav.m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+      const cell = document.createElement("div"); cell.className = "cal-cell"; cell.textContent = d;
+      const done = cntOf(h.checks || {}, ds) > 0;
+      if (done) cell.classList.add("on");
+      else if (perDay === "once" && ds < today) cell.classList.add("missed");
+      grid.appendChild(cell);
+    }
+    wrap.appendChild(grid);
+    prev.onclick = () => { let m = nav.m - 1, y = nav.y; if (m < 0) { m = 11; y--; } nav.m = m; nav.y = y; renderHabits(); };
+    next.onclick = () => { let m = nav.m + 1, y = nav.y; if (m > 11) { m = 0; y++; } nav.m = m; nav.y = y; renderHabits(); };
+    return wrap;
+  }
   function renderHabits() {
     habits = store.get("wb_habits", []);
     const list = $("#habit-list"); list.innerHTML = "";
@@ -1377,6 +2379,8 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       const row = document.createElement("div"); row.className = "habit-row";
       const head = document.createElement("div"); head.className = "habit-head";
       const name = document.createElement("div"); name.className = "habit-name"; name.textContent = h.name + (perDay === "multi" ? "（每天多次）" : "");
+      const streak = calcStreak(checks);
+      const best = calcBest(checks);
       const cnt = document.createElement("div"); cnt.className = "habit-count"; cnt.innerHTML = "累计 <b>" + total + "</b> 次";
       const acts = document.createElement("div"); acts.className = "habit-acts";
       const btn = document.createElement("button"); btn.className = "btn";
@@ -1385,11 +2389,13 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
         btn.textContent = done ? "今日已打卡 ✓" : "打卡";
         btn.classList.toggle("ghost", done);
         btn.disabled = done;
-        btn.onclick = () => { if (cntOf(h.checks, today) > 0) return; h.checks[today] = 1; saveHabits(); renderHabits(); };
+        btn.onclick = guardClick(() => { if (cntOf(h.checks, today) > 0) return; h.checks[today] = 1; saveHabits(); renderHabits(); }, 600);
       } else {
         btn.textContent = "打卡 +1" + (todayCnt > 0 ? "（今日 " + todayCnt + "）" : "");
-        btn.onclick = () => { h.checks[today] = cntOf(h.checks, today) + 1; saveHabits(); renderHabits(); };
+        btn.onclick = guardClick(() => { h.checks[today] = cntOf(h.checks, today) + 1; saveHabits(); renderHabits(); }, 600);
       }
+      const calBtn = document.createElement("button"); calBtn.type = "button"; calBtn.className = "cal-mode"; calBtn.textContent = habitOpen[h.id] ? "收起月历" : "📅 月历";
+      calBtn.onclick = () => { habitOpen[h.id] = !habitOpen[h.id]; renderHabits(); };
       const del = document.createElement("button"); del.className = "del"; del.textContent = "✕";
       del.onclick = () => { if (confirm("删除习惯「" + h.name + "」？打卡记录会一起删除")) { habits = habits.filter((x) => x.id !== h.id); saveHabits(); renderHabits(); } };
       const remind = document.createElement("label"); remind.className = "habit-remind";
@@ -1399,34 +2405,37 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
       tIn.title = "提醒时间（到点会弹提醒）";
       tIn.onchange = () => { h.time = tIn.value; saveHabits(); if (h.time) maybeRequestNotify(); };
       remind.appendChild(tIn);
-      acts.append(remind, btn, del);
+      acts.append(remind, btn, calBtn, del);
       head.append(name, cnt, acts);
+      const stats = document.createElement("div"); stats.className = "habit-stats";
+      stats.innerHTML = "连续打卡 <b class=\"fire\">" + streak + "</b> 天🔥 · 最长连续 <b>" + best + "</b> 天";
       row.appendChild(head);
+      row.appendChild(stats);
+      if (habitOpen[h.id]) row.appendChild(renderHabitMini(h));
       list.appendChild(row);
     });
     renderRecordPanel();
   }
-  $("#habit-record").onclick = () => { habitRecordOpen = !habitRecordOpen; habitCal.mode = "month"; habitCal.y = new Date().getFullYear(); habitCal.m = new Date().getMonth(); renderHabits(); };
-  $("#habit-add").onclick = () => {
-    const v = $("#habit-input").value.trim(); if (!v) return;
+  $("#habit-record").onclick = guardClick(() => { habitRecordOpen = !habitRecordOpen; habitCal.mode = "month"; habitCal.y = new Date().getFullYear(); habitCal.m = new Date().getMonth(); renderHabits(); }, 500);
+  bindAdd("habit-input", "habit-add", (v) => {
     const perDay = $("#habit-perday").value || "once";
     const t = $("#habit-time").value || "";
     habits.push({ id: uid(), name: v, created: todayStr(), perDay, time: t, checks: {} });
-    $("#habit-input").value = ""; $("#habit-time").value = ""; saveHabits(); renderHabits();
-    if (t) maybeRequestNotify();
-  };
-  $("#habit-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#habit-add").click(); });
+    $("#habit-time").value = ""; saveHabits(); renderHabits();
+    showToast("习惯已添加"); if (t) maybeRequestNotify();
+  });
 
   /* 习惯打卡提醒引擎 */
   function maybeRequestNotify() {
     if (!("Notification" in window)) return;
     if (Notification.permission === "default") { try { Notification.requestPermission(); } catch (e) {} }
   }
-  function showToast(msg) {
+  function showToast(msg, dur) {
     let t = document.getElementById("wb-toast");
     if (!t) { t = document.createElement("div"); t.id = "wb-toast"; t.className = "wb-toast"; document.body.appendChild(t); }
     t.textContent = msg; t.classList.add("show");
-    clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("show"), 7000);
+    clearTimeout(t._tm);
+    t._tm = setTimeout(() => t.classList.remove("show"), dur && dur > 0 ? dur : 7000);
   }
   const habitReminded = {};
   function habitNowHM() { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
@@ -1449,10 +2458,35 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   checkHabitReminders();
   renderHabits();
 
+  /* 本轮：外观设置 + 番茄钟初始化（需在 DOM 就绪后、首屏渲染前应用） */
+  applyTheme(); applyName(); bindSettings(); bindPomo();
+
+  autoBackup();
   Sync.onRemote = applyRemote;
-  });
-})();
-  /* ---------- 热点聚合（自动提取各平台热搜） ---------- */
+  Sync.init().catch(function () {});
+  /* 注意：主 IIFE 不再在此处关闭 —— 其结束符已移至脚本末尾，使 精神食粮/教育口播 模块（原位于主 IIFE 之外）能共享 $ / guardClick / store 等作用域，修复 ReferenceError。 */
+
+  /* ---------- 精神食粮常量（提前声明，避免 TDZ） ---------- */
+  const FEED_CATS = [
+    { key: "sport", name: "运动", ic: "🏃", pools: [
+      ["泡沫轴放松", "跳操", "力量训练", "瑜伽", "普拉提", "拉伸放松"],
+      ["女生居家运动", "健身操", "哑铃训练", "燃脂舞", "体态矫正", "睡前拉伸"],
+      ["帕梅拉", "刘畊宏", "美丽芭蕾", "办公室拉伸", "运动后放松", "晨间唤醒"]
+    ] },
+    { key: "makeup", name: "化妆", ic: "💄", pools: [
+      ["新手化妆", "日常妆容", "通勤妆", "约会妆", "伪素颜"],
+      ["淡妆教程", "约会妆容", "伪素颜妆", "通勤淡妆", "新手化妆教程"],
+      ["日常淡妆", "韩系妆容", "约会妆", "伪素颜", "新手化妆"]
+    ] }
+  ];
+  const FEED_SEED = {"sport":{"groups":[{"label":"泡沫轴放松","list":[{"title":"【自用】韩小四泡沫轴腿部放松","author":"25不摆烂","play":"163.8万","duration":"24:27","pic":"https://i1.hdslb.com/bfs/archive/561347120de6dec40d0aad969f073e0a06477f99.jpg","link":"https://www.bilibili.com/video/BV1154y1f7Gj"},{"title":"做完就细了1cm?! 站立腿部拉伸➕懒人版泡沫轴按摩，告别肌肉/水肿腿｜运动后必做！【韩小四April】","author":"韩小四AprilHan","play":"1562.6万","duration":"63:45","pic":"https://i1.hdslb.com/bfs/archive/3bd234abb919c2c2523585122f9166b9c8fb81bc.jpg","link":"https://www.bilibili.com/video/BV1Lh411m7Th"},{"title":"YOTTOY泡沫轴瑜伽柱入门到高阶教学课程","author":"YOTTOY优特","play":"1.2万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/b1a04e0636dce2b956e6ca58c24752e9d4882b94.jpg","link":"https://www.bilibili.com/cheese/play/ss460141845?query_from=0&search_id=7809551241497624903&search_query=%E6%B3%A1%E6%B2%AB%E8%BD%B4%E6%94%BE%E6%9D%BE"},{"title":"健身好物推荐，泡沫轴。可以放松全身还能辅助锻炼。","author":"大业健身","play":"1228","duration":"2:29","pic":"https://i0.hdslb.com/bfs/archive/1a1f559e540be2f687fe85f665caaad346e339db.jpg","link":"https://www.bilibili.com/video/BV1Kg3k6dEPQ"},{"title":"17分钟泡沫轴全身按摩/摆脱粗壮肌肉腿/放松全身筋膜","author":"欧阳春晓Aurora","play":"545.0万","duration":"18:15","pic":"https://i0.hdslb.com/bfs/archive/ec2a3688b613d0ecf6cd3b857559c4e7eeac530b.jpg","link":"https://www.bilibili.com/video/BV1pp4y1X7og"},{"title":"13MIN超详细泡沫轴放松教程|从头到脚都舒服✌️","author":"大越越moon","play":"55.5万","duration":"13:48","pic":"https://i0.hdslb.com/bfs/archive/ca800d96331a2b0aa5fc9946b09fc35652e60a71.jpg","link":"https://www.bilibili.com/video/BV12e4y1Z75R"},{"title":"9分钟跟练版泡沫轴放松肩背，缓解后背僵硬，改善不良体态圆肩驼背头前引","author":"黄君之","play":"83.0万","duration":"9:44","pic":"https://i0.hdslb.com/bfs/archive/d9959c961bbbefc9558bb1317c834faea8b3e121.jpg","link":"https://www.bilibili.com/video/BV1HP411H7t8"},{"title":"全网最全最专业的泡沫轴自我筋膜放松  缓解疼痛 运动前后必备。","author":"大脸老师教普拉提","play":"87.9万","duration":"42:52","pic":"https://i2.hdslb.com/bfs/archive/29ca1cf75579c3c75a61ee623ee62e6e8bb4ad52.jpg","link":"https://www.bilibili.com/video/BV1H34y1Q7TA"},{"title":"加强版泡沫轴瘦腿全教程跟练｜针对各种粗腿","author":"hogungun","play":"74.2万","duration":"14:50","pic":"https://i2.hdslb.com/bfs/archive/de24b3faba9f993c2e0b55ba63668bff8012d6d7.jpg","link":"https://www.bilibili.com/video/BV1WW4y187eL"},{"title":"泡沫轴全身松解五分钟跟练版","author":"一周五练的小飞侠","play":"1857","duration":"4:58","pic":"https://i0.hdslb.com/bfs/archive/649ae947b37a6db9b4762bdb7a47a13ac62c1562.jpg","link":"https://www.bilibili.com/video/BV1ei3g6UEMu"},{"title":"欧阳春晓17min泡沫轴按摩，去除叨b叨纯跟练版【自用】","author":"是馨伊不是新一","play":"23.8万","duration":"17:7","pic":"https://i2.hdslb.com/bfs/archive/c79087216c53187c675077acb5094f407d227f57.png","link":"https://www.bilibili.com/video/BV1pz4y1S7oZ"},{"title":"30分钟泡沫轴全身按摩，肌筋膜放松（生理期可练）（欧阳春晓30天居家维密普拉提第1天）","author":"艮沐槿","play":"5.0万","duration":"30:17","pic":"https://i0.hdslb.com/bfs/archive/f6881d3570f6d1a57d1abecfc2c1d6e8d1e85606.jpg","link":"https://www.bilibili.com/video/BV1hPA7zsEAa"}]},{"label":"跳操","list":[{"title":"快乐尊巴舞8曲连跳|快乐跳操轻松瘦身|暴汗燃脂塑形|动作简单新手可入","author":"小兔子乖乖smile","play":"35.9万","duration":"25:58","pic":"https://i2.hdslb.com/bfs/archive/e21b098c9341d1f2238304d07151e55c16cec25f.jpg","link":"https://www.bilibili.com/video/BV1Hu4y1S7D2"},{"title":"【张艺兴&amp;费教练】演唱会陪练8000步暴汗燃脂|横屏","author":"柚子桃L","play":"1.1万","duration":"46:37","pic":"https://i1.hdslb.com/bfs/archive/f34a6856116e824a59379dec8a554ffa38a01402.jpg","link":"https://www.bilibili.com/video/BV1Juq5BPEY5"},{"title":"60分钟燃脂+拉伸合集，全程无跑跳，不伤膝盖高效瘦全身💦，消耗：370大卡🔥，适合0基础、大基数的宝子。","author":"塑形的范er","play":"7.6万","duration":"59:0","pic":"https://i2.hdslb.com/bfs/archive/03ee47e3a4cba62bac6eaf4e9eac9b4537a1384e.jpg","link":"https://www.bilibili.com/video/BV1t3TYzzEWv"},{"title":"帕梅拉三部曲搭配港风DJ版 30分钟暴汗暴瘦 ！大基数慎选（易伤）！无间歇版！！！新手适度跟练 跳操过程中如有不适立刻停止！严重不适立即就医！！身体第一位！","author":"下顿不吃了嘻嘻","play":"2606","duration":"31:38","pic":"https://i2.hdslb.com/bfs/archive/806469f76f86f94464a7230805c2fbc6ca117fa1.jpg","link":"https://www.bilibili.com/video/BV1r9376JEno"},{"title":"开心的跳操","author":"家庭CEO唐总","play":"2","duration":"3:34","pic":"https://i1.hdslb.com/bfs/archive/2d9c54d3c645f323f9101c3b18312811fb4ea526.jpg","link":"https://www.bilibili.com/video/BV1fA3C6JEqM"},{"title":"【SEVENTEEN&amp;Jo】14首40minTabata燃脂训练 ｜全身燃脂 促进新陈代谢","author":"ohmylittlepuppyz","play":"42.0万","duration":"43:2","pic":"https://i2.hdslb.com/bfs/archive/2f0d3aa65a5ecc0bfcdd086bf2a178373b9fab6d.jpg","link":"https://www.bilibili.com/video/BV1Ba411f7Er"},{"title":"【29分钟燃爆心率】高强度预警！高效减脂，暴汗跳操，华语天后金曲拼盘，做自己的唱跳DIVA！| 东北赵又廷 自用混剪","author":"妖零五105","play":"3.7万","duration":"29:11","pic":"https://i1.hdslb.com/bfs/archive/65d5a6313c51e5acde19636d60e05a83725af8fb.jpg","link":"https://www.bilibili.com/video/BV1gwj36bEmB"},{"title":"【每天一虐】跟着力克体育跳操——(合集来喽)20首歌无重复60分钟暴汗燃脂","author":"肉肉芒果干-跟跳员","play":"149.2万","duration":"59:24","pic":"https://i0.hdslb.com/bfs/archive/c89b7cdf07704c58b21be051dbb1f77c7e875984.jpg","link":"https://www.bilibili.com/video/BV1tG4y1u7D4"},{"title":"【十首连跳】30分钟燃脂合集！小基数刷脂必备，跳到流油，突破平台期！让你一次跳个够！","author":"Carina陈自律","play":"300.1万","duration":"30:22","pic":"https://i0.hdslb.com/bfs/archive/2c1c0b354994b9d0463a97b798bfce9ddbb1837c.jpg","link":"https://www.bilibili.com/video/BV1q34y1x7KP"},{"title":"暴汗难以置信！爽到停不下来的15首女团燃脂舞谁跳谁瘦！","author":"手舞足蹈的Angela","play":"277.9万","duration":"46:12","pic":"https://i2.hdslb.com/bfs/archive/4a3d4ce32b32db2f396ea3a5d413ec35df4c4b9e.jpg","link":"https://www.bilibili.com/video/BV1Xf4y157Vn"},{"title":"【季更快码住】KPOP健身有氧舞蹈半小时合集 最新BGM吐血整理 对不起我来晚了","author":"Christina林木","play":"11.5万","duration":"30:26","pic":"https://i0.hdslb.com/bfs/archive/63e9a012a97b14396301239a19f9d624bf7de1e3.jpg","link":"https://www.bilibili.com/video/BV1Um421g7nw"},{"title":"肩膀酸痛，手脚麻木，每天坚持跳操30分钟《健身操》背正面","author":"阳光香果广场舞","play":"90.3万","duration":"6:40","pic":"https://i0.hdslb.com/bfs/archive/60d38ea23eb68852c490ba7662feabf7d88998f2.jpg","link":"https://www.bilibili.com/video/BV1A5411e7iW"}]},{"label":"力量训练","list":[{"title":"无器械全身无氧力量训练｜瘦身塑形提升代谢！","author":"miss朱zhu","play":"103.6万","duration":"13:20","pic":"https://i1.hdslb.com/bfs/archive/4aa7d3af4da7386363f0d8544f007bf61fcf9b6b.jpg","link":"https://www.bilibili.com/video/BV1Ve411j7o8"},{"title":"【安娜growingannanas】30分钟音乐全身力量训练-配合哑铃","author":"安娜growingannanas","play":"35.3万","duration":"35:26","pic":"https://i2.hdslb.com/bfs/archive/ede53d26e4bb12f4e217e806d2385a5536152e65.jpg","link":"https://www.bilibili.com/video/BV1WtQJB4Eve"},{"title":"健身入门：基础力量训练","author":"健身食堂杨师傅","play":"11.7万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/26c51be904e92cc6c69fdbe718fd43b3d9e4d7cd.jpg","link":"https://www.bilibili.com/cheese/play/ss20909?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"30加女生零基础必须控制饮食加力训减肚子最高效#科学减脂#力量训练#减脂塑形#薄肌#少女感","author":"呆萌塑形减脂","play":"149","duration":"2:33","pic":"https://i0.hdslb.com/bfs/archive/50b060837783a5d691234f45bf1ac4840e7d4cdd.jpg","link":"https://www.bilibili.com/video/BV1xY3C6fEcK"},{"title":"【塑形】40分钟力量训练，一月体脂率减10%，需哑铃，动作不重复","author":"范享乐动","play":"136.9万","duration":"39:41","pic":"https://i1.hdslb.com/bfs/archive/84daba0d285efe94cf96792bf68af34ff29bc649.jpg","link":"https://www.bilibili.com/video/BV11t421a7LB"},{"title":"50分钟全身无氧自重力量塑形训练、无工具徒手力量、塑形紧致、循环代谢提升、自重力量紧致肌肉线条","author":"刘元","play":"20.3万","duration":"48:8","pic":"https://i1.hdslb.com/bfs/archive/63d317167154b1c22f72660fb0bb9b0f280d4b4b.jpg","link":"https://www.bilibili.com/video/BV1ZqD3BWEDM"},{"title":"30分钟无氧自重抗阻力量训练、薄肌线条塑造、全身自重训练、提升代谢、增加肌肉弹性","author":"刘元","play":"26.3万","duration":"29:0","pic":"https://i0.hdslb.com/bfs/archive/db83a509f0fa8ccb019a9ef41186455ae49f7073.jpg","link":"https://www.bilibili.com/video/BV11umzBiEJx"},{"title":"【安娜growingannanas】10分钟每日徒手力量训练-无需器械","author":"安娜growingannanas","play":"11.9万","duration":"10:56","pic":"https://i0.hdslb.com/bfs/archive/cf0d1ea694142a309a444280aaf2e8c9105eaa53.jpg","link":"https://www.bilibili.com/video/BV1knKs64Emb"},{"title":"居家减脂塑形力量跟练计划","author":"康老师特别细","play":"4442","duration":"","pic":"https://archive.biliimg.com/bfs/archive/ace96015d0f9ce5871d5a9623443568510ad251f.jpg","link":"https://www.bilibili.com/cheese/play/ss725914551?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"【安娜growingannanas】力量训练四周计划Day2-30分钟上半身训练-配合哑铃","author":"安娜growingannanas","play":"7082","duration":"34:0","pic":"https://i1.hdslb.com/bfs/archive/995ad20d1df4d8fc1e0933420d092dc94e0d845d.jpg","link":"https://www.bilibili.com/video/BV1DJ3C6BExP"},{"title":"30min组合力量训练，快速减掉20斤并全身紧致！","author":"真的费教练健身教学","play":"136.6万","duration":"32:36","pic":"https://i0.hdslb.com/bfs/archive/fb4caaa2b1315c6376b845097f031c5e6b6a1abc.jpg","link":"https://www.bilibili.com/video/BV1D94y1A7EL"},{"title":"22min哑铃全身无氧力量训练｜燃脂塑形，提高代谢","author":"miss朱zhu","play":"270.1万","duration":"22:3","pic":"https://i1.hdslb.com/bfs/archive/6ee62861ba5b23d2dcc0d50ef7bbfabe7cba870b.jpg","link":"https://www.bilibili.com/video/BV1ne4y1i7Dx"}]},{"label":"瑜伽","list":[{"title":"2026.01.12 【Breathe and Flow】试试这个战士2式挑战瑜伽课程","author":"我叫阿搬","play":"3.9万","duration":"27:58","pic":"https://i1.hdslb.com/bfs/archive/f1944b5a26d1e51ca2767d9ad52685a3359694a9.jpg","link":"https://www.bilibili.com/video/BV1kqrvBuEve"},{"title":"10分钟伸展燃烧有氧运动！适合冬季懒人舒展身体和取暖燃脂升温！【周六野】","author":"周六野Zoey","play":"199.3万","duration":"11:55","pic":"https://i2.hdslb.com/bfs/archive/cc93c5c49fa29905d73730b850382c69a66a435e.jpg","link":"https://www.bilibili.com/video/BV1qJ411C7sq"},{"title":"10分钟美腿拉伸运动，变直变长，改善腿型！【周六野Zoey】","author":"周六野Zoey","play":"402.7万","duration":"15:7","pic":"https://i1.hdslb.com/bfs/archive/f0f6b7404d3fb209b944e9266c7f0ec4ced48f32.jpg","link":"https://www.bilibili.com/video/BV1kE411W75u"},{"title":"28天 高效瘦小腿！脂肪型 肌肉型 水肿型 针对训练 漫画腿get","author":"文不叮","play":"167.2万","duration":"7:55","pic":"https://i0.hdslb.com/bfs/archive/b005462e44bad2bfd4926ada1194a3c39d2d5ff8.jpg","link":"https://www.bilibili.com/video/BV1dJ411Q7x8"},{"title":"明星抗衰保养！【秋冬气血瑜伽】懒女孩睡前8min，冻龄婴儿肌+养出瘦体质！","author":"Rosie的瑜伽乐园","play":"17.3万","duration":"9:17","pic":"https://i1.hdslb.com/bfs/archive/7f4e774d40e30c4f2f2eed227a3f382a39c382ca.jpg","link":"https://www.bilibili.com/video/BV1U34y1U78j"},{"title":"【自我康复】5个动作解决肩胛骨内侧疼、肩颈疼痛","author":"郝强Fit","play":"142.1万","duration":"1:34","pic":"https://i1.hdslb.com/bfs/archive/7a50824f3e4366b82455687d3ce39716d903a674.jpg","link":"https://www.bilibili.com/video/BV1Du411S7oQ"},{"title":"【Hisdream】面部瑜伽剪辑版 每天10分钟改善大小脸、面部不对称、歪嘴歪鼻和大小眼高低眉","author":"CupidsArrowHit","play":"101.1万","duration":"9:40","pic":"https://i1.hdslb.com/bfs/archive/84f8a8e984fe775f98dd56255af552dc5d9509b9.jpg","link":"https://www.bilibili.com/video/BV1az4y197Lr"},{"title":"起床空腹6分钟轰炸腹肌/Mooki的瑜伽分享09","author":"Mooki瑜伽","play":"46.6万","duration":"7:13","pic":"https://i1.hdslb.com/bfs/archive/ae3f2a0952cbb084733ecebe202feec21a02590d.jpg","link":"https://www.bilibili.com/video/BV1N54y1y7RW"},{"title":"我必须要给意志力差的姐妹，强烈安利这个韩国一分钟魔性瘦身操！最近在外网上炒鸡火！！｜转自卤水二妹姐","author":"陌与陌寻","play":"360.6万","duration":"7:17","pic":"https://i0.hdslb.com/bfs/archive/2ba5b9012e492f7ae4c3f4dbbede30e4a0c372fc.jpg","link":"https://www.bilibili.com/video/BV1fE411k7NW"},{"title":"【每日瑜伽】脊柱理疗-全方位修复肩颈颈椎，疼痛不再！","author":"每日瑜伽官方账号","play":"43.2万","duration":"179:53","pic":"https://i1.hdslb.com/bfs/archive/53fbbadd0673a55a4fe7d6d6d6d29265c616f2b1.jpg","link":"https://www.bilibili.com/video/BV12W411A7oR"},{"title":"2个晨起瑜伽，每天坚持10分钟，立现性感蝴蝶背","author":"洗衣机推荐2026-","play":"47.0万","duration":"1:10","pic":"https://i2.hdslb.com/bfs/archive/199afaebd6d9ca032025592e89a27986f4e583c2.jpg","link":"https://www.bilibili.com/video/BV1Lt411g7DS"},{"title":"【艾琳】15分钟全身燃脂 | 不用跳不伤膝盖不深蹲 | 适用宿舍学生党上班族","author":"艾琳鱼鱼","play":"47.6万","duration":"19:12","pic":"https://i0.hdslb.com/bfs/archive/5313255cb5dea2ad3be44e5aec4474fac1c220e7.jpg","link":"https://www.bilibili.com/video/BV1Xv411z7NJ"}]},{"label":"普拉提","list":[{"title":"【虐腿】高强度瘦腿|普拉提100次大腿外侧＋100次内侧瘦腿训练","author":"wishisnotfar","play":"1923.6万","duration":"45:44","pic":"https://i0.hdslb.com/bfs/archive/6f72ca203d2b06f451db86e991259fe2cd98818a.jpg","link":"https://www.bilibili.com/video/BV1bp411A7Yp"},{"title":"Eleni Fit - 30分钟站立普拉提训练｜全身燃脂塑形·无重复·含热身拉伸","author":"EleniFit","play":"19.5万","duration":"33:13","pic":"https://i1.hdslb.com/bfs/archive/e59033bbbed66918503dd36b6be7bc7ab792dc95.jpg","link":"https://www.bilibili.com/video/BV1JjTL6AEde"},{"title":"帕梅拉 - 15分钟普拉提训练|慢速全身紧实 膝盖友好低冲击 (Pamela Reif Official)","author":"帕梅拉PamelaReif","play":"458.2万","duration":"16:28","pic":"https://i0.hdslb.com/bfs/archive/38a79651845a239f3395d597ddea68aec2dbc540.jpg","link":"https://www.bilibili.com/video/BV1Wm4y1U72s"},{"title":"35分钟全身塑形普拉提｜紧致线条·提升力量｜居家无器械｜LUNACHEN","author":"LunavChen","play":"5393","duration":"36:40","pic":"https://i1.hdslb.com/bfs/archive/b5bc0c824f094fdd5c30e3632e823b2ec5b9fba3.jpg","link":"https://www.bilibili.com/video/BV19a3M6kExJ"},{"title":"【限时特惠】欧阳春晓：30天维密普拉提居家瘦身","author":"欧阳春晓Aurora","play":"1606.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/2f8600af26c9a566407d0914a75d042ab8328dc5.jpg","link":"https://www.bilibili.com/cheese/play/ss15046?query_from=0&search_id=183304677490764785&search_query=%E6%99%AE%E6%8B%89%E6%8F%90"},{"title":"【2026最新】魏巍普拉提完整课程28天魏巍普拉提完整课程跟练版魏巍普拉提完整课程21天魏巍普拉提完整课程瘦肚子 魏巍普拉提跟练 魏巍普拉提完整课程 魏巍普","author":"62071062","play":"1198","duration":"8352:12","pic":"https://i0.hdslb.com/bfs/archive/0e5f9742f6dde11d53d795e1995ae30b6fb17bd0.jpg","link":"https://www.bilibili.com/video/BV15D3T6rE8a"},{"title":"全身完整版瑶瑶维密普拉提塑形直播回放早课2026/7/29","author":"嘴强王者-练不动","play":"73","duration":"82:8","pic":"https://i1.hdslb.com/bfs/archive/7389e5c5321dacd81ac4f9eef37ded5efbcd5fb5.jpg","link":"https://www.bilibili.com/video/BV1vR316pEdq"},{"title":"【2026最新】魏巍普拉提完整课程 魏巍普拉提跟练版 魏巍普拉提完整课程跟练版 魏魏21天/28天普拉提课程28天骨态塑形营21天普拉提瘦身蜕变营14天快速瘦身","author":"努力1366226","play":"668","duration":"6538:11","pic":"https://i1.hdslb.com/bfs/archive/32d5341677c275e80129b4807cf0b770b2a18d5b.jpg","link":"https://www.bilibili.com/video/BV1nJ3M6QEcr"},{"title":"健身普拉提","author":"仙气缭","play":"74","duration":"0:52","pic":"https://i0.hdslb.com/bfs/archive/e4910c53d475d8db8b9b6f861716216b35b9c2d5.jpg","link":"https://www.bilibili.com/video/BV1aL3r6YEhr"},{"title":"静静晚课普拉提＋私教课腰腹单边右2026.7.28周二晚上录屏上传自用","author":"我叫郑明霞","play":"115","duration":"114:42","pic":"https://i0.hdslb.com/bfs/archive/abb511f6d152e442193d84d74a845de3c5a4bb74.jpg","link":"https://www.bilibili.com/video/BV1jm3r6rEvY"},{"title":"小肚子长不了一点！20分钟普拉提虐腹瘦肚｜私教级口令带练","author":"欧阳春晓Aurora","play":"302.4万","duration":"19:34","pic":"https://i1.hdslb.com/bfs/archive/f18e87b5551416c99b2432124b38e70f506c500e.jpg","link":"https://www.bilibili.com/video/BV1pQ4y1g7C3"},{"title":"MIZI 40分钟练出纤瘦身材｜全身普拉提训练｜无需器材","author":"MIZI","play":"24.5万","duration":"40:31","pic":"https://i1.hdslb.com/bfs/archive/c2dbd5c305cbfe1d2b37451778c27f924f6f6a17.jpg","link":"https://www.bilibili.com/video/BV15P8izHEYE"}]},{"label":"拉伸放松","list":[{"title":"自用，跑步，骑行运动后全身拉伸，全程站立，舒展筋骨，拉伸线条","author":"zngogo","play":"285.3万","duration":"8:3","pic":"https://i0.hdslb.com/bfs/archive/cb5b0516a125bc96153647884df366dffaa4d4e2.jpg","link":"https://www.bilibili.com/video/BV1ae411D7SL"},{"title":"mizi 15分钟全身放松拉伸降低皮质醇舒缓压力放松身心","author":"简宁无跑跳跟练","play":"1037","duration":"15:12","pic":"https://i2.hdslb.com/bfs/archive/084db2863b569bd43bfdd3bf77f95b9c1619d62a.jpg","link":"https://www.bilibili.com/video/BV1wP3w6BEhY"},{"title":"【Mady Morrison】运动后必做10分钟全身拉伸｜冷身放松，修复肌肉缓解酸痛","author":"开合跳撒金币","play":"699","duration":"11:17","pic":"https://i1.hdslb.com/bfs/archive/449e05bbedf63b3599e3c15b08d40e8e09c151a1.jpg","link":"https://www.bilibili.com/video/BV1GnKc6gEGe"},{"title":"拉伸","author":"洗了蒜啦l","play":"7376","duration":"7:7","pic":"https://i1.hdslb.com/bfs/archive/63f7d46623e6fadec61ca3e5073489e5f636707f.jpg","link":"https://www.bilibili.com/video/BV168GX62EPJ"},{"title":"腿部拉伸 | 改善肌肉型腿粗·get细长直美腿！","author":"不织布是Wendy","play":"211.7万","duration":"8:47","pic":"https://i1.hdslb.com/bfs/archive/c0e8bd4f70b213990db51390d88bd9fe6a00fc4a.jpg","link":"https://www.bilibili.com/video/BV1gU4y1d7nV"},{"title":"【MIZI】 14 分钟全身拉伸丨运动后放松，舒展身体，改善僵硬，提升柔韧性","author":"开合跳撒金币","play":"4987","duration":"14:11","pic":"https://i2.hdslb.com/bfs/archive/33adea6d1059932cbabaea2a6c44915ce4fb33d7.jpg","link":"https://www.bilibili.com/video/BV19tMJ6PEWd"},{"title":"【47min 有效改善骨盆前倾】缓解腰痛｜含体态自测 + 原理讲解｜拉伸放松 + 力量巩固全套理疗瑜伽 | 告别小腹突出、久坐腰痛","author":"月川Yue","play":"538","duration":"50:26","pic":"https://i0.hdslb.com/bfs/archive/c8fa520ef5685c9181170bd008631da72661eefa.jpg","link":"https://www.bilibili.com/video/BV1C63e6AEpw"},{"title":"帕梅拉 - 10min 全身拉伸|运动后全身伸展 有效放松肌肉 增强灵活性","author":"帕梅拉PamelaReif","play":"2063.5万","duration":"10:27","pic":"https://i2.hdslb.com/bfs/archive/8d6ee8eb034699b238b42d55aad5ab6c73de4098.jpg","link":"https://www.bilibili.com/video/BV1gf4y1p78A"},{"title":"170 平躺拉伸放松｜深度解锁：再次升级的轻松体验｜碎碎念","author":"军凝伟悦彬江康","play":"0","duration":"0:18","pic":"https://i0.hdslb.com/bfs/archive/08d541da1c1705ff99ebbf95f49ec167dba3c249.jpg","link":"https://www.bilibili.com/video/BV1AG3662EMg"},{"title":"体大硕士带你正确拉伸｜跑前动态拉伸+跑后深度拉伸+入门静态拉伸｜跑步拉伸从入门到精通","author":"跑步的子章老师","play":"380.2万","duration":"24:30","pic":"https://i0.hdslb.com/bfs/archive/97c26f74bb2b0a09c04f9135bef85f2707d21a98.jpg","link":"https://www.bilibili.com/video/BV1fq4y1M7L1"},{"title":"体育课放松拉伸","author":"壹斤米","play":"1.5万","duration":"1:25","pic":"https://i2.hdslb.com/bfs/archive/edfab39ac3b0152729da92852cfe69356ffa368a.jpg","link":"https://www.bilibili.com/video/BV1R6421c7bV"},{"title":"划船机运动之后的拉伸放松","author":"肥渣是只猫","play":"2.4万","duration":"3:36","pic":"https://i0.hdslb.com/bfs/archive/f0eee7b246b1f53e8eb6e7650581a11d49fcd578.jpg","link":"https://www.bilibili.com/video/BV1QK4y1s7Hy"}]}]},"makeup":{"groups":[{"label":"新手化妆","list":[{"title":"【化妆入门课】0基础化妆变美逆袭课！易上手|化妆技巧|化妆教程|系统课|手把手教化妆|毕业变美指南","author":"JSMN-Me","play":"308.0万","duration":"706:28","pic":"https://i1.hdslb.com/bfs/archive/13f3dbf71ada18ba13be81fe20814b6d117f2d7a.png","link":"https://www.bilibili.com/video/BV1iU4y1L7G2"},{"title":"新手跟练版！巨巨巨详细化妆教程，我看谁还学不会。","author":"王艺慈wyc","play":"116.5万","duration":"15:7","pic":"https://i0.hdslb.com/bfs/archive/d4f4d6bda970636024b6c071fc017d756b21aca1.jpg","link":"https://www.bilibili.com/video/BV1Kz421Z7Xc"},{"title":"毛戈平的化妆课","author":"大渔大师课","play":"10.9万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/746ddede613a89824efe59abe51c61460de8c3f2.jpg","link":"https://www.bilibili.com/cheese/play/ss11210?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"10min超详细全妆跟练！新手友好的日杂清透感淡妆~真正能让小白学会化妆的视频！","author":"王小吉日记","play":"536","duration":"10:13","pic":"https://i2.hdslb.com/bfs/archive/67db6a6df0d188da16e21780208521109b45e6ed.jpg","link":"https://www.bilibili.com/video/BV1U53q6mEpH"},{"title":"《看完你就学会化妆》","author":"dao刀刀_","play":"389.4万","duration":"14:33","pic":"https://i1.hdslb.com/bfs/archive/2200201d2187398e69c3aea8db97697f5070a815.jpg","link":"https://www.bilibili.com/video/BV1qa411o7MT"},{"title":"零基础化妆教程","author":"VV美妆小课堂","play":"5.6万","duration":"12:14","pic":"https://i2.hdslb.com/bfs/archive/0c185fa5174c4044ecffba990fcdd9b3c949dc26.jpg","link":"https://www.bilibili.com/video/BV1CHoxBpE5f"},{"title":"巨巨巨巨详细新手化妆教程来啦❗码住跟练~","author":"煤球球coal","play":"41.7万","duration":"13:43","pic":"https://i2.hdslb.com/bfs/archive/48c426b4583a402ed743db9725eeefbb54fcffc0.jpg","link":"https://www.bilibili.com/video/BV1dpGAz7E6f"},{"title":"从洗脸开始拍的新手裸妆教程","author":"四花女士","play":"71.8万","duration":"18:52","pic":"https://i1.hdslb.com/bfs/archive/94a5f8cac15b6683d4a0599fc1e85140a749fab7.jpg","link":"https://www.bilibili.com/video/BV1AnMEzcEKi"},{"title":"化妆课","author":"橘子小课","play":"4.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/a274c7c9cb5d3377def572cdf1c7c08800e066c6.jpg","link":"https://www.bilibili.com/cheese/play/ss24987?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"零基础化妆特训班！底妆轻松学，记得交作业！","author":"勇仔leo","play":"16.9万","duration":"7:32","pic":"https://i1.hdslb.com/bfs/archive/463a4152fd911492c7ddc1ef9031fb7fd41c0509.jpg","link":"https://www.bilibili.com/video/BV1xX4y1H7P2"},{"title":"v太阳花睫毛轻松拿捏～ #三资堂睫毛膏 #睫毛膏 #新手化妆 #防水防汗不晕染 #眼妆","author":"苌大苡d诟W","play":"0","duration":"0:29","pic":"https://i2.hdslb.com/bfs/archive/6e83cc28326fc4aaa608d88cf5dc08cd2c2cb5ad.jpg","link":"https://www.bilibili.com/video/BV1on3B6aEvz"},{"title":"0基础学化妆！新手小白化妆步骤","author":"Lyla豆豆","play":"3.2万","duration":"6:10","pic":"https://i2.hdslb.com/bfs/archive/d3ae150750896719b4138c9c23534e10f86122b3.jpg","link":"https://www.bilibili.com/video/BV1g24y1b7kv"}]},{"label":"日常妆容","list":[{"title":"专属详解版 | 显贵显质感的日常妆容~","author":"程十安an","play":"261.5万","duration":"14:44","pic":"https://i1.hdslb.com/bfs/archive/5a2c264ac447e9adac074198324ee3dd2596e8f1.jpg","link":"https://www.bilibili.com/video/BV1y8411T7VF"},{"title":"这才是普通人应该学的轻透日常妆","author":"美少女老王_","play":"9306","duration":"2:52","pic":"https://i0.hdslb.com/bfs/archive/df7ce28624e9c23db2a80f86e0a8190af6f1c9cf.jpg","link":"https://www.bilibili.com/video/BV11wN96uEct"},{"title":"毛戈平美妆学院：零基础流行妆容应用","author":"毛戈平光影美学","play":"1399","duration":"","pic":"https://archive.biliimg.com/bfs/archive/f6beb7f4ef43d3f0a74d2a44940c85eac3cc5db9.jpg","link":"https://www.bilibili.com/cheese/play/ss3929?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手必看 保姆级眼妆教程 ｜不会画眼影的都来学","author":"是一只小何","play":"127.0万","duration":"2:1","pic":"https://i0.hdslb.com/bfs/archive/c581cfc246accba726020906dd9e37cc1281b60b.jpg","link":"https://www.bilibili.com/video/BV1qi4y1r7an"},{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"男生日常妆容，做好这两步就够了！不会显娘气","author":"崔佳楠sayi","play":"19.3万","duration":"2:38","pic":"https://i2.hdslb.com/bfs/archive/3d97704807197ece76ffbd871336d44799c49508.jpg","link":"https://www.bilibili.com/video/BV1nv411T7GH"},{"title":"清透日常妆容😘内附你们要的眉毛教程！！","author":"enndmee","play":"268.0万","duration":"2:26","pic":"https://i0.hdslb.com/bfs/archive/a2e5922df619d97fb70de9ca30d400397a7ac2a5.jpg","link":"https://www.bilibili.com/video/BV1Lt4y1S7ib"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"化妆美学|零基础化妆教程|毕业变美指南|化妆基础","author":"JSMN-Me","play":"831","duration":"","pic":"https://archive.biliimg.com/bfs/archive/80e35fbb848dd2d1bd0b3cddd99eb50dc6e92f1c.jpg","link":"https://www.bilibili.com/cheese/play/ss27496?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手赶快来学这个日常拍照都好看的淡颜韩妆～","author":"一颗小泡芙芙","play":"2256","duration":"2:5","pic":"https://i1.hdslb.com/bfs/archive/8712dc9ff899f8ff542e961bff30a6cf8fe17b8f.jpg","link":"https://www.bilibili.com/video/BV1z8gS6wENC"},{"title":"妆前是丑女，妆后是女神你还爱我么","author":"小樱桃日常","play":"28.5万","duration":"2:9","pic":"https://i2.hdslb.com/bfs/archive/77a710bd9ed90e4da5eb4cded1f2e94b369bd671.jpg","link":"https://www.bilibili.com/video/BV1ctT96uEEQ"},{"title":"工作日，去上班的一个妆容记录","author":"大脸猫爱吃鱼昂","play":"57.0万","duration":"5:19","pic":"https://i0.hdslb.com/bfs/archive/95e9d5ece483c6644c87ef2305a45640542172f6.jpg","link":"https://www.bilibili.com/video/BV1QL4y1Y7Zf"}]},{"label":"通勤妆","list":[{"title":"十分钟速成美女！通勤/早八/懒人糊弄学换头大法！","author":"九梨Jelly","play":"39.4万","duration":"7:52","pic":"https://i1.hdslb.com/bfs/archive/5c4bfc785784872a0747e0a54d54208463c34b00.jpg","link":"https://www.bilibili.com/video/BV1VT4y1r7kf"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"早九牛马全妆｜花知晓03二画这样更适合通勤","author":"爱臭美的猴儿","play":"594","duration":"6:0","pic":"https://i0.hdslb.com/bfs/archive/26bf268a72aed8119b30c2fb46dbd6db1f7aa1a3.jpg","link":"https://www.bilibili.com/video/BV13Q3q6pEcX"},{"title":"43岁外企理级｜5min搞定通勤妆","author":"jiu酱姨姨","play":"2.8万","duration":"5:53","pic":"https://i0.hdslb.com/bfs/archive/fe49b425d45055954195342b6a897b159a3d34a1.jpg","link":"https://www.bilibili.com/video/BV1nMVU6uEpP"},{"title":"大方脸，早八通勤妆咋画？","author":"弄弄这个妆","play":"21.1万","duration":"2:30","pic":"https://i2.hdslb.com/bfs/archive/515ac543159894a4dc554dc570ab3390ddae9fd0.jpg","link":"https://www.bilibili.com/video/BV1HG4y1t728"},{"title":"新手也一定能学会的早八妆！","author":"nana羊羊羊","play":"9.5万","duration":"6:15","pic":"https://i2.hdslb.com/bfs/archive/159128ba3d1f8bac48afa50c57c3c024ea4718d9.jpg","link":"https://www.bilibili.com/video/BV1igovYGE78"},{"title":"【canmake眼影盘02教程｜10分钟日常通勤妆】","author":"Ulia_Ly","play":"1.5万","duration":"4:5","pic":"https://i0.hdslb.com/bfs/archive/b34bff47b5866470b8c3befbdffecaed343caf12.jpg","link":"https://www.bilibili.com/video/BV1Rz4y1R73v"},{"title":"2分钟搞完通勤伪素颜妆（详细版","author":"一碗粥耶_","play":"5.7万","duration":"6:50","pic":"https://i1.hdslb.com/bfs/archive/7e9a10714dcbd8be8c8b9de48000040181620d22.jpg","link":"https://www.bilibili.com/video/BV1MzrYYDEvJ"},{"title":"【eunHae】 韩国上班族女生10min 快速通勤妆 | my daily 10mins make-up","author":"SunnieMellet","play":"1.3万","duration":"11:28","pic":"https://i2.hdslb.com/bfs/archive/e4e1302a290cce956f67603cba79682c35a8c1e9.jpg","link":"https://www.bilibili.com/video/BV1Ac411d77P"},{"title":"日常通勤底妆 只需要2分钟","author":"Elvis增增-","play":"1.5万","duration":"6:20","pic":"https://i2.hdslb.com/bfs/archive/08f8c683f95c2eacda679269cbf18bafb7ecc369.jpg","link":"https://www.bilibili.com/video/BV17Kcfz7Exv"},{"title":"高效通勤出门淡妆好物！最短的时间最大的改变！","author":"九梨Jelly","play":"21.1万","duration":"6:51","pic":"https://i0.hdslb.com/bfs/archive/105fdfc0f5551c04961927257db143d8fdcf1b12.jpg","link":"https://www.bilibili.com/video/BV1vs4y1u7Tf"},{"title":"爱用合集｜通勤早八面试百搭色！气血高智感！","author":"Carina喵酱","play":"6.3万","duration":"1:37","pic":"https://i0.hdslb.com/bfs/archive/baa6caa59fca5dbec35c2facc3de3d8d879b41d8.jpg","link":"https://www.bilibili.com/video/BV1g1NCzMEkN"}]},{"label":"约会妆","list":[{"title":"新手好学！20分钟又纯又嗲的七夕约会妆容","author":"诺诺和香菜_","play":"2.1万","duration":"3:5","pic":"https://i1.hdslb.com/bfs/archive/e57ec1ad93492d56bd0f2dd33e79b0ae0c683aa5.jpg","link":"https://www.bilibili.com/video/BV1Yd4y1T7BY"},{"title":"【白桃子】约会斩男妆｜只要够精致每天都是情人节","author":"白桃子s","play":"1.7万","duration":"8:25","pic":"https://i1.hdslb.com/bfs/archive/618546872440b3cda88d1e85ed0f86950cc8e3bb.jpg","link":"https://www.bilibili.com/video/BV1bf4y1Q73E"},{"title":"男生夏天的妆容跟练！很自然而且暴汗不脱妆，希望对你有帮助！","author":"乐仔Levi","play":"5426","duration":"4:46","pic":"https://i2.hdslb.com/bfs/archive/f4e3fc529fcbec8195f0c491b9705584d57982e5.jpg","link":"https://www.bilibili.com/video/BV1Miga6NEau"},{"title":"40岁中年老阿姨的无眼线 520心动约会妆 从黄脸婆到面带桃花","author":"白晓袅","play":"3.5万","duration":"10:49","pic":"https://i0.hdslb.com/bfs/archive/c93a0403ec893156e484dc7f21bae0d3755da9b2.jpg","link":"https://www.bilibili.com/video/BV1Nv411L7m8"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"蓝蓝化妆分享","play":"1.1万","duration":"9:37","pic":"https://i2.hdslb.com/bfs/archive/bbd5db0208dc6214827e2fdc6dfe405a70376731.jpg","link":"https://www.bilibili.com/video/BV1PYLw6WEtX"},{"title":"2min跟练｜夏日暴汗不脱妆底妆教程分享～get胶水底妆","author":"露露堡-","play":"2701","duration":"1:53","pic":"https://i2.hdslb.com/bfs/archive/c616543953df9cce3109f4593668573743149d72.jpg","link":"https://www.bilibili.com/video/BV1ya3u6aE9N"},{"title":"新手10分钟氧气甜妹妆！淡颜100%适配！","author":"chilly香菜","play":"39.5万","duration":"1:58","pic":"https://i2.hdslb.com/bfs/archive/63dd33ae8509de6350a700da7d9a4b2a4168f674.jpg","link":"https://www.bilibili.com/video/BV1fZ42127FY"},{"title":"画儿童舞台妆视频教程，学会以后自己小孩舞台表演就不用愁了！","author":"雪児酱","play":"8.8万","duration":"3:45","pic":"https://i0.hdslb.com/bfs/archive/7f857c37b6f03de659abb24cd5cf756d16b29b4d.jpg","link":"https://www.bilibili.com/video/BV1Et411G7ni"},{"title":"【中字 · gojiseung】韩博年末约会妆❄️ | 表面伪素颜 but其实是核级全妆…！！","author":"SunnieMellet","play":"3.8万","duration":"16:9","pic":"https://i0.hdslb.com/bfs/archive/37ceed8ff964d9e067a455c67c5c483d8388c692.jpg","link":"https://www.bilibili.com/video/BV1HRq8BmEaR"},{"title":"GRWM｜温柔桃粉兔兔妆+做蛋糕日常～","author":"Mhoney蒙蒙","play":"30.8万","duration":"4:38","pic":"https://i1.hdslb.com/bfs/archive/6013d1e791338d7302975919144ce1c209722c8f.jpg","link":"https://www.bilibili.com/video/BV166epeCE6k"},{"title":"男友脸红心跳！氛围感纯欲妆！超简单新手必备！通勤约会妆｜圆脸减龄妆教","author":"兔染染Summer","play":"29.5万","duration":"7:5","pic":"https://i2.hdslb.com/bfs/archive/b28e0d950ca182c3dae95917ce95aa0a356163e8.jpg","link":"https://www.bilibili.com/video/BV1M84y1F7vp"},{"title":"让新手看清细节！巨巨详细的心动约会妆！！","author":"爱化妆的陈陈","play":"19.6万","duration":"5:49","pic":"https://i1.hdslb.com/bfs/archive/ace17ca12ee53771e7aac30f0ed0e1fb8b18bc99.jpg","link":"https://www.bilibili.com/video/BV1ju4m1T7WH"}]},{"label":"伪素颜","list":[{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"伪素颜｜参考女明星素颜天花板！普通人如何伪造天然好气色素颜感？【一枝南南】","author":"一枝南南","play":"86.3万","duration":"13:39","pic":"https://i2.hdslb.com/bfs/archive/784b3dc54ebefa2e2fc43c8baa71ae79c33cd033.jpg","link":"https://www.bilibili.com/video/BV1ZA4y1Q7X2"},{"title":"五分钟就能搞定的伪素颜妆","author":"入时十六今六十","play":"78.5万","duration":"1:13","pic":"https://i0.hdslb.com/bfs/archive/9892d1a831157a1a82844a27070edefd859218be.jpg","link":"https://www.bilibili.com/video/BV1oP4y157Xo"},{"title":"“伪妆”高级生活伪素颜","author":"蓝曳-伪妆大师","play":"5.0万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/5efa8a52c8a1569f08ecbf790c6eab32badae4e4.jpg","link":"https://www.bilibili.com/cheese/play/ss16781?query_from=0&search_id=5485147832150080592&search_query=%E4%BC%AA%E7%B4%A0%E9%A2%9C%E5%A6%86"},{"title":"学生党伪素颜四件套，还是很实用的在学校也能美美哒","author":"夏熙呀呀呀","play":"19.3万","duration":"1:55","pic":"https://i0.hdslb.com/bfs/archive/953c6204d285cd57347d55f4c95c32a0a7e66295.jpg","link":"https://www.bilibili.com/video/BV1dP411v73Y"},{"title":"男生素颜妆【一看就会版】","author":"恶霸崔憨憨","play":"117.6万","duration":"2:57","pic":"https://i1.hdslb.com/bfs/archive/bcc30c030421dd3735f7b0f385d83f260963d350.jpg","link":"https://www.bilibili.com/video/BV1tL4y1J7X6"},{"title":"早八5分钟！轻松换头的白开水伪素颜妆","author":"一只超能梦梦","play":"2498","duration":"5:14","pic":"https://i0.hdslb.com/bfs/archive/b07e99f33bc2eccf5348c2d7afd8cee893b42eef.jpg","link":"https://www.bilibili.com/video/BV19R3C6yEB6"},{"title":"无粉底也能画出氛围感伪素颜？10分钟get！","author":"摆烂小O椰","play":"8.2万","duration":"4:2","pic":"https://i2.hdslb.com/bfs/archive/e1ecfb35c784d390f796d24401be67a2ba17beae.jpg","link":"https://www.bilibili.com/video/BV1tDu1zEEb9"},{"title":"新手赶快码住这个1min快素伪素颜淡妆～","author":"一颗小泡芙芙","play":"3341","duration":"1:9","pic":"https://i2.hdslb.com/bfs/archive/2ce2171bfd89da24efa73374b00c64b467e9a4b6.jpg","link":"https://www.bilibili.com/video/BV1GW3w6REf1"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"安琪教化妆","play":"1404","duration":"7:21","pic":"https://i2.hdslb.com/bfs/archive/0fb51b6b478f92790d94259698cf1944128af4db.jpg","link":"https://www.bilibili.com/video/BV1t9gQ6WEH3"},{"title":"【幸運】less is more—极致伪素颜化妆思路～不好意思我素颜就这么美","author":"裴幸運","play":"44.5万","duration":"5:15","pic":"https://i1.hdslb.com/bfs/archive/6952fdaa53743d1775a1d38728c37eef11eb144a.jpg","link":"https://www.bilibili.com/video/BV1Nv411A7jG"},{"title":"绝了！这个新手5min早八伪素颜妆也太嫩太简单了吧！","author":"兰兰同学v","play":"3.2万","duration":"1:24","pic":"https://i2.hdslb.com/bfs/archive/a7a57dc8628ff327d4a9f763a9a9abe80582455a.jpg","link":"https://www.bilibili.com/video/BV1AWsmeFEa7"}]}]}};
+  /* 精神食粮状态变量（提前声明，避免 TDZ） */
+  let feedCat = 0, feedPool = 0;
+  let feedSearch = '';
+  let feedState = {};
+  try { feedState = JSON.parse(localStorage.getItem('wb_feed_state') || '{}'); } catch (e) { feedState = {}; }
+  function saveFeedState() { try { localStorage.setItem('wb_feed_state', JSON.stringify(feedState)); } catch (e) {} }
+
   const HOT = [
     { key: "weibo", name: "新浪微博", ic: "📰", api: "https://60s.viki.moe/v2/weibo", web: "https://s.weibo.com/top/summary" },
     { key: "douyin", name: "抖音", ic: "🎵", api: "https://60s.viki.moe/v2/douyin", web: "https://www.douyin.com/hot" },
@@ -1545,7 +2579,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     });
   }
   const hotRefresh = document.getElementById("hot-refresh");
-  if (hotRefresh) hotRefresh.onclick = function () { loadAllHot(true); };
+  if (hotRefresh) hotRefresh.onclick = guardClick(function () { loadAllHot(true); }, 2000);
   // 实时更新：每 5 分钟自动刷新一次热点（仅当「热点」页处于激活状态时，避免无谓请求）
   setInterval(function () {
     const hotTab = document.querySelector('.tab[data-view="hot"]');
@@ -1635,20 +2669,6 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     p.w_rid = feedMd5(q + mixinKey);
     return p;
   }
-  const FEED_CATS = [
-    { key: "sport", name: "运动", ic: "🏃", pools: [
-      ["泡沫轴放松", "跳操", "力量训练", "瑜伽", "普拉提", "拉伸放松"],
-      ["女生居家运动", "健身操", "哑铃训练", "燃脂舞", "体态矫正", "睡前拉伸"],
-      ["帕梅拉", "刘畊宏", "美丽芭蕾", "办公室拉伸", "运动后放松", "晨间唤醒"]
-    ] },
-    { key: "makeup", name: "化妆", ic: "💄", pools: [
-      ["新手化妆", "日常妆容", "通勤妆", "约会妆", "伪素颜"],
-      ["淡妆教程", "约会妆容", "伪素颜妆", "通勤淡妆", "新手化妆教程"],
-      ["日常淡妆", "韩系妆容", "约会妆", "伪素颜", "新手化妆"]
-    ] }
-  ];
-  const FEED_SEED = {"sport":{"groups":[{"label":"泡沫轴放松","list":[{"title":"【自用】韩小四泡沫轴腿部放松","author":"25不摆烂","play":"163.8万","duration":"24:27","pic":"https://i1.hdslb.com/bfs/archive/561347120de6dec40d0aad969f073e0a06477f99.jpg","link":"https://www.bilibili.com/video/BV1154y1f7Gj"},{"title":"做完就细了1cm?! 站立腿部拉伸➕懒人版泡沫轴按摩，告别肌肉/水肿腿｜运动后必做！【韩小四April】","author":"韩小四AprilHan","play":"1562.6万","duration":"63:45","pic":"https://i1.hdslb.com/bfs/archive/3bd234abb919c2c2523585122f9166b9c8fb81bc.jpg","link":"https://www.bilibili.com/video/BV1Lh411m7Th"},{"title":"YOTTOY泡沫轴瑜伽柱入门到高阶教学课程","author":"YOTTOY优特","play":"1.2万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/b1a04e0636dce2b956e6ca58c24752e9d4882b94.jpg","link":"https://www.bilibili.com/cheese/play/ss460141845?query_from=0&search_id=7809551241497624903&search_query=%E6%B3%A1%E6%B2%AB%E8%BD%B4%E6%94%BE%E6%9D%BE"},{"title":"健身好物推荐，泡沫轴。可以放松全身还能辅助锻炼。","author":"大业健身","play":"1228","duration":"2:29","pic":"https://i0.hdslb.com/bfs/archive/1a1f559e540be2f687fe85f665caaad346e339db.jpg","link":"https://www.bilibili.com/video/BV1Kg3k6dEPQ"},{"title":"17分钟泡沫轴全身按摩/摆脱粗壮肌肉腿/放松全身筋膜","author":"欧阳春晓Aurora","play":"545.0万","duration":"18:15","pic":"https://i0.hdslb.com/bfs/archive/ec2a3688b613d0ecf6cd3b857559c4e7eeac530b.jpg","link":"https://www.bilibili.com/video/BV1pp4y1X7og"},{"title":"13MIN超详细泡沫轴放松教程|从头到脚都舒服✌️","author":"大越越moon","play":"55.5万","duration":"13:48","pic":"https://i0.hdslb.com/bfs/archive/ca800d96331a2b0aa5fc9946b09fc35652e60a71.jpg","link":"https://www.bilibili.com/video/BV12e4y1Z75R"},{"title":"9分钟跟练版泡沫轴放松肩背，缓解后背僵硬，改善不良体态圆肩驼背头前引","author":"黄君之","play":"83.0万","duration":"9:44","pic":"https://i0.hdslb.com/bfs/archive/d9959c961bbbefc9558bb1317c834faea8b3e121.jpg","link":"https://www.bilibili.com/video/BV1HP411H7t8"},{"title":"全网最全最专业的泡沫轴自我筋膜放松  缓解疼痛 运动前后必备。","author":"大脸老师教普拉提","play":"87.9万","duration":"42:52","pic":"https://i2.hdslb.com/bfs/archive/29ca1cf75579c3c75a61ee623ee62e6e8bb4ad52.jpg","link":"https://www.bilibili.com/video/BV1H34y1Q7TA"},{"title":"加强版泡沫轴瘦腿全教程跟练｜针对各种粗腿","author":"hogungun","play":"74.2万","duration":"14:50","pic":"https://i2.hdslb.com/bfs/archive/de24b3faba9f993c2e0b55ba63668bff8012d6d7.jpg","link":"https://www.bilibili.com/video/BV1WW4y187eL"},{"title":"泡沫轴全身松解五分钟跟练版","author":"一周五练的小飞侠","play":"1857","duration":"4:58","pic":"https://i0.hdslb.com/bfs/archive/649ae947b37a6db9b4762bdb7a47a13ac62c1562.jpg","link":"https://www.bilibili.com/video/BV1ei3g6UEMu"},{"title":"欧阳春晓17min泡沫轴按摩，去除叨b叨纯跟练版【自用】","author":"是馨伊不是新一","play":"23.8万","duration":"17:7","pic":"https://i2.hdslb.com/bfs/archive/c79087216c53187c675077acb5094f407d227f57.png","link":"https://www.bilibili.com/video/BV1pz4y1S7oZ"},{"title":"30分钟泡沫轴全身按摩，肌筋膜放松（生理期可练）（欧阳春晓30天居家维密普拉提第1天）","author":"艮沐槿","play":"5.0万","duration":"30:17","pic":"https://i0.hdslb.com/bfs/archive/f6881d3570f6d1a57d1abecfc2c1d6e8d1e85606.jpg","link":"https://www.bilibili.com/video/BV1hPA7zsEAa"}]},{"label":"跳操","list":[{"title":"快乐尊巴舞8曲连跳|快乐跳操轻松瘦身|暴汗燃脂塑形|动作简单新手可入","author":"小兔子乖乖smile","play":"35.9万","duration":"25:58","pic":"https://i2.hdslb.com/bfs/archive/e21b098c9341d1f2238304d07151e55c16cec25f.jpg","link":"https://www.bilibili.com/video/BV1Hu4y1S7D2"},{"title":"【张艺兴&amp;费教练】演唱会陪练8000步暴汗燃脂|横屏","author":"柚子桃L","play":"1.1万","duration":"46:37","pic":"https://i1.hdslb.com/bfs/archive/f34a6856116e824a59379dec8a554ffa38a01402.jpg","link":"https://www.bilibili.com/video/BV1Juq5BPEY5"},{"title":"60分钟燃脂+拉伸合集，全程无跑跳，不伤膝盖高效瘦全身💦，消耗：370大卡🔥，适合0基础、大基数的宝子。","author":"塑形的范er","play":"7.6万","duration":"59:0","pic":"https://i2.hdslb.com/bfs/archive/03ee47e3a4cba62bac6eaf4e9eac9b4537a1384e.jpg","link":"https://www.bilibili.com/video/BV1t3TYzzEWv"},{"title":"帕梅拉三部曲搭配港风DJ版 30分钟暴汗暴瘦 ！大基数慎选（易伤）！无间歇版！！！新手适度跟练 跳操过程中如有不适立刻停止！严重不适立即就医！！身体第一位！","author":"下顿不吃了嘻嘻","play":"2606","duration":"31:38","pic":"https://i2.hdslb.com/bfs/archive/806469f76f86f94464a7230805c2fbc6ca117fa1.jpg","link":"https://www.bilibili.com/video/BV1r9376JEno"},{"title":"开心的跳操","author":"家庭CEO唐总","play":"2","duration":"3:34","pic":"https://i1.hdslb.com/bfs/archive/2d9c54d3c645f323f9101c3b18312811fb4ea526.jpg","link":"https://www.bilibili.com/video/BV1fA3C6JEqM"},{"title":"【SEVENTEEN&amp;Jo】14首40minTabata燃脂训练 ｜全身燃脂 促进新陈代谢","author":"ohmylittlepuppyz","play":"42.0万","duration":"43:2","pic":"https://i2.hdslb.com/bfs/archive/2f0d3aa65a5ecc0bfcdd086bf2a178373b9fab6d.jpg","link":"https://www.bilibili.com/video/BV1Ba411f7Er"},{"title":"【29分钟燃爆心率】高强度预警！高效减脂，暴汗跳操，华语天后金曲拼盘，做自己的唱跳DIVA！| 东北赵又廷 自用混剪","author":"妖零五105","play":"3.7万","duration":"29:11","pic":"https://i1.hdslb.com/bfs/archive/65d5a6313c51e5acde19636d60e05a83725af8fb.jpg","link":"https://www.bilibili.com/video/BV1gwj36bEmB"},{"title":"【每天一虐】跟着力克体育跳操——(合集来喽)20首歌无重复60分钟暴汗燃脂","author":"肉肉芒果干-跟跳员","play":"149.2万","duration":"59:24","pic":"https://i0.hdslb.com/bfs/archive/c89b7cdf07704c58b21be051dbb1f77c7e875984.jpg","link":"https://www.bilibili.com/video/BV1tG4y1u7D4"},{"title":"【十首连跳】30分钟燃脂合集！小基数刷脂必备，跳到流油，突破平台期！让你一次跳个够！","author":"Carina陈自律","play":"300.1万","duration":"30:22","pic":"https://i0.hdslb.com/bfs/archive/2c1c0b354994b9d0463a97b798bfce9ddbb1837c.jpg","link":"https://www.bilibili.com/video/BV1q34y1x7KP"},{"title":"暴汗难以置信！爽到停不下来的15首女团燃脂舞谁跳谁瘦！","author":"手舞足蹈的Angela","play":"277.9万","duration":"46:12","pic":"https://i2.hdslb.com/bfs/archive/4a3d4ce32b32db2f396ea3a5d413ec35df4c4b9e.jpg","link":"https://www.bilibili.com/video/BV1Xf4y157Vn"},{"title":"【季更快码住】KPOP健身有氧舞蹈半小时合集 最新BGM吐血整理 对不起我来晚了","author":"Christina林木","play":"11.5万","duration":"30:26","pic":"https://i0.hdslb.com/bfs/archive/63e9a012a97b14396301239a19f9d624bf7de1e3.jpg","link":"https://www.bilibili.com/video/BV1Um421g7nw"},{"title":"肩膀酸痛，手脚麻木，每天坚持跳操30分钟《健身操》背正面","author":"阳光香果广场舞","play":"90.3万","duration":"6:40","pic":"https://i0.hdslb.com/bfs/archive/60d38ea23eb68852c490ba7662feabf7d88998f2.jpg","link":"https://www.bilibili.com/video/BV1A5411e7iW"}]},{"label":"力量训练","list":[{"title":"无器械全身无氧力量训练｜瘦身塑形提升代谢！","author":"miss朱zhu","play":"103.6万","duration":"13:20","pic":"https://i1.hdslb.com/bfs/archive/4aa7d3af4da7386363f0d8544f007bf61fcf9b6b.jpg","link":"https://www.bilibili.com/video/BV1Ve411j7o8"},{"title":"【安娜growingannanas】30分钟音乐全身力量训练-配合哑铃","author":"安娜growingannanas","play":"35.3万","duration":"35:26","pic":"https://i2.hdslb.com/bfs/archive/ede53d26e4bb12f4e217e806d2385a5536152e65.jpg","link":"https://www.bilibili.com/video/BV1WtQJB4Eve"},{"title":"健身入门：基础力量训练","author":"健身食堂杨师傅","play":"11.7万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/26c51be904e92cc6c69fdbe718fd43b3d9e4d7cd.jpg","link":"https://www.bilibili.com/cheese/play/ss20909?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"30加女生零基础必须控制饮食加力训减肚子最高效#科学减脂#力量训练#减脂塑形#薄肌#少女感","author":"呆萌塑形减脂","play":"149","duration":"2:33","pic":"https://i0.hdslb.com/bfs/archive/50b060837783a5d691234f45bf1ac4840e7d4cdd.jpg","link":"https://www.bilibili.com/video/BV1xY3C6fEcK"},{"title":"【塑形】40分钟力量训练，一月体脂率减10%，需哑铃，动作不重复","author":"范享乐动","play":"136.9万","duration":"39:41","pic":"https://i1.hdslb.com/bfs/archive/84daba0d285efe94cf96792bf68af34ff29bc649.jpg","link":"https://www.bilibili.com/video/BV11t421a7LB"},{"title":"50分钟全身无氧自重力量塑形训练、无工具徒手力量、塑形紧致、循环代谢提升、自重力量紧致肌肉线条","author":"刘元","play":"20.3万","duration":"48:8","pic":"https://i1.hdslb.com/bfs/archive/63d317167154b1c22f72660fb0bb9b0f280d4b4b.jpg","link":"https://www.bilibili.com/video/BV1ZqD3BWEDM"},{"title":"30分钟无氧自重抗阻力量训练、薄肌线条塑造、全身自重训练、提升代谢、增加肌肉弹性","author":"刘元","play":"26.3万","duration":"29:0","pic":"https://i0.hdslb.com/bfs/archive/db83a509f0fa8ccb019a9ef41186455ae49f7073.jpg","link":"https://www.bilibili.com/video/BV11umzBiEJx"},{"title":"【安娜growingannanas】10分钟每日徒手力量训练-无需器械","author":"安娜growingannanas","play":"11.9万","duration":"10:56","pic":"https://i0.hdslb.com/bfs/archive/cf0d1ea694142a309a444280aaf2e8c9105eaa53.jpg","link":"https://www.bilibili.com/video/BV1knKs64Emb"},{"title":"居家减脂塑形力量跟练计划","author":"康老师特别细","play":"4442","duration":"","pic":"https://archive.biliimg.com/bfs/archive/ace96015d0f9ce5871d5a9623443568510ad251f.jpg","link":"https://www.bilibili.com/cheese/play/ss725914551?query_from=0&search_id=12389339266831492512&search_query=%E5%A5%B3%E7%94%9F%E5%8A%9B%E9%87%8F%E8%AE%AD%E7%BB%83"},{"title":"【安娜growingannanas】力量训练四周计划Day2-30分钟上半身训练-配合哑铃","author":"安娜growingannanas","play":"7082","duration":"34:0","pic":"https://i1.hdslb.com/bfs/archive/995ad20d1df4d8fc1e0933420d092dc94e0d845d.jpg","link":"https://www.bilibili.com/video/BV1DJ3C6BExP"},{"title":"30min组合力量训练，快速减掉20斤并全身紧致！","author":"真的费教练健身教学","play":"136.6万","duration":"32:36","pic":"https://i0.hdslb.com/bfs/archive/fb4caaa2b1315c6376b845097f031c5e6b6a1abc.jpg","link":"https://www.bilibili.com/video/BV1D94y1A7EL"},{"title":"22min哑铃全身无氧力量训练｜燃脂塑形，提高代谢","author":"miss朱zhu","play":"270.1万","duration":"22:3","pic":"https://i1.hdslb.com/bfs/archive/6ee62861ba5b23d2dcc0d50ef7bbfabe7cba870b.jpg","link":"https://www.bilibili.com/video/BV1ne4y1i7Dx"}]},{"label":"瑜伽","list":[{"title":"2026.01.12 【Breathe and Flow】试试这个战士2式挑战瑜伽课程","author":"我叫阿搬","play":"3.9万","duration":"27:58","pic":"https://i1.hdslb.com/bfs/archive/f1944b5a26d1e51ca2767d9ad52685a3359694a9.jpg","link":"https://www.bilibili.com/video/BV1kqrvBuEve"},{"title":"10分钟伸展燃烧有氧运动！适合冬季懒人舒展身体和取暖燃脂升温！【周六野】","author":"周六野Zoey","play":"199.3万","duration":"11:55","pic":"https://i2.hdslb.com/bfs/archive/cc93c5c49fa29905d73730b850382c69a66a435e.jpg","link":"https://www.bilibili.com/video/BV1qJ411C7sq"},{"title":"10分钟美腿拉伸运动，变直变长，改善腿型！【周六野Zoey】","author":"周六野Zoey","play":"402.7万","duration":"15:7","pic":"https://i1.hdslb.com/bfs/archive/f0f6b7404d3fb209b944e9266c7f0ec4ced48f32.jpg","link":"https://www.bilibili.com/video/BV1kE411W75u"},{"title":"28天 高效瘦小腿！脂肪型 肌肉型 水肿型 针对训练 漫画腿get","author":"文不叮","play":"167.2万","duration":"7:55","pic":"https://i0.hdslb.com/bfs/archive/b005462e44bad2bfd4926ada1194a3c39d2d5ff8.jpg","link":"https://www.bilibili.com/video/BV1dJ411Q7x8"},{"title":"明星抗衰保养！【秋冬气血瑜伽】懒女孩睡前8min，冻龄婴儿肌+养出瘦体质！","author":"Rosie的瑜伽乐园","play":"17.3万","duration":"9:17","pic":"https://i1.hdslb.com/bfs/archive/7f4e774d40e30c4f2f2eed227a3f382a39c382ca.jpg","link":"https://www.bilibili.com/video/BV1U34y1U78j"},{"title":"【自我康复】5个动作解决肩胛骨内侧疼、肩颈疼痛","author":"郝强Fit","play":"142.1万","duration":"1:34","pic":"https://i1.hdslb.com/bfs/archive/7a50824f3e4366b82455687d3ce39716d903a674.jpg","link":"https://www.bilibili.com/video/BV1Du411S7oQ"},{"title":"【Hisdream】面部瑜伽剪辑版 每天10分钟改善大小脸、面部不对称、歪嘴歪鼻和大小眼高低眉","author":"CupidsArrowHit","play":"101.1万","duration":"9:40","pic":"https://i1.hdslb.com/bfs/archive/84f8a8e984fe775f98dd56255af552dc5d9509b9.jpg","link":"https://www.bilibili.com/video/BV1az4y197Lr"},{"title":"起床空腹6分钟轰炸腹肌/Mooki的瑜伽分享09","author":"Mooki瑜伽","play":"46.6万","duration":"7:13","pic":"https://i1.hdslb.com/bfs/archive/ae3f2a0952cbb084733ecebe202feec21a02590d.jpg","link":"https://www.bilibili.com/video/BV1N54y1y7RW"},{"title":"我必须要给意志力差的姐妹，强烈安利这个韩国一分钟魔性瘦身操！最近在外网上炒鸡火！！｜转自卤水二妹姐","author":"陌与陌寻","play":"360.6万","duration":"7:17","pic":"https://i0.hdslb.com/bfs/archive/2ba5b9012e492f7ae4c3f4dbbede30e4a0c372fc.jpg","link":"https://www.bilibili.com/video/BV1fE411k7NW"},{"title":"【每日瑜伽】脊柱理疗-全方位修复肩颈颈椎，疼痛不再！","author":"每日瑜伽官方账号","play":"43.2万","duration":"179:53","pic":"https://i1.hdslb.com/bfs/archive/53fbbadd0673a55a4fe7d6d6d6d29265c616f2b1.jpg","link":"https://www.bilibili.com/video/BV12W411A7oR"},{"title":"2个晨起瑜伽，每天坚持10分钟，立现性感蝴蝶背","author":"洗衣机推荐2026-","play":"47.0万","duration":"1:10","pic":"https://i2.hdslb.com/bfs/archive/199afaebd6d9ca032025592e89a27986f4e583c2.jpg","link":"https://www.bilibili.com/video/BV1Lt411g7DS"},{"title":"【艾琳】15分钟全身燃脂 | 不用跳不伤膝盖不深蹲 | 适用宿舍学生党上班族","author":"艾琳鱼鱼","play":"47.6万","duration":"19:12","pic":"https://i0.hdslb.com/bfs/archive/5313255cb5dea2ad3be44e5aec4474fac1c220e7.jpg","link":"https://www.bilibili.com/video/BV1Xv411z7NJ"}]},{"label":"普拉提","list":[{"title":"【虐腿】高强度瘦腿|普拉提100次大腿外侧＋100次内侧瘦腿训练","author":"wishisnotfar","play":"1923.6万","duration":"45:44","pic":"https://i0.hdslb.com/bfs/archive/6f72ca203d2b06f451db86e991259fe2cd98818a.jpg","link":"https://www.bilibili.com/video/BV1bp411A7Yp"},{"title":"Eleni Fit - 30分钟站立普拉提训练｜全身燃脂塑形·无重复·含热身拉伸","author":"EleniFit","play":"19.5万","duration":"33:13","pic":"https://i1.hdslb.com/bfs/archive/e59033bbbed66918503dd36b6be7bc7ab792dc95.jpg","link":"https://www.bilibili.com/video/BV1JjTL6AEde"},{"title":"帕梅拉 - 15分钟普拉提训练|慢速全身紧实 膝盖友好低冲击 (Pamela Reif Official)","author":"帕梅拉PamelaReif","play":"458.2万","duration":"16:28","pic":"https://i0.hdslb.com/bfs/archive/38a79651845a239f3395d597ddea68aec2dbc540.jpg","link":"https://www.bilibili.com/video/BV1Wm4y1U72s"},{"title":"35分钟全身塑形普拉提｜紧致线条·提升力量｜居家无器械｜LUNACHEN","author":"LunavChen","play":"5393","duration":"36:40","pic":"https://i1.hdslb.com/bfs/archive/b5bc0c824f094fdd5c30e3632e823b2ec5b9fba3.jpg","link":"https://www.bilibili.com/video/BV19a3M6kExJ"},{"title":"【限时特惠】欧阳春晓：30天维密普拉提居家瘦身","author":"欧阳春晓Aurora","play":"1606.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/2f8600af26c9a566407d0914a75d042ab8328dc5.jpg","link":"https://www.bilibili.com/cheese/play/ss15046?query_from=0&search_id=183304677490764785&search_query=%E6%99%AE%E6%8B%89%E6%8F%90"},{"title":"【2026最新】魏巍普拉提完整课程28天魏巍普拉提完整课程跟练版魏巍普拉提完整课程21天魏巍普拉提完整课程瘦肚子 魏巍普拉提跟练 魏巍普拉提完整课程 魏巍普","author":"62071062","play":"1198","duration":"8352:12","pic":"https://i0.hdslb.com/bfs/archive/0e5f9742f6dde11d53d795e1995ae30b6fb17bd0.jpg","link":"https://www.bilibili.com/video/BV15D3T6rE8a"},{"title":"全身完整版瑶瑶维密普拉提塑形直播回放早课2026/7/29","author":"嘴强王者-练不动","play":"73","duration":"82:8","pic":"https://i1.hdslb.com/bfs/archive/7389e5c5321dacd81ac4f9eef37ded5efbcd5fb5.jpg","link":"https://www.bilibili.com/video/BV1vR316pEdq"},{"title":"【2026最新】魏巍普拉提完整课程 魏巍普拉提跟练版 魏巍普拉提完整课程跟练版 魏魏21天/28天普拉提课程28天骨态塑形营21天普拉提瘦身蜕变营14天快速瘦身","author":"努力1366226","play":"668","duration":"6538:11","pic":"https://i1.hdslb.com/bfs/archive/32d5341677c275e80129b4807cf0b770b2a18d5b.jpg","link":"https://www.bilibili.com/video/BV1nJ3M6QEcr"},{"title":"健身普拉提","author":"仙气缭","play":"74","duration":"0:52","pic":"https://i0.hdslb.com/bfs/archive/e4910c53d475d8db8b9b6f861716216b35b9c2d5.jpg","link":"https://www.bilibili.com/video/BV1aL3r6YEhr"},{"title":"静静晚课普拉提＋私教课腰腹单边右2026.7.28周二晚上录屏上传自用","author":"我叫郑明霞","play":"115","duration":"114:42","pic":"https://i0.hdslb.com/bfs/archive/abb511f6d152e442193d84d74a845de3c5a4bb74.jpg","link":"https://www.bilibili.com/video/BV1jm3r6rEvY"},{"title":"小肚子长不了一点！20分钟普拉提虐腹瘦肚｜私教级口令带练","author":"欧阳春晓Aurora","play":"302.4万","duration":"19:34","pic":"https://i1.hdslb.com/bfs/archive/f18e87b5551416c99b2432124b38e70f506c500e.jpg","link":"https://www.bilibili.com/video/BV1pQ4y1g7C3"},{"title":"MIZI 40分钟练出纤瘦身材｜全身普拉提训练｜无需器材","author":"MIZI","play":"24.5万","duration":"40:31","pic":"https://i1.hdslb.com/bfs/archive/c2dbd5c305cbfe1d2b37451778c27f924f6f6a17.jpg","link":"https://www.bilibili.com/video/BV15P8izHEYE"}]},{"label":"拉伸放松","list":[{"title":"自用，跑步，骑行运动后全身拉伸，全程站立，舒展筋骨，拉伸线条","author":"zngogo","play":"285.3万","duration":"8:3","pic":"https://i0.hdslb.com/bfs/archive/cb5b0516a125bc96153647884df366dffaa4d4e2.jpg","link":"https://www.bilibili.com/video/BV1ae411D7SL"},{"title":"mizi 15分钟全身放松拉伸降低皮质醇舒缓压力放松身心","author":"简宁无跑跳跟练","play":"1037","duration":"15:12","pic":"https://i2.hdslb.com/bfs/archive/084db2863b569bd43bfdd3bf77f95b9c1619d62a.jpg","link":"https://www.bilibili.com/video/BV1wP3w6BEhY"},{"title":"【Mady Morrison】运动后必做10分钟全身拉伸｜冷身放松，修复肌肉缓解酸痛","author":"开合跳撒金币","play":"699","duration":"11:17","pic":"https://i1.hdslb.com/bfs/archive/449e05bbedf63b3599e3c15b08d40e8e09c151a1.jpg","link":"https://www.bilibili.com/video/BV1GnKc6gEGe"},{"title":"拉伸","author":"洗了蒜啦l","play":"7376","duration":"7:7","pic":"https://i1.hdslb.com/bfs/archive/63f7d46623e6fadec61ca3e5073489e5f636707f.jpg","link":"https://www.bilibili.com/video/BV168GX62EPJ"},{"title":"腿部拉伸 | 改善肌肉型腿粗·get细长直美腿！","author":"不织布是Wendy","play":"211.7万","duration":"8:47","pic":"https://i1.hdslb.com/bfs/archive/c0e8bd4f70b213990db51390d88bd9fe6a00fc4a.jpg","link":"https://www.bilibili.com/video/BV1gU4y1d7nV"},{"title":"【MIZI】 14 分钟全身拉伸丨运动后放松，舒展身体，改善僵硬，提升柔韧性","author":"开合跳撒金币","play":"4987","duration":"14:11","pic":"https://i2.hdslb.com/bfs/archive/33adea6d1059932cbabaea2a6c44915ce4fb33d7.jpg","link":"https://www.bilibili.com/video/BV19tMJ6PEWd"},{"title":"【47min 有效改善骨盆前倾】缓解腰痛｜含体态自测 + 原理讲解｜拉伸放松 + 力量巩固全套理疗瑜伽 | 告别小腹突出、久坐腰痛","author":"月川Yue","play":"538","duration":"50:26","pic":"https://i0.hdslb.com/bfs/archive/c8fa520ef5685c9181170bd008631da72661eefa.jpg","link":"https://www.bilibili.com/video/BV1C63e6AEpw"},{"title":"帕梅拉 - 10min 全身拉伸|运动后全身伸展 有效放松肌肉 增强灵活性","author":"帕梅拉PamelaReif","play":"2063.5万","duration":"10:27","pic":"https://i2.hdslb.com/bfs/archive/8d6ee8eb034699b238b42d55aad5ab6c73de4098.jpg","link":"https://www.bilibili.com/video/BV1gf4y1p78A"},{"title":"170 平躺拉伸放松｜深度解锁：再次升级的轻松体验｜碎碎念","author":"军凝伟悦彬江康","play":"0","duration":"0:18","pic":"https://i0.hdslb.com/bfs/archive/08d541da1c1705ff99ebbf95f49ec167dba3c249.jpg","link":"https://www.bilibili.com/video/BV1AG3662EMg"},{"title":"体大硕士带你正确拉伸｜跑前动态拉伸+跑后深度拉伸+入门静态拉伸｜跑步拉伸从入门到精通","author":"跑步的子章老师","play":"380.2万","duration":"24:30","pic":"https://i0.hdslb.com/bfs/archive/97c26f74bb2b0a09c04f9135bef85f2707d21a98.jpg","link":"https://www.bilibili.com/video/BV1fq4y1M7L1"},{"title":"体育课放松拉伸","author":"壹斤米","play":"1.5万","duration":"1:25","pic":"https://i2.hdslb.com/bfs/archive/edfab39ac3b0152729da92852cfe69356ffa368a.jpg","link":"https://www.bilibili.com/video/BV1R6421c7bV"},{"title":"划船机运动之后的拉伸放松","author":"肥渣是只猫","play":"2.4万","duration":"3:36","pic":"https://i0.hdslb.com/bfs/archive/f0eee7b246b1f53e8eb6e7650581a11d49fcd578.jpg","link":"https://www.bilibili.com/video/BV1QK4y1s7Hy"}]}]},"makeup":{"groups":[{"label":"新手化妆","list":[{"title":"【化妆入门课】0基础化妆变美逆袭课！易上手|化妆技巧|化妆教程|系统课|手把手教化妆|毕业变美指南","author":"JSMN-Me","play":"308.0万","duration":"706:28","pic":"https://i1.hdslb.com/bfs/archive/13f3dbf71ada18ba13be81fe20814b6d117f2d7a.png","link":"https://www.bilibili.com/video/BV1iU4y1L7G2"},{"title":"新手跟练版！巨巨巨详细化妆教程，我看谁还学不会。","author":"王艺慈wyc","play":"116.5万","duration":"15:7","pic":"https://i0.hdslb.com/bfs/archive/d4f4d6bda970636024b6c071fc017d756b21aca1.jpg","link":"https://www.bilibili.com/video/BV1Kz421Z7Xc"},{"title":"毛戈平的化妆课","author":"大渔大师课","play":"10.9万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/746ddede613a89824efe59abe51c61460de8c3f2.jpg","link":"https://www.bilibili.com/cheese/play/ss11210?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"10min超详细全妆跟练！新手友好的日杂清透感淡妆~真正能让小白学会化妆的视频！","author":"王小吉日记","play":"536","duration":"10:13","pic":"https://i2.hdslb.com/bfs/archive/67db6a6df0d188da16e21780208521109b45e6ed.jpg","link":"https://www.bilibili.com/video/BV1U53q6mEpH"},{"title":"《看完你就学会化妆》","author":"dao刀刀_","play":"389.4万","duration":"14:33","pic":"https://i1.hdslb.com/bfs/archive/2200201d2187398e69c3aea8db97697f5070a815.jpg","link":"https://www.bilibili.com/video/BV1qa411o7MT"},{"title":"零基础化妆教程","author":"VV美妆小课堂","play":"5.6万","duration":"12:14","pic":"https://i2.hdslb.com/bfs/archive/0c185fa5174c4044ecffba990fcdd9b3c949dc26.jpg","link":"https://www.bilibili.com/video/BV1CHoxBpE5f"},{"title":"巨巨巨巨详细新手化妆教程来啦❗码住跟练~","author":"煤球球coal","play":"41.7万","duration":"13:43","pic":"https://i2.hdslb.com/bfs/archive/48c426b4583a402ed743db9725eeefbb54fcffc0.jpg","link":"https://www.bilibili.com/video/BV1dpGAz7E6f"},{"title":"从洗脸开始拍的新手裸妆教程","author":"四花女士","play":"71.8万","duration":"18:52","pic":"https://i1.hdslb.com/bfs/archive/94a5f8cac15b6683d4a0599fc1e85140a749fab7.jpg","link":"https://www.bilibili.com/video/BV1AnMEzcEKi"},{"title":"化妆课","author":"橘子小课","play":"4.1万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/a274c7c9cb5d3377def572cdf1c7c08800e066c6.jpg","link":"https://www.bilibili.com/cheese/play/ss24987?query_from=0&search_id=16528909070007549016&search_query=%E6%96%B0%E6%89%8B%E5%8C%96%E5%A6%86"},{"title":"零基础化妆特训班！底妆轻松学，记得交作业！","author":"勇仔leo","play":"16.9万","duration":"7:32","pic":"https://i1.hdslb.com/bfs/archive/463a4152fd911492c7ddc1ef9031fb7fd41c0509.jpg","link":"https://www.bilibili.com/video/BV1xX4y1H7P2"},{"title":"v太阳花睫毛轻松拿捏～ #三资堂睫毛膏 #睫毛膏 #新手化妆 #防水防汗不晕染 #眼妆","author":"苌大苡d诟W","play":"0","duration":"0:29","pic":"https://i2.hdslb.com/bfs/archive/6e83cc28326fc4aaa608d88cf5dc08cd2c2cb5ad.jpg","link":"https://www.bilibili.com/video/BV1on3B6aEvz"},{"title":"0基础学化妆！新手小白化妆步骤","author":"Lyla豆豆","play":"3.2万","duration":"6:10","pic":"https://i2.hdslb.com/bfs/archive/d3ae150750896719b4138c9c23534e10f86122b3.jpg","link":"https://www.bilibili.com/video/BV1g24y1b7kv"}]},{"label":"日常妆容","list":[{"title":"专属详解版 | 显贵显质感的日常妆容~","author":"程十安an","play":"261.5万","duration":"14:44","pic":"https://i1.hdslb.com/bfs/archive/5a2c264ac447e9adac074198324ee3dd2596e8f1.jpg","link":"https://www.bilibili.com/video/BV1y8411T7VF"},{"title":"这才是普通人应该学的轻透日常妆","author":"美少女老王_","play":"9306","duration":"2:52","pic":"https://i0.hdslb.com/bfs/archive/df7ce28624e9c23db2a80f86e0a8190af6f1c9cf.jpg","link":"https://www.bilibili.com/video/BV11wN96uEct"},{"title":"毛戈平美妆学院：零基础流行妆容应用","author":"毛戈平光影美学","play":"1399","duration":"","pic":"https://archive.biliimg.com/bfs/archive/f6beb7f4ef43d3f0a74d2a44940c85eac3cc5db9.jpg","link":"https://www.bilibili.com/cheese/play/ss3929?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手必看 保姆级眼妆教程 ｜不会画眼影的都来学","author":"是一只小何","play":"127.0万","duration":"2:1","pic":"https://i0.hdslb.com/bfs/archive/c581cfc246accba726020906dd9e37cc1281b60b.jpg","link":"https://www.bilibili.com/video/BV1qi4y1r7an"},{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"男生日常妆容，做好这两步就够了！不会显娘气","author":"崔佳楠sayi","play":"19.3万","duration":"2:38","pic":"https://i2.hdslb.com/bfs/archive/3d97704807197ece76ffbd871336d44799c49508.jpg","link":"https://www.bilibili.com/video/BV1nv411T7GH"},{"title":"清透日常妆容😘内附你们要的眉毛教程！！","author":"enndmee","play":"268.0万","duration":"2:26","pic":"https://i0.hdslb.com/bfs/archive/a2e5922df619d97fb70de9ca30d400397a7ac2a5.jpg","link":"https://www.bilibili.com/video/BV1Lt4y1S7ib"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"化妆美学|零基础化妆教程|毕业变美指南|化妆基础","author":"JSMN-Me","play":"831","duration":"","pic":"https://archive.biliimg.com/bfs/archive/80e35fbb848dd2d1bd0b3cddd99eb50dc6e92f1c.jpg","link":"https://www.bilibili.com/cheese/play/ss27496?query_from=0&search_id=9849082319378001562&search_query=%E6%97%A5%E5%B8%B8%E5%A6%86%E5%AE%B9"},{"title":"新手赶快来学这个日常拍照都好看的淡颜韩妆～","author":"一颗小泡芙芙","play":"2256","duration":"2:5","pic":"https://i1.hdslb.com/bfs/archive/8712dc9ff899f8ff542e961bff30a6cf8fe17b8f.jpg","link":"https://www.bilibili.com/video/BV1z8gS6wENC"},{"title":"妆前是丑女，妆后是女神你还爱我么","author":"小樱桃日常","play":"28.5万","duration":"2:9","pic":"https://i2.hdslb.com/bfs/archive/77a710bd9ed90e4da5eb4cded1f2e94b369bd671.jpg","link":"https://www.bilibili.com/video/BV1ctT96uEEQ"},{"title":"工作日，去上班的一个妆容记录","author":"大脸猫爱吃鱼昂","play":"57.0万","duration":"5:19","pic":"https://i0.hdslb.com/bfs/archive/95e9d5ece483c6644c87ef2305a45640542172f6.jpg","link":"https://www.bilibili.com/video/BV1QL4y1Y7Zf"}]},{"label":"通勤妆","list":[{"title":"十分钟速成美女！通勤/早八/懒人糊弄学换头大法！","author":"九梨Jelly","play":"39.4万","duration":"7:52","pic":"https://i1.hdslb.com/bfs/archive/5c4bfc785784872a0747e0a54d54208463c34b00.jpg","link":"https://www.bilibili.com/video/BV1VT4y1r7kf"},{"title":"暑假学化妆！从10mins日常/通勤 快速出门妆开始!","author":"-红猫猫","play":"1.1万","duration":"3:25","pic":"https://i1.hdslb.com/bfs/archive/81813f8826de91baf298bb77e2e1607887d16cb7.jpg","link":"https://www.bilibili.com/video/BV1ZAKg6kEWX"},{"title":"早九牛马全妆｜花知晓03二画这样更适合通勤","author":"爱臭美的猴儿","play":"594","duration":"6:0","pic":"https://i0.hdslb.com/bfs/archive/26bf268a72aed8119b30c2fb46dbd6db1f7aa1a3.jpg","link":"https://www.bilibili.com/video/BV13Q3q6pEcX"},{"title":"43岁外企理级｜5min搞定通勤妆","author":"jiu酱姨姨","play":"2.8万","duration":"5:53","pic":"https://i0.hdslb.com/bfs/archive/fe49b425d45055954195342b6a897b159a3d34a1.jpg","link":"https://www.bilibili.com/video/BV1nMVU6uEpP"},{"title":"大方脸，早八通勤妆咋画？","author":"弄弄这个妆","play":"21.1万","duration":"2:30","pic":"https://i2.hdslb.com/bfs/archive/515ac543159894a4dc554dc570ab3390ddae9fd0.jpg","link":"https://www.bilibili.com/video/BV1HG4y1t728"},{"title":"新手也一定能学会的早八妆！","author":"nana羊羊羊","play":"9.5万","duration":"6:15","pic":"https://i2.hdslb.com/bfs/archive/159128ba3d1f8bac48afa50c57c3c024ea4718d9.jpg","link":"https://www.bilibili.com/video/BV1igovYGE78"},{"title":"【canmake眼影盘02教程｜10分钟日常通勤妆】","author":"Ulia_Ly","play":"1.5万","duration":"4:5","pic":"https://i0.hdslb.com/bfs/archive/b34bff47b5866470b8c3befbdffecaed343caf12.jpg","link":"https://www.bilibili.com/video/BV1Rz4y1R73v"},{"title":"2分钟搞完通勤伪素颜妆（详细版","author":"一碗粥耶_","play":"5.7万","duration":"6:50","pic":"https://i1.hdslb.com/bfs/archive/7e9a10714dcbd8be8c8b9de48000040181620d22.jpg","link":"https://www.bilibili.com/video/BV1MzrYYDEvJ"},{"title":"【eunHae】 韩国上班族女生10min 快速通勤妆 | my daily 10mins make-up","author":"SunnieMellet","play":"1.3万","duration":"11:28","pic":"https://i2.hdslb.com/bfs/archive/e4e1302a290cce956f67603cba79682c35a8c1e9.jpg","link":"https://www.bilibili.com/video/BV1Ac411d77P"},{"title":"日常通勤底妆 只需要2分钟","author":"Elvis增增-","play":"1.5万","duration":"6:20","pic":"https://i2.hdslb.com/bfs/archive/08f8c683f95c2eacda679269cbf18bafb7ecc369.jpg","link":"https://www.bilibili.com/video/BV17Kcfz7Exv"},{"title":"高效通勤出门淡妆好物！最短的时间最大的改变！","author":"九梨Jelly","play":"21.1万","duration":"6:51","pic":"https://i0.hdslb.com/bfs/archive/105fdfc0f5551c04961927257db143d8fdcf1b12.jpg","link":"https://www.bilibili.com/video/BV1vs4y1u7Tf"},{"title":"爱用合集｜通勤早八面试百搭色！气血高智感！","author":"Carina喵酱","play":"6.3万","duration":"1:37","pic":"https://i0.hdslb.com/bfs/archive/baa6caa59fca5dbec35c2facc3de3d8d879b41d8.jpg","link":"https://www.bilibili.com/video/BV1g1NCzMEkN"}]},{"label":"约会妆","list":[{"title":"新手好学！20分钟又纯又嗲的七夕约会妆容","author":"诺诺和香菜_","play":"2.1万","duration":"3:5","pic":"https://i1.hdslb.com/bfs/archive/e57ec1ad93492d56bd0f2dd33e79b0ae0c683aa5.jpg","link":"https://www.bilibili.com/video/BV1Yd4y1T7BY"},{"title":"【白桃子】约会斩男妆｜只要够精致每天都是情人节","author":"白桃子s","play":"1.7万","duration":"8:25","pic":"https://i1.hdslb.com/bfs/archive/618546872440b3cda88d1e85ed0f86950cc8e3bb.jpg","link":"https://www.bilibili.com/video/BV1bf4y1Q73E"},{"title":"男生夏天的妆容跟练！很自然而且暴汗不脱妆，希望对你有帮助！","author":"乐仔Levi","play":"5426","duration":"4:46","pic":"https://i2.hdslb.com/bfs/archive/f4e3fc529fcbec8195f0c491b9705584d57982e5.jpg","link":"https://www.bilibili.com/video/BV1Miga6NEau"},{"title":"40岁中年老阿姨的无眼线 520心动约会妆 从黄脸婆到面带桃花","author":"白晓袅","play":"3.5万","duration":"10:49","pic":"https://i0.hdslb.com/bfs/archive/c93a0403ec893156e484dc7f21bae0d3755da9b2.jpg","link":"https://www.bilibili.com/video/BV1Nv411L7m8"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"蓝蓝化妆分享","play":"1.1万","duration":"9:37","pic":"https://i2.hdslb.com/bfs/archive/bbd5db0208dc6214827e2fdc6dfe405a70376731.jpg","link":"https://www.bilibili.com/video/BV1PYLw6WEtX"},{"title":"2min跟练｜夏日暴汗不脱妆底妆教程分享～get胶水底妆","author":"露露堡-","play":"2701","duration":"1:53","pic":"https://i2.hdslb.com/bfs/archive/c616543953df9cce3109f4593668573743149d72.jpg","link":"https://www.bilibili.com/video/BV1ya3u6aE9N"},{"title":"新手10分钟氧气甜妹妆！淡颜100%适配！","author":"chilly香菜","play":"39.5万","duration":"1:58","pic":"https://i2.hdslb.com/bfs/archive/63dd33ae8509de6350a700da7d9a4b2a4168f674.jpg","link":"https://www.bilibili.com/video/BV1fZ42127FY"},{"title":"画儿童舞台妆视频教程，学会以后自己小孩舞台表演就不用愁了！","author":"雪児酱","play":"8.8万","duration":"3:45","pic":"https://i0.hdslb.com/bfs/archive/7f857c37b6f03de659abb24cd5cf756d16b29b4d.jpg","link":"https://www.bilibili.com/video/BV1Et411G7ni"},{"title":"【中字 · gojiseung】韩博年末约会妆❄️ | 表面伪素颜 but其实是核级全妆…！！","author":"SunnieMellet","play":"3.8万","duration":"16:9","pic":"https://i0.hdslb.com/bfs/archive/37ceed8ff964d9e067a455c67c5c483d8388c692.jpg","link":"https://www.bilibili.com/video/BV1HRq8BmEaR"},{"title":"GRWM｜温柔桃粉兔兔妆+做蛋糕日常～","author":"Mhoney蒙蒙","play":"30.8万","duration":"4:38","pic":"https://i1.hdslb.com/bfs/archive/6013d1e791338d7302975919144ce1c209722c8f.jpg","link":"https://www.bilibili.com/video/BV166epeCE6k"},{"title":"男友脸红心跳！氛围感纯欲妆！超简单新手必备！通勤约会妆｜圆脸减龄妆教","author":"兔染染Summer","play":"29.5万","duration":"7:5","pic":"https://i2.hdslb.com/bfs/archive/b28e0d950ca182c3dae95917ce95aa0a356163e8.jpg","link":"https://www.bilibili.com/video/BV1M84y1F7vp"},{"title":"让新手看清细节！巨巨详细的心动约会妆！！","author":"爱化妆的陈陈","play":"19.6万","duration":"5:49","pic":"https://i1.hdslb.com/bfs/archive/ace17ca12ee53771e7aac30f0ed0e1fb8b18bc99.jpg","link":"https://www.bilibili.com/video/BV1ju4m1T7WH"}]},{"label":"伪素颜","list":[{"title":"越热越美 夏日限定伪素颜妆容","author":"姜乘澜","play":"78.6万","duration":"14:41","pic":"https://i0.hdslb.com/bfs/archive/35d42224823ac1b5e9718beb1daebaf37c38bffc.jpg","link":"https://www.bilibili.com/video/BV1kK7a6gEq9"},{"title":"伪素颜｜参考女明星素颜天花板！普通人如何伪造天然好气色素颜感？【一枝南南】","author":"一枝南南","play":"86.3万","duration":"13:39","pic":"https://i2.hdslb.com/bfs/archive/784b3dc54ebefa2e2fc43c8baa71ae79c33cd033.jpg","link":"https://www.bilibili.com/video/BV1ZA4y1Q7X2"},{"title":"五分钟就能搞定的伪素颜妆","author":"入时十六今六十","play":"78.5万","duration":"1:13","pic":"https://i0.hdslb.com/bfs/archive/9892d1a831157a1a82844a27070edefd859218be.jpg","link":"https://www.bilibili.com/video/BV1oP4y157Xo"},{"title":"“伪妆”高级生活伪素颜","author":"蓝曳-伪妆大师","play":"5.0万","duration":"","pic":"https://archive.biliimg.com/bfs/archive/5efa8a52c8a1569f08ecbf790c6eab32badae4e4.jpg","link":"https://www.bilibili.com/cheese/play/ss16781?query_from=0&search_id=5485147832150080592&search_query=%E4%BC%AA%E7%B4%A0%E9%A2%9C%E5%A6%86"},{"title":"学生党伪素颜四件套，还是很实用的在学校也能美美哒","author":"夏熙呀呀呀","play":"19.3万","duration":"1:55","pic":"https://i0.hdslb.com/bfs/archive/953c6204d285cd57347d55f4c95c32a0a7e66295.jpg","link":"https://www.bilibili.com/video/BV1dP411v73Y"},{"title":"男生素颜妆【一看就会版】","author":"恶霸崔憨憨","play":"117.6万","duration":"2:57","pic":"https://i1.hdslb.com/bfs/archive/bcc30c030421dd3735f7b0f385d83f260963d350.jpg","link":"https://www.bilibili.com/video/BV1tL4y1J7X6"},{"title":"早八5分钟！轻松换头的白开水伪素颜妆","author":"一只超能梦梦","play":"2498","duration":"5:14","pic":"https://i0.hdslb.com/bfs/archive/b07e99f33bc2eccf5348c2d7afd8cee893b42eef.jpg","link":"https://www.bilibili.com/video/BV19R3C6yEB6"},{"title":"无粉底也能画出氛围感伪素颜？10分钟get！","author":"摆烂小O椰","play":"8.2万","duration":"4:2","pic":"https://i2.hdslb.com/bfs/archive/e1ecfb35c784d390f796d24401be67a2ba17beae.jpg","link":"https://www.bilibili.com/video/BV1tDu1zEEb9"},{"title":"新手赶快码住这个1min快素伪素颜淡妆～","author":"一颗小泡芙芙","play":"3341","duration":"1:9","pic":"https://i2.hdslb.com/bfs/archive/2ce2171bfd89da24efa73374b00c64b467e9a4b6.jpg","link":"https://www.bilibili.com/video/BV1GW3w6REf1"},{"title":"10min早八糊弄学！新手速成的氛围伪素颜妆","author":"安琪教化妆","play":"1404","duration":"7:21","pic":"https://i2.hdslb.com/bfs/archive/0fb51b6b478f92790d94259698cf1944128af4db.jpg","link":"https://www.bilibili.com/video/BV1t9gQ6WEH3"},{"title":"【幸運】less is more—极致伪素颜化妆思路～不好意思我素颜就这么美","author":"裴幸運","play":"44.5万","duration":"5:15","pic":"https://i1.hdslb.com/bfs/archive/6952fdaa53743d1775a1d38728c37eef11eb144a.jpg","link":"https://www.bilibili.com/video/BV1Nv411A7jG"},{"title":"绝了！这个新手5min早八伪素颜妆也太嫩太简单了吧！","author":"兰兰同学v","play":"3.2万","duration":"1:24","pic":"https://i2.hdslb.com/bfs/archive/a7a57dc8628ff327d4a9f763a9a9abe80582455a.jpg","link":"https://www.bilibili.com/video/BV1AWsmeFEa7"}]}]}};
-  let feedCat = 0, feedPool = 0;
   function feedEscapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
   function feedKwList() {
     const cat = FEED_CATS[feedCat];
@@ -1664,17 +2684,31 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     head.className = "feed-cat-head";
     head.innerHTML = '<span class="ic">' + cat.ic + "</span>" + cat.name;
     grid.appendChild(head);
+    let kws = feedKwList();
+    if (feedSearch.trim()) {
+      const q = feedSearch.trim().toLowerCase();
+      kws = kws.filter(function (kw) { return kw.toLowerCase().indexOf(q) >= 0; });
+    }
+    if (!kws.length) { grid.innerHTML += '<div class="empty">没有匹配「' + feedEscapeHtml(feedSearch.trim()) + '」的关键词</div>'; return; }
     const wrap = document.createElement("div");
     wrap.className = "feed-grid-cards";
-    feedKwList().forEach(function (kw) {
+    kws.forEach(function (kw) {
+      const st = feedState[kw] || {};
       const a = document.createElement("a");
       a.className = "kcard";
       a.href = "https://search.bilibili.com/all?keyword=" + encodeURIComponent(kw);
       a.target = "_blank"; a.rel = "noopener";
       a.innerHTML =
         '<div class="kcard-ic">▶</div>' +
-        '<div class="kcard-title">' + feedEscapeHtml(kw) + '</div>' +
+        '<div class="kcard-title">' + (st.top ? "📌 " : "") + feedEscapeHtml(kw) + '</div>' +
         '<div class="kcard-sub">前往 B 站看相关视频 ›</div>';
+      const acts = document.createElement("div"); acts.className = "item-row-acts"; acts.style.marginTop = "8px"; acts.style.justifyContent = "center";
+      const starBtn = document.createElement("button"); starBtn.type = "button"; starBtn.className = "star-btn" + (st.star ? " on" : ""); starBtn.textContent = "★"; starBtn.title = st.star ? "取消收藏" : "收藏";
+      starBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); feedState[kw] = feedState[kw] || {}; feedState[kw].star = !feedState[kw].star; saveFeedState(); renderFeed(); };
+      const pinBtn = document.createElement("button"); pinBtn.type = "button"; pinBtn.className = "pin-btn" + (st.top ? " on" : ""); pinBtn.textContent = "📌"; pinBtn.title = st.top ? "取消置顶" : "置顶";
+      pinBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); feedState[kw] = feedState[kw] || {}; feedState[kw].top = !feedState[kw].top; saveFeedState(); renderFeed(); };
+      acts.append(starBtn, pinBtn);
+      a.appendChild(acts);
       wrap.appendChild(a);
     });
     grid.appendChild(wrap);
@@ -1694,9 +2728,11 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   }
   renderFeedTabs();
   const feedRefresh = document.getElementById("feed-refresh");
-  if (feedRefresh) feedRefresh.onclick = function () { renderFeed(); };
+  if (feedRefresh) feedRefresh.onclick = guardClick(function () { renderFeed(); }, 1000);
   const feedNext = document.getElementById("feed-next");
-  if (feedNext) feedNext.onclick = function () { feedPool = (feedPool + 1) % FEED_CATS[feedCat].pools.length; renderFeed(); };
+  if (feedNext) feedNext.onclick = guardClick(function () { feedPool = (feedPool + 1) % FEED_CATS[feedCat].pools.length; renderFeed(); }, 600);
+  const feedSearchEl = $("#feed-search");
+  if (feedSearchEl) feedSearchEl.addEventListener("input", function () { feedSearch = feedSearchEl.value; renderFeed(); });
   // 进入精神食粮视图时即时渲染（无网络依赖，秒开）
   const feedView = document.getElementById("view-feed");
   if (feedView && "MutationObserver" in window) {
@@ -1714,6 +2750,10 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
 
 /* ===================== 教育口播短视频资料库 ===================== */
 (function () {
+  var eduSearch = "";
+  var eduBlogState = {};
+  try { eduBlogState = JSON.parse(localStorage.getItem("wb_edu_blogstar") || "{}"); } catch (e) { eduBlogState = {}; }
+  function saveEduBlogState() { try { localStorage.setItem("wb_edu_blogstar", JSON.stringify(eduBlogState)); } catch (e) {} }
   var EDU_CHANNELS = [
     { group: "📺 B 站账号", items: [
       { name: "南门录像厅", platform: "B站", kw: "剪辑 思路 拉片" },
@@ -1819,11 +2859,17 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   function buildChannel() {
     var wrap = document.createElement("div");
     EDU_CHANNELS.forEach(function (g) {
+      var items = g.items;
+      if (eduSearch) {
+        var q = eduSearch.toLowerCase();
+        items = items.filter(function (it) { return (it.name + it.platform + it.kw).toLowerCase().indexOf(q) >= 0; });
+      }
+      if (!items.length) return;
       var acc = document.createElement("div"); acc.className = "acc";
       var head = document.createElement("div"); head.className = "acc-head";
       head.innerHTML = '<span>' + esc(g.group) + '</span><span class="chev">▾</span>';
       var body = document.createElement("div"); body.className = "acc-body";
-      g.items.forEach(function (it) {
+      items.forEach(function (it) {
         var row = document.createElement("div"); row.className = "edu-account";
         row.innerHTML =
           '<div class="edu-account-info"><div class="edu-blog-name">' + esc(it.name) + '</div>' +
@@ -1841,12 +2887,19 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   function buildTrain() {
     var wrap = document.createElement("div");
     EDU_TRAIN.forEach(function (t) {
+      var items = t.items;
+      if (eduSearch) {
+        var q = eduSearch.toLowerCase();
+        if ((t.title + " " + t.items.join(" ")).toLowerCase().indexOf(q) < 0) return;
+        items = items.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; });
+        if (!items.length) items = t.items;
+      }
       var acc = document.createElement("div"); acc.className = "acc";
       var head = document.createElement("div"); head.className = "acc-head";
       head.innerHTML = '<span>' + esc(t.title) + '</span><span class="chev">▾</span>';
       var body = document.createElement("div"); body.className = "acc-body";
       var ul = document.createElement("ul"); ul.className = "edu-ul";
-      t.items.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+      items.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
       body.appendChild(ul);
       acc.append(head, body);
       head.onclick = function () { acc.classList.toggle("open"); };
@@ -1857,11 +2910,18 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
 
   function buildCheck() {
     var wrap = document.createElement("div");
+    var items = EDU_CHECK;
+    if (eduSearch) {
+      var q = eduSearch.toLowerCase();
+      if (EDU_CHECK.join(" ").toLowerCase().indexOf(q) < 0) return wrap;
+      items = EDU_CHECK.filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; });
+      if (!items.length) items = EDU_CHECK;
+    }
     var acc = document.createElement("div"); acc.className = "acc";
     var head = document.createElement("div"); head.className = "acc-head";
     head.innerHTML = '<span>教育口播剪辑自查清单</span><span class="chev">▾</span>';
     var body = document.createElement("div"); body.className = "acc-body";
-    EDU_CHECK.forEach(function (x, i) {
+    items.forEach(function (x, i) {
       var id = "ck" + i;
       var lab = document.createElement("label"); lab.className = "edu-check";
       lab.innerHTML = '<input type="checkbox" ' + (checkSet[id] ? "checked" : "") + '><span>' + esc(x) + '</span>';
@@ -1882,6 +2942,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   function buildAssets() {
     var wrap = document.createElement("div");
     EDU_ASSETS.forEach(function (a) {
+      if (eduSearch && (a.title + " " + a.html).toLowerCase().indexOf(eduSearch.toLowerCase()) < 0) return;
       var acc = document.createElement("div"); acc.className = "acc";
       var head = document.createElement("div"); head.className = "acc-head";
       head.innerHTML = '<span>' + esc(a.title) + '</span><span class="chev">▾</span>';
@@ -1947,22 +3008,34 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   function renderBloggers() {
     const box = document.getElementById("edu-bloggers");
     if (!box) return;
+    const q = eduSearch.trim().toLowerCase();
     const groups = [
       { key: "douyin", label: "抖音博主（手机端点击直接唤起抖音 APP）" },
       { key: "bili", label: "B 站博主（手机端点击直接唤起 B 站 APP）" }
     ];
-    box.innerHTML = groups.map(function (g) {
-      const list = BLOGGERS[g.key];
+    let html = "";
+    groups.forEach(function (g) {
+      let list = BLOGGERS[g.key].slice().sort(function (a, b) {
+        const ta = (eduBlogState[a.name] && eduBlogState[a.name].top) ? 1 : 0;
+        const tb = (eduBlogState[b.name] && eduBlogState[b.name].top) ? 1 : 0;
+        return tb - ta;
+      });
+      if (q) list = list.filter(function (b) { return b.name.toLowerCase().indexOf(q) >= 0 || (b.study || "").toLowerCase().indexOf(q) >= 0; });
+      if (!list.length) return;
       const rows = list.map(function (b) {
+        const st = eduBlogState[b.name] || {};
         const scheme = g.key === "bili" ? "bilibili://" : "snssdk1128://";
         const web = (g.key === "bili"
           ? "https://www.bilibili.com/search?keyword="
           : "https://www.douyin.com/search?keyword=") + encodeURIComponent(b.search);
         const jump = '<button class="edu-blogger-jump" data-scheme="' + scheme + '" data-web="' + web + '" data-name="' + b.name + '"><span>🚀</span><span>打开' + (g.key === "bili" ? "B站" : "抖音") + ' · ' + b.name + '</span></button>';
-        return '<div class="edu-blogger-row"><div class="edu-blogger-name">' + b.name + '</div><div class="edu-blogger-study"><span class="edu-chk" aria-hidden="true">✅</span> ' + b.study + '</div><div class="edu-blogger-actions">' + jump + '</div></div>';
+        const star = '<button class="star-btn' + (st.star ? " on" : "") + '" data-blog="' + b.name + '" data-act="star" type="button">★</button>';
+        const pin = '<button class="pin-btn' + (st.top ? " on" : "") + '" data-blog="' + b.name + '" data-act="pin" type="button">📌</button>';
+        return '<div class="edu-blogger-row"><div class="edu-blogger-name">' + (st.top ? "📌 " : "") + b.name + '</div><div class="edu-blogger-study"><span class="edu-chk" aria-hidden="true">✅</span> ' + b.study + '</div><div class="edu-blogger-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' + jump + star + pin + '</div></div>';
       }).join("");
-      return '<div class="edu-blogger-group" data-key="' + g.key + '"><div class="edu-blogger-group-head">' + g.label + '</div>' + rows + '</div>';
-    }).join("");
+      html += '<div class="edu-blogger-group" data-key="' + g.key + '"><div class="edu-blogger-group-head">' + g.label + '</div>' + rows + '</div>';
+    });
+    box.innerHTML = html || '<div class="empty">没有匹配「' + eduSearch.trim() + '」的博主</div>';
   }
 
 
@@ -1973,11 +3046,33 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
     renderBloggers();
   }
   initEdu();
+  const eduSearchEl = $("#edu-search");
+  if (eduSearchEl) eduSearchEl.addEventListener("input", function () { eduSearch = eduSearchEl.value; renderEdu(); renderBloggers(); showEduPanel(); });
+  document.addEventListener("click", function (e) {
+    var s = e.target && e.target.closest ? e.target.closest("[data-blog]") : null;
+    if (!s) return;
+    var name = s.getAttribute("data-blog"); var act = s.getAttribute("data-act");
+    if (!name || !act) return;
+    e.preventDefault(); e.stopPropagation();
+    eduBlogState[name] = eduBlogState[name] || {};
+    eduBlogState[name][act] = !eduBlogState[name][act];
+    saveEduBlogState(); renderBloggers();
+  });
   window.goEduTab = function (i) {
     try { eduTab = (typeof i === "number") ? i : 0; renderEduTabs(); showEduPanel(); } catch (e) {}
     var t = document.querySelector('.tab[data-view="edu"]'); if (t) t.click();
   };
 
+  /* 版本角标：用于确认各设备加载的是否为最新版本（清缓存后右下角应显示该版本号） */
+  (function () {
+    var d = document.createElement("div");
+    d.className = "v-badge";
+    d.textContent = "v" + BUILD;
+    d.style.cssText = "position:fixed;right:6px;bottom:6px;font-size:10px;color:rgba(0,0,0,.22);z-index:1;user-select:none;-webkit-user-select:none;pointer-events:none;";
+    document.body.appendChild(d);
+  })();
+
+})();
 })();
 
 </script>
