@@ -1166,7 +1166,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ 
   window.addEventListener("error", function (e) {
     try { var m = (e && e.message) ? e.message : "未知脚本错误"; if (typeof showToast === "function") showToast("⚠️ " + m); } catch (_) {}
   });
-  const BUILD = "20260803t";
+  const BUILD = "20260803u";
   const store = {
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
     set(k, v, silent) { localStorage.setItem(k, JSON.stringify(v)); if (!silent && Sync.ready) Sync.schedulePush(); }
